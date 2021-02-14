@@ -138,7 +138,6 @@
     <ClCompile Include="PMC.c" />
     <ClCompile Include="StateMachine.c" />
     <ClCompile Include="VirtualContext.c" />
-    <ClCompile Include="VirtualContext.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

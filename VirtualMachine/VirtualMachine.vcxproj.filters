@@ -26,7 +26,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.c" />
-    <ClCompile Include="VirtualContext.cpp" />
     <ClCompile Include="StateMachine.c">
       <Filter>Parser\StateMachine</Filter>
     </ClCompile>
