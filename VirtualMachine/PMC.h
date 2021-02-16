@@ -8,12 +8,14 @@
  */
 typedef enum _EParrotMagicCookieType
 {
-	EPMCT_Integer,
-	EPMCT_Float,
-	EPMCT_String,
-	EPMCT_HashTable,
-	EPMCT_List
+	EPMCT_INTEGER,
+	EPMCT_FLOAT,
+	EPMCT_STRING,
+	EPMCT_HASHTABLE,
+	EPMCT_LIST
 } EParrotMagicCookieType, *PEParrotMagicCookieType;
+
+
 
 typedef struct _SParrotMagicCookie
 {

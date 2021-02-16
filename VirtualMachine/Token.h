@@ -8,7 +8,7 @@ typedef enum _EToken
 	ET_STRING			= 1 << 2
 } EToken, *PEToken;
 
-typedef enum _EMemoryType
+typedef enum _ETokenType
 {
 	EMT_I				= 1 << 0,
 	EMT_N				= 1 << 1,
@@ -19,13 +19,19 @@ typedef enum _EMemoryType
 
 	EMT_MARKER			= 1 << 5,
 
-	EMT_LITERAL			= 1 << 6
-} EMemoryType, *PEMemoryType;
+	EMT_STRING_LITERAL	= 1 << 6,
+	EMT_NUMBER_LITERAL  = 1 << 7,
+
+	EMT_PMC_TYPE		= 1 << 8
+} ETokenType, *PETokenType;
+
+
 
 #define ALL_MEMORY_MASK			0x0000001F
 #define REGISTERS_MASK			0x0000000F
 #define VIRTUAL_MEMORY_ONLY		0x00000010
-#define REGISTERS_AND_LITERAL	0x00000079
-
+#define ALL_LITERAL_MASK		0x000000C0
+#define REGISTERS_AND_LITERAL	0x000000CF
+#define ALL_NUMBER_MASK			0x0000008B
 
 #endif

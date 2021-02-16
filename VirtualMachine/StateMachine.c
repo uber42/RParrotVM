@@ -35,57 +35,117 @@ static const SStateMahcineCommand commands[][16] =
 	{ -1 ,	"end",		0x6A8E75AA }
 };
 
+static const SMiddleStateLayer set_table[] =
+{
+	{ EMT_VIRTUAL_MEMORY, REGISTERS_MASK | ALL_LITERAL_MASK,	{ .nNextState = -1 },		14,		 1,	ENST_NUMBER },
+	{ EMT_I, EMT_I | EMT_P | EMT_NUMBER_LITERAL,				{ .nNextState = -1 },		14,		 1,	ENST_NUMBER	},
+	{ EMT_N, EMT_N | EMT_P | EMT_NUMBER_LITERAL,				{ .nNextState = -1 },		14,		 1,	ENST_NUMBER	},
+	{ EMT_S, EMT_N | EMT_P | EMT_NUMBER_LITERAL,				{ .nNextState = -1 },		14,		 1,	ENST_NUMBER	},
+	{ EMT_P, ALL_MEMORY_MASK,									{ .nNextState = -1 },		14,		 1,	ENST_NUMBER }
+};
+
+static const SMiddleStateLayer math_table[] =
+{
+	{ EMT_I, EMT_I | EMT_NUMBER_LITERAL, { .sTable = &math_table },		15,		1, ENST_TABLE },
+	{ EMT_N, EMT_N | EMT_NUMBER_LITERAL, { .sTable = &math_table },		15,		1, ENST_TABLE },
+	{ EMT_P, EMT_P | EMT_NUMBER_LITERAL, { .sTable = &math_table },		15,		1, ENST_TABLE },
+	{ EMT_NUMBER_LITERAL, -1,			 { .nNextState = -1		 },		15,		1, ENST_NUMBER }
+};
 
 static const SStateMachineTransition transition_1[] =
 {
-	{ EMT_P,					0,		0,		0	},
-	{ ALL_MEMORY_MASK,			1,		-1,		0	},
+	{ EMT_P,						{ .nNextState = 0			},		0,		0,		ENST_NUMBER },		// new [REG], [PMC_TYPE]
+	{ ALL_MEMORY_MASK,				{ .sTable	  = &set_table	},		-1,		0,		ENST_TABLE	},		// set [REG, MEM], [REG, MEM]
 
-	{ EMT_I | EMT_N | EMT_P,	-1,		1,		1	},
-	{ EMT_I | EMT_N | EMT_P,	-1,		1,		1	},
-	{ EMT_I | EMT_N | EMT_P,	2,		2,		0	},
-	{ EMT_I | EMT_N | EMT_P,	3,		3,		0	},
-	{ EMT_I | EMT_N | EMT_P,	4,		4,		0	},
-	{ EMT_I | EMT_N | EMT_P,	5,		5,		0	},
+	{ EMT_I | EMT_N | EMT_P,		{ .nNextState = -1			},		1,		1,		ENST_NUMBER },		// inc [REG]
+	{ EMT_I | EMT_N | EMT_P,		{ .nNextState = -1			},		1,		1,		ENST_NUMBER },		// dec [REG]
+	{ EMT_I | EMT_N | EMT_P,		{ .sTable	  = &math_table	},		2,		0,		ENST_TABLE  },		// add [REG], [REG, NUMBER_LITERAL]!, [REG, NUMBER_LITERAL]
+	{ EMT_I | EMT_N | EMT_P,		{ .sTable	  = &math_table	},		3,		0,		ENST_TABLE  },		// sub [REG], [REG, NUMBER_LITERAL]!, [REG, NUMBER_LITERAL]
+	{ EMT_I | EMT_N | EMT_P,		{ .sTable	  = &math_table	},		4,		0,		ENST_TABLE	},		// mul [REG], [REG, NUMBER_LITERAL]!, [REG, NUMBER_LITERAL]
+	{ EMT_I | EMT_N | EMT_P,		{ .sTable	  = &math_table	},		5,		0,		ENST_TABLE	},		// div [REG], [REG, NUMBER_LITERAL]!, [REG, NUMBER_LITERAL]
 
-	{ EMT_S | EMT_P,			-1,		6,		1	},
-	{ EMT_S | EMT_P,			6,		7,		0	},
-	{ EMT_S | EMT_P,			7,		8,		0	},
+	{ EMT_I | EMT_P,				{ .nNextState = 1			},		6,		0,		ENST_NUMBER	},		// length [REG], [REG, STRING_LITERAL]
+	{ EMT_S | EMT_P,				{ .nNextState = 2			},		7,		0,		ENST_NUMBER	},		// concat [REG], [REG, STRING_LITERAL]
+	{ EMT_S | EMT_P,				{ .nNextState = 3			},		8,		0,		ENST_NUMBER	},		// substr [REG], [REG, STRING_LITERAL], [REG, NUMBER_LITERAL], [REG, NUMBER_LITERAL]
 
-	{ EMT_MARKER,				-1,		9,		1	},
-	{ EMT_I,					8,		10,		0	},
-	{ REGISTERS_MASK,			9,		11,		0	},
-	{ REGISTERS_MASK,			9,		11,		0	},
-	{ REGISTERS_MASK,			9,		11,		0	},
-	{ REGISTERS_MASK,			9,		11,		0	},
+	{ EMT_MARKER,					{ .nNextState = -1			},		9,		1,		ENST_NUMBER	},		// branch [MARKER]
+	{ EMT_I | EMT_NUMBER_LITERAL,	{ .nNextState = 4			},		10,		0,		ENST_NUMBER	},		// if [REG, NUMBER_LITERAL], [MARKER], [MARKER]
+	{ REGISTERS_AND_LITERAL,		{ .nNextState = 5			},		11,		0,		ENST_NUMBER	},		// ne [REG, ANY_LITERAL], [REG, ANY_LITERAL], [MARKER], [MARKER]
+	{ REGISTERS_AND_LITERAL,		{ .nNextState = 6			},		11,		0,		ENST_NUMBER	},		// eq [REG, ANY_LITERAL], [REG, ANY_LITERAL], [MARKER], [MARKER]
+	{ REGISTERS_AND_LITERAL,		{ .nNextState = 7			},		11,		0,		ENST_NUMBER	},		// gt [REG, ANY_LITERAL], [REG, ANY_LITERAL], [MARKER], [MARKER]
+	{ REGISTERS_AND_LITERAL,		{ .nNextState = 8			},		11,		0,		ENST_NUMBER	},		// lt [REG, ANY_LITERAL], [REG, ANY_LITERAL], [MARKER], [MARKER]
 
-	{ EMT_MARKER,				-1,		9,		1	},
+	{ EMT_MARKER,					{ .nNextState = -1			},		9,		1,		ENST_NUMBER	},		// bsr [MARKER]
 
-	{ REGISTERS_AND_LITERAL,	-1,		12,		1	},
+	{ REGISTERS_AND_LITERAL,		{ .nNextState = -1			},		12,		1,		ENST_NUMBER	},		// print [REG, ANY_LITERAL]
 
-	{ REGISTERS_AND_LITERAL,	-1,		13,		1	},
-	{ REGISTERS_MASK,			-1,		13,		1	},
+	{ REGISTERS_AND_LITERAL,		{ .nNextState = -1			},		13,		1,		ENST_NUMBER	},		// push [REG, ANY_LITERAL]
+	{ REGISTERS_MASK,				{ .nNextState = -1			},		13,		1,		ENST_NUMBER	},		// pop  [REG]
 };
+
+static const SStateMachineTransition transition_2[] =
+{
+	{ EMT_PMC_TYPE,					{ .nNextState = -1 },		16,		1,		ENST_NUMBER },				// new
+
+	{ EMT_S | EMT_STRING_LITERAL,	{ .nNextState = -1 },		17,		1,		ENST_NUMBER },				// length
+	{ EMT_S | EMT_STRING_LITERAL,	{ .nNextState = -1 },		18,		1,		ENST_NUMBER },				// concat
+	{ EMT_S | EMT_STRING_LITERAL,	{ .nNextState = 0  },		19,		0,		ENST_NUMBER },				// substr
+
+	{ REGISTERS_AND_LITERAL,		{ .nNextState = 1  },		20,		0,		ENST_NUMBER	},				// if
+	{ REGISTERS_AND_LITERAL,		{ .nNextState = 1  },		20,		0,		ENST_NUMBER	},				// ne
+	{ REGISTERS_AND_LITERAL,		{ .nNextState = 1  },		20,		0,		ENST_NUMBER	},				// eq
+	{ REGISTERS_AND_LITERAL,		{ .nNextState = 1  },		20,		0,		ENST_NUMBER	},				// gt
+	{ REGISTERS_AND_LITERAL,		{ .nNextState = 1  },		20,		0,		ENST_NUMBER	}				// lt
+};
+
+static const SStateMachineTransition transition_3[] =
+{
+	{ EMT_I | EMT_NUMBER_LITERAL,	{ .nNextState = 0 },		21,		0,		ENST_NUMBER },				// substr
+	{ EMT_MARKER,					{ .nNextState = 1 },		22,		1,		ENST_NUMBER }				// if, ne, eq, gt, lt
+};
+
+static const SStateMachineTransition transition_4[] =
+{
+	{ EMT_I | EMT_NUMBER_LITERAL,	{ .nNextState = -1 },		21,		1,		ENST_NUMBER },				// substr
+	{ EMT_MARKER,					{ .nNextState = -1 },		22,		1,		ENST_NUMBER }				// if, ne, eq, gt, lt
+};
+
+int getNextState()
+{
+	return transition_1[0].uNextState.nNextState;
+}
 
 static const char errorMessages[][STRING_MAX_LENGTH] =
 {
-	"Команда new предназначена только для регистов P",
+	"Команда new предназначена только для регистов P",							// 0
 
-	"Инкремент производится только для числовых регистров",
-	"Декремент производится только для числовых регистров",
-	"Сложение выполняется только для числовых значений",
-	"Вычитание выполняется только для числовых значений",
-	"Умножение выполняется только для числовых значений",
-	"Деление выполняется только для числовых значений",
+	"Инкремент производится только для числовых регистров",						// 1
+	"Декремент производится только для числовых регистров",						// 2
+	"Сложение выполняется только для числовых значений",						// 3
+	"Вычитание выполняется только для числовых значений",						// 4
+	"Умножение выполняется только для числовых значений",						// 5
+	"Деление выполняется только для числовых значений",							// 6
 
-	"Длина вычисляется только для строк",
-	"Конкатенация выполняется только для строк",
-	"Оператор подстроки может принимать только строку для параметра",
+	"Длина строки должна записываться в регистр",								// 7
+	"Конкатенация выполняется только для строк",								// 8
+	"Оператор подстроки может принимать только строку для параметра",			// 9
 
-	"Должна быть указана метка",
-	"Для условия принимается целочисленное значение",
-	"Для условия может приниматься только регистр",
+	"Должна быть указана метка",												// 10
+	"Для условия принимается целочисленное значение",							// 11
+	"Для условия может приниматься только регистр",								// 12
 
-	"В стек можно добавить только значение или регистр",
-	"Из стека можно записать только в регистр"
-}
+	"В стек можно добавить только значение или регистр",						// 13
+	"Из стека можно записать только в регистр",									// 14
+
+	"Ошибка set",																// 15
+	"Ошибка арифметической операции",											// 16
+
+	"Оператор длины строки должен принимать строку или строковый регистр",		// 17
+	"Оператор конкатенации должен принимать строку или строковый регистр",		// 18
+
+	"Оператор подстроки должен принимать строку или строковый регистр",			// 19
+	"Условие должно принимать число или числовой регистр",						// 20
+
+	"Оператор подстроки должен принимать строку или строковый регистр",			// 21
+	"Оператор условия должен содержать маркер"									// 22
+};
