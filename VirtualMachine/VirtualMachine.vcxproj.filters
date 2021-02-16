@@ -23,6 +23,9 @@
     <ClInclude Include="Token.h">
       <Filter>Parser</Filter>
     </ClInclude>
+    <ClInclude Include="Lexer.h">
+      <Filter>Parser\Lexer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.c" />
@@ -37,6 +40,9 @@
     </ClCompile>
     <ClCompile Include="PMC.c">
       <Filter>Core\ParrotMagicCookie</Filter>
+    </ClCompile>
+    <ClCompile Include="Lexer.c">
+      <Filter>Parser\Lexer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -54,6 +60,9 @@
     </Filter>
     <Filter Include="Core\ParrotMagicCookie">
       <UniqueIdentifier>{1f2721af-80fd-4372-a46b-b6bf0086d155}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Parser\Lexer">
+      <UniqueIdentifier>{625a6916-36df-4cbd-8588-e98eb5848722}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

@@ -5,18 +5,21 @@
 typedef struct _SStateMachineCommand
 {
 	/** Код операции */
-	u16 nOpCode;
+	WORD	nOpCode;
 
 	/** Имя */
-	i8	szName[STRING_MAX_LENGTH];
+	CHAR	szName[STRING_MAX_LENGTH];
 
 	/** Хэш (FNV1-A) */
-	u32	dwHash;
+	DWORD	dwHash;
 } SStateMahcineCommand, *PSStateMachineCommand;
 
 typedef enum _ENextStateType
 {
+	/** Номер перехода */
 	ENST_NUMBER,
+
+	/** Таблица переходов */
 	ENST_TABLE
 } ENextStateType, *PENextStateType;
 
@@ -32,17 +35,17 @@ typedef struct _SMiddleStateLayer
 	union
 	{
 		/** Переход на следующую таблицу */
-		u16 nNextState;
+		WORD nNextState;
 
 		/** Переход на список состояний */
 		struct _SMiddleStateLayer* sTable;
 	} uNextState;
 
 	/** Номер ошибки (Если закончилось без ошибки то 0) */
-	u16						nErrorNumber;
+	WORD					nErrorNumber;
 
 	/** Конец или нет */
-	u8						bMayEnd;
+	BOOL					bMayEnd;
 
 	/** Тип перехода */
 	ENextStateType			eTransitionType;
@@ -57,22 +60,21 @@ typedef struct _SStateMachineTransition
 	union
 	{
 		/** Переход на следующую таблицу */
-		u16					nNextState;
+		WORD				nNextState;
 
 		/** Переход на список состояний */
 		SMiddleStateLayer*	sTable;
 	} uNextState;
 
 	/** Номер ошибки (Если закончилось без ошибки то 0) */
-	u16						nErrorNumber;
+	WORD					nErrorNumber;
 
 	/** Конец или нет */
-	u8						bMayEnd;
+	BOOL					bMayEnd;
 
 	/** Тип перехода */
 	ENextStateType			eTransitionType;
 } SStateMachineTransition, *PSStateMachineTransition;
 
-int getNextState();
 
 #endif

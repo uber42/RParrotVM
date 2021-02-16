@@ -185,9 +185,6 @@ ListCutPosition(
 
 #define LIST_FIRST(head) ((head)->pFlink)
 
-#define CONTAINING_RECORD(address, type, field) \
-        ((type *)((char *)(address) - (char *)(&((type *)0)->field)))
-
 #define LIST_FIRST_ENTRY(head, type, member)    \
         CONTAINING_RECORD((head)->pFlink, type, member)
 

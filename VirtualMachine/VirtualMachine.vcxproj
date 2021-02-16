@@ -125,6 +125,7 @@
   <ItemGroup>
     <ClInclude Include="Fnv1a.h" />
     <ClInclude Include="global.h" />
+    <ClInclude Include="Lexer.h" />
     <ClInclude Include="List.h" />
     <ClInclude Include="PMC.h" />
     <ClInclude Include="StateMachine.h" />
@@ -134,6 +135,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Fnv1a.c" />
+    <ClCompile Include="Lexer.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="PMC.c" />
     <ClCompile Include="StateMachine.c" />
