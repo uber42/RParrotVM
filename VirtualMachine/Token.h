@@ -15,7 +15,11 @@ typedef enum _ETokenType
 	EMT_STRING_LITERAL	= 1 << 6,
 	EMT_NUMBER_LITERAL  = 1 << 7,
 
-	EMT_PMC_TYPE		= 1 << 8,
+	PMC_INTEGER			= 1 << 8,
+	PMC_FLOAT			= 1 << 9,
+	PMC_STRING			= 1 << 10,
+	PMC_LIST			= 1 << 11,
+	PMC_HASHTABLE		= 1 << 12,
 
 	EMT_COMMAND			= ~((WORD)-1)
 } ETokenType, *PETokenType;
@@ -26,6 +30,7 @@ typedef enum _ETokenType
 #define ALL_LITERAL_MASK		0x000000C0
 #define REGISTERS_AND_LITERAL	0x000000CF
 #define ALL_NUMBER_MASK			0x0000008B
+#define PMC_TYPE_MASK			0x00001F00
 
 
 //static struct

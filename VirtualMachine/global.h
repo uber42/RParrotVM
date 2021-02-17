@@ -5,6 +5,8 @@
 
 #include <stdio.h>
 #include <Windows.h>
+#include <string.h>
+#include <assert.h>
 
 #include "Types.h"
 #include "List.h"
@@ -13,7 +15,10 @@
 #include "Token.h"
 #include "PMC.h"
 #include "VirtualContext.h"
+#include "Lexer.h"
 #include "StateMachine.h"
 
+
+#include "LexerTest.h"
 
 #endif

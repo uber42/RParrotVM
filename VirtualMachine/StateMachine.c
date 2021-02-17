@@ -85,7 +85,7 @@ static const SStateMachineTransition transition_1[] =
 
 static const SStateMachineTransition transition_2[] =
 {
-	{ EMT_PMC_TYPE,					{ .nNextState = -1 },		16,		1,		ENST_NUMBER },				// new
+	{ PMC_TYPE_MASK,					{ .nNextState = -1 },		16,		1,		ENST_NUMBER },				// new
 
 	{ EMT_S | EMT_STRING_LITERAL,	{ .nNextState = -1 },		17,		1,		ENST_NUMBER },				// length
 	{ EMT_S | EMT_STRING_LITERAL,	{ .nNextState = -1 },		18,		1,		ENST_NUMBER },				// concat

@@ -26,6 +26,9 @@
     <ClInclude Include="Lexer.h">
       <Filter>Parser\Lexer</Filter>
     </ClInclude>
+    <ClInclude Include="LexerTest.h">
+      <Filter>Parser\Lexer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.c" />
@@ -42,6 +45,9 @@
       <Filter>Core\ParrotMagicCookie</Filter>
     </ClCompile>
     <ClCompile Include="Lexer.c">
+      <Filter>Parser\Lexer</Filter>
+    </ClCompile>
+    <ClCompile Include="LexerTest.c">
       <Filter>Parser\Lexer</Filter>
     </ClCompile>
   </ItemGroup>

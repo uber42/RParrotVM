@@ -5,7 +5,7 @@
 
 int main()
 {
-	printf("%d", CommandMatch[0].szName);
+	LexerCommandsTest();
 
 	//system("PAUSE");
 }
