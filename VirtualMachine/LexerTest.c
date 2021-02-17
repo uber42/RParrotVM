@@ -94,4 +94,23 @@ LexerCommandsTest()
 	assert(sContainer.eToken[0] == EMT_COMMAND);
 	assert(sContainer.eToken[1] == EMT_P);
 	assert(sContainer.eToken[2] == PMC_HASHTABLE);
+
+	memset(&sContainer, 0, sizeof(SLexemeContainer));
+	bResult = PrepareCommand("if I0, MARKER_FIRST, MARKER_SECOND", &sContainer);
+	assert(bResult);
+	assert(sContainer.dwCount == 4);
+	assert(sContainer.eToken[0] == EMT_COMMAND);
+	assert(sContainer.eToken[1] == EMT_I);
+	assert(sContainer.eToken[2] == EMT_MARKER);
+	assert(sContainer.eToken[3] == EMT_MARKER);
+
+	memset(&sContainer, 0, sizeof(SLexemeContainer));
+	bResult = PrepareCommand("lt I0, 556, MARKER_FIRST, MARKER_SECOND", &sContainer);
+	assert(bResult);
+	assert(sContainer.dwCount == 5);
+	assert(sContainer.eToken[0] == EMT_COMMAND);
+	assert(sContainer.eToken[1] == EMT_I);
+	assert(sContainer.eToken[2] == EMT_NUMBER_LITERAL);
+	assert(sContainer.eToken[3] == EMT_MARKER);
+	assert(sContainer.eToken[4] == EMT_MARKER);
 }

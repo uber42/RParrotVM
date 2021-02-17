@@ -49,6 +49,8 @@ PrepareCommand(
 
 	for (DWORD i = 0; i < dwLength; i++)
 	{
+		CHAR c = pszCommandLine[i];
+
 		/** Пропускаем пробелы и запятые */
 		if (CheckWhiteSpace(pszCommandLine[i]))
 		{
@@ -191,81 +193,105 @@ PrepareCommand(
 
 			i = j;
 		}
-		/** Целочисленные регистры */
-		else if (pszCommandLine[i] == 'I')
+		/** Маркеры и регистры */
+		else if (isalpha(pszCommandLine[i]))
 		{
-			if (pszCommandLine[i + 1] < '0' || pszCommandLine[i + 1] > '3')
+			DWORD j = i;
+			for (; j < dwLength && !CheckWhiteSpace(pszCommandLine[j]); j++);
+
+			/** Маркеры */
+			if (j - 1 - i > 2)
 			{
-				return FALSE;
-			}
+				for (DWORD k = i; k < j; k++)
+				{
+					if (!isalpha(pszCommandLine[k]) && pszCommandLine[k] != '_')
+					{
+						return FALSE;
+					}
+				}
 
-			if (i + 2 != dwLength && !CheckWhiteSpace(pszCommandLine[i + 2]))
+				memset(psLexemeContainer->szLexemes[dwCurrentCount], 0, STRING_MAX_LENGTH);
+				memcpy(psLexemeContainer->szLexemes[dwCurrentCount], pszCommandLine + i, j - i);
+				psLexemeContainer->eToken[dwCurrentCount] = EMT_MARKER;
+
+				i = j - 1;
+			}
+			/** Целочисленные регистры */
+			else if (pszCommandLine[i] == 'I')
 			{
-				return FALSE;
+				if (pszCommandLine[i + 1] < '0' || pszCommandLine[i + 1] > '3')
+				{
+					return FALSE;
+				}
+
+				if (i + 2 != dwLength && !CheckWhiteSpace(pszCommandLine[i + 2]))
+				{
+					return FALSE;
+				}
+
+				memset(psLexemeContainer->szLexemes[dwCurrentCount], 0, STRING_MAX_LENGTH);
+				memcpy(psLexemeContainer->szLexemes[dwCurrentCount], pszCommandLine + i, 2);
+				psLexemeContainer->eToken[dwCurrentCount] = EMT_I;
+
+				i++;
 			}
-
-			memset(psLexemeContainer->szLexemes[dwCurrentCount], 0, STRING_MAX_LENGTH);
-			memcpy(psLexemeContainer->szLexemes[dwCurrentCount], pszCommandLine + i, 2);
-			psLexemeContainer->eToken[dwCurrentCount] = EMT_I;
-
-			i++;
-		}
-		/** Регистры чисел с плавающей запятой */
-		else if (pszCommandLine[i] == 'N')
-		{
-			if (pszCommandLine[i + 1] < '0' || pszCommandLine[i + 1] > '3')
+			/** Регистры чисел с плавающей запятой */
+			else if (pszCommandLine[i] == 'N')
 			{
-				return FALSE;
-			}
+				if (pszCommandLine[i + 1] < '0' || pszCommandLine[i + 1] > '3')
+				{
+					return FALSE;
+				}
 
-			if (i + 2 != dwLength && !CheckWhiteSpace(pszCommandLine[i + 2]))
+				if (i + 2 != dwLength && !CheckWhiteSpace(pszCommandLine[i + 2]))
+				{
+					return FALSE;
+				}
+
+				memset(psLexemeContainer->szLexemes[dwCurrentCount], 0, STRING_MAX_LENGTH);
+				memcpy(psLexemeContainer->szLexemes[dwCurrentCount], pszCommandLine + i, 2);
+				psLexemeContainer->eToken[dwCurrentCount] = EMT_N;
+
+				i++;
+			}
+			/** Строковые регистры */
+			else if (pszCommandLine[i] == 'S')
 			{
-				return FALSE;
+				if (pszCommandLine[i + 1] < '0' || pszCommandLine[i + 1] > '3')
+				{
+					return FALSE;
+				}
+
+				if (i + 2 != dwLength && !CheckWhiteSpace(pszCommandLine[i + 2]))
+				{
+					return FALSE;
+				}
+
+				memset(psLexemeContainer->szLexemes[dwCurrentCount], 0, STRING_MAX_LENGTH);
+				memcpy(psLexemeContainer->szLexemes[dwCurrentCount], pszCommandLine + i, 2);
+				psLexemeContainer->eToken[dwCurrentCount] = EMT_S;
+
+				i++;
 			}
-
-			memset(psLexemeContainer->szLexemes[dwCurrentCount], 0, STRING_MAX_LENGTH);
-			memcpy(psLexemeContainer->szLexemes[dwCurrentCount], pszCommandLine + i, 2);
-			psLexemeContainer->eToken[dwCurrentCount] = EMT_N;
-
-			i++;
-		}
-		/** Строковые регистры */
-		else if (pszCommandLine[i] == 'S')
-		{
-			if (pszCommandLine[i + 1] < '0' || pszCommandLine[i + 1] > '3')
+			/** PMC регистры */
+			else if (pszCommandLine[i] == 'P')
 			{
-				return FALSE;
+				if (pszCommandLine[i + 1] < '0' || pszCommandLine[i + 1] > '3')
+				{
+					return FALSE;
+				}
+
+				if (i + 2 != dwLength && !CheckWhiteSpace(pszCommandLine[i + 2]))
+				{
+					return FALSE;
+				}
+
+				memset(psLexemeContainer->szLexemes[dwCurrentCount], 0, STRING_MAX_LENGTH);
+				memcpy(psLexemeContainer->szLexemes[dwCurrentCount], pszCommandLine + i, 2);
+				psLexemeContainer->eToken[dwCurrentCount] = EMT_P;
+
+				i++;
 			}
-
-			if (i + 2 != dwLength && !CheckWhiteSpace(pszCommandLine[i + 2]))
-			{
-				return FALSE;
-			}
-
-			memset(psLexemeContainer->szLexemes[dwCurrentCount], 0, STRING_MAX_LENGTH);
-			memcpy(psLexemeContainer->szLexemes[dwCurrentCount], pszCommandLine + i, 2);
-			psLexemeContainer->eToken[dwCurrentCount] = EMT_S;
-
-			i++;
-		}
-		/** PMC регистры */
-		else if (pszCommandLine[i] == 'P')
-		{
-			if (pszCommandLine[i + 1] < '0' || pszCommandLine[i + 1] > '3')
-			{
-				return FALSE;
-			}
-
-			if (i + 2 != dwLength && !CheckWhiteSpace(pszCommandLine[i + 2]))
-			{
-				return FALSE;
-			}
-
-			memset(psLexemeContainer->szLexemes[dwCurrentCount], 0, STRING_MAX_LENGTH);
-			memcpy(psLexemeContainer->szLexemes[dwCurrentCount], pszCommandLine + i, 2);
-			psLexemeContainer->eToken[dwCurrentCount] = EMT_P;
-
-			i++;
 		}
 		/** Обращения к виртуальной памяти */
 		else if (pszCommandLine[i] == '[')
