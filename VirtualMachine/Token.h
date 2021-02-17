@@ -31,7 +31,7 @@ typedef enum _ETokenType
 #define REGISTERS_AND_LITERAL	0x000000CF
 #define ALL_NUMBER_MASK			0x0000008B
 #define PMC_TYPE_MASK			0x00001F00
-
+#define INTEGERS_MASK			0x00000089
 
 
 #endif

@@ -100,7 +100,7 @@ static const SStateMachineTransition transition_2[] =
 
 static const SStateMachineTransition transition_3[] =
 {
-	{ EMT_I | EMT_NUMBER_LITERAL,	{ .nNextState = 0  },		21,		0,		ENST_NUMBER },				// substr
+	{ INTEGERS_MASK,				{ .nNextState = 0  },		21,		0,		ENST_NUMBER },				// substr
 	{ EMT_MARKER,					{ .nNextState = -1 },		22,		1,		ENST_NUMBER },				// if
 	{ EMT_MARKER,					{ .nNextState = 1  },		22,		1,		ENST_NUMBER }				// ne, eq, gt, lt
 };
