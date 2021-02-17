@@ -37,18 +37,18 @@ static const SStateMahcineCommand commands[][16] =
 
 static const SMiddleStateLayer set_table[] =
 {
-	{ EMT_VIRTUAL_MEMORY, REGISTERS_MASK | ALL_LITERAL_MASK,	{ .nNextState = -1 },		14,		 1,	ENST_NUMBER },
-	{ EMT_I, EMT_I | EMT_P | EMT_NUMBER_LITERAL,				{ .nNextState = -1 },		14,		 1,	ENST_NUMBER	},
-	{ EMT_N, EMT_N | EMT_P | EMT_NUMBER_LITERAL,				{ .nNextState = -1 },		14,		 1,	ENST_NUMBER	},
-	{ EMT_S, EMT_N | EMT_P | EMT_NUMBER_LITERAL,				{ .nNextState = -1 },		14,		 1,	ENST_NUMBER	},
-	{ EMT_P, ALL_MEMORY_MASK,									{ .nNextState = -1 },		14,		 1,	ENST_NUMBER }
+	{ EMT_VIRTUAL_MEMORY, REGISTERS_MASK | ALL_LITERAL_MASK,			{ .nNextState = -1 },		14,		 1,	ENST_NUMBER },
+	{ EMT_I, EMT_I | EMT_P | EMT_NUMBER_LITERAL | EMT_VIRTUAL_MEMORY,	{ .nNextState = -1 },		14,		 1,	ENST_NUMBER	},
+	{ EMT_N, EMT_N | EMT_P | EMT_NUMBER_LITERAL | EMT_VIRTUAL_MEMORY,	{ .nNextState = -1 },		14,		 1,	ENST_NUMBER	},
+	{ EMT_S, EMT_S | EMT_P | EMT_NUMBER_LITERAL | EMT_VIRTUAL_MEMORY,	{ .nNextState = -1 },		14,		 1,	ENST_NUMBER	},
+	{ EMT_P, ALL_MEMORY_MASK | ALL_LITERAL_MASK,						{ .nNextState = -1 },		14,		 1,	ENST_NUMBER }
 };
 
 static const SMiddleStateLayer math_table[] =
 {
-	{ EMT_I, EMT_I | EMT_NUMBER_LITERAL, { .sTable = &math_table },		15,		1, ENST_TABLE },
-	{ EMT_N, EMT_N | EMT_NUMBER_LITERAL, { .sTable = &math_table },		15,		1, ENST_TABLE },
-	{ EMT_P, EMT_P | EMT_NUMBER_LITERAL, { .sTable = &math_table },		15,		1, ENST_TABLE },
+	{ EMT_I, EMT_I | EMT_NUMBER_LITERAL, { .sTable = &math_table },		15,		1, ENST_TABLE  },
+	{ EMT_N, EMT_N | EMT_NUMBER_LITERAL, { .sTable = &math_table },		15,		1, ENST_TABLE  },
+	{ EMT_P, EMT_P | EMT_NUMBER_LITERAL, { .sTable = &math_table },		15,		1, ENST_TABLE  },
 	{ EMT_NUMBER_LITERAL, -1,			 { .nNextState = -1		 },		15,		1, ENST_NUMBER }
 };
 

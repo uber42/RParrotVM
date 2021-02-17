@@ -1,13 +1,6 @@
 #ifndef TOKEN_H
 #define TOKEN_H
 
-typedef enum _EToken
-{
-	ET_INTEGER			= 1 << 0,
-	ET_FLOAT			= 1 << 1,
-	ET_STRING			= 1 << 2
-} EToken, *PEToken;
-
 typedef enum _ETokenType
 {
 	EMT_I				= 1 << 0,
@@ -22,10 +15,10 @@ typedef enum _ETokenType
 	EMT_STRING_LITERAL	= 1 << 6,
 	EMT_NUMBER_LITERAL  = 1 << 7,
 
-	EMT_PMC_TYPE		= 1 << 8
+	EMT_PMC_TYPE		= 1 << 8,
+
+	EMT_COMMAND			= ~((WORD)-1)
 } ETokenType, *PETokenType;
-
-
 
 #define ALL_MEMORY_MASK			0x0000001F
 #define REGISTERS_MASK			0x0000000F
@@ -33,5 +26,17 @@ typedef enum _ETokenType
 #define ALL_LITERAL_MASK		0x000000C0
 #define REGISTERS_AND_LITERAL	0x000000CF
 #define ALL_NUMBER_MASK			0x0000008B
+
+
+//static struct
+//{
+//	EProcessorOperation		eOperation;
+//
+//	CHAR					szName[16];
+//} CommandMatch[]
+//{
+//	{ EPO_NEW, "new" }
+//};
+
 
 #endif

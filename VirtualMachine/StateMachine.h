@@ -38,7 +38,7 @@ typedef struct _SMiddleStateLayer
 		WORD nNextState;
 
 		/** Переход на список состояний */
-		struct _SMiddleStateLayer* sTable;
+		struct _SMiddleStateLayer** sTable;
 	} uNextState;
 
 	/** Номер ошибки (Если закончилось без ошибки то 0) */
@@ -63,7 +63,7 @@ typedef struct _SStateMachineTransition
 		WORD				nNextState;
 
 		/** Переход на список состояний */
-		SMiddleStateLayer*	sTable;
+		SMiddleStateLayer**	sTable;
 	} uNextState;
 
 	/** Номер ошибки (Если закончилось без ошибки то 0) */

@@ -5,7 +5,7 @@
 
 int main()
 {
-	printf("%d", getNextState());
+	printf("%d", CommandMatch[0].szName);
 
 	//system("PAUSE");
 }
