@@ -33,15 +33,5 @@ typedef enum _ETokenType
 #define PMC_TYPE_MASK			0x00001F00
 
 
-//static struct
-//{
-//	EProcessorOperation		eOperation;
-//
-//	CHAR					szName[16];
-//} CommandMatch[]
-//{
-//	{ EPO_NEW, "new" }
-//};
-
 
 #endif

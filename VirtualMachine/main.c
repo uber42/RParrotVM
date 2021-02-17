@@ -5,7 +5,8 @@
 
 int main()
 {
-	LexerCommandsTest();
+	//LexerCommandsTest();
+	StateMachineTestParsedLexems();
 
 	//system("PAUSE");
 }

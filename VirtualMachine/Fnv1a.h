@@ -4,12 +4,12 @@
 #define FNV_1A_SEED		0x811C9DC5
 #define FNV_1A_PRIME	0x01000193
 
-u32
+DWORD
 Fnv1aCompute(
-	void*		pData,
-	u32			dwDataLength,
-	u32			dwDataSize,
-	u32			dwHashSeed
+	PVOID		pData,
+	DWORD		dwDataLength,
+	DWORD		dwDataSize,
+	DWORD		dwHashSeed
 );
 
 #endif

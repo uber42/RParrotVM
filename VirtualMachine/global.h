@@ -8,7 +8,6 @@
 #include <string.h>
 #include <assert.h>
 
-#include "Types.h"
 #include "List.h"
 #include "Fnv1a.h"
 
@@ -20,5 +19,6 @@
 
 
 #include "LexerTest.h"
+#include "StateMachineTest.h"
 
 #endif

@@ -8,7 +8,7 @@ typedef struct _SStateMachineCommand
 	WORD	nOpCode;
 
 	/** Имя */
-	CHAR	szName[STRING_MAX_LENGTH];
+	CHAR	szName[16];
 
 	/** Хэш (FNV1-A) */
 	DWORD	dwHash;
@@ -38,7 +38,7 @@ typedef struct _SMiddleStateLayer
 		WORD nNextState;
 
 		/** Переход на список состояний */
-		struct _SMiddleStateLayer** sTable;
+		VOID* sTable;
 	} uNextState;
 
 	/** Номер ошибки (Если закончилось без ошибки то 0) */
@@ -63,7 +63,7 @@ typedef struct _SStateMachineTransition
 		WORD				nNextState;
 
 		/** Переход на список состояний */
-		SMiddleStateLayer**	sTable;
+		VOID*	sTable;
 	} uNextState;
 
 	/** Номер ошибки (Если закончилось без ошибки то 0) */
@@ -76,5 +76,9 @@ typedef struct _SStateMachineTransition
 	ENextStateType			eTransitionType;
 } SStateMachineTransition, *PSStateMachineTransition;
 
+BOOL
+StateMachineDriveLexemes(
+	PSLexemeContainer	psLexemeContainer
+);
 
 #endif

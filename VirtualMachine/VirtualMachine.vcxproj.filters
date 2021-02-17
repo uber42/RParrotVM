@@ -5,9 +5,6 @@
     <ClInclude Include="VirtualContext.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="Types.h">
-      <Filter>Generic</Filter>
-    </ClInclude>
     <ClInclude Include="PMC.h">
       <Filter>Core\ParrotMagicCookie</Filter>
     </ClInclude>
@@ -29,6 +26,9 @@
     <ClInclude Include="LexerTest.h">
       <Filter>Parser\Lexer</Filter>
     </ClInclude>
+    <ClInclude Include="StateMachineTest.h">
+      <Filter>Parser\StateMachine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.c" />
@@ -49,6 +49,9 @@
     </ClCompile>
     <ClCompile Include="LexerTest.c">
       <Filter>Parser\Lexer</Filter>
+    </ClCompile>
+    <ClCompile Include="StateMachineTest.c">
+      <Filter>Parser\StateMachine</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

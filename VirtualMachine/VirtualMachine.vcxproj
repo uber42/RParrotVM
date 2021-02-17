@@ -130,8 +130,8 @@
     <ClInclude Include="List.h" />
     <ClInclude Include="PMC.h" />
     <ClInclude Include="StateMachine.h" />
+    <ClInclude Include="StateMachineTest.h" />
     <ClInclude Include="Token.h" />
-    <ClInclude Include="Types.h" />
     <ClInclude Include="VirtualContext.h" />
   </ItemGroup>
   <ItemGroup>
@@ -141,6 +141,7 @@
     <ClCompile Include="main.c" />
     <ClCompile Include="PMC.c" />
     <ClCompile Include="StateMachine.c" />
+    <ClCompile Include="StateMachineTest.c" />
     <ClCompile Include="VirtualContext.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

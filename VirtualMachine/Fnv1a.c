@@ -1,30 +1,30 @@
 #include "global.h"
 
 
-u32
+DWORD
 Fnv1aCodeOneByte(
-	i8	ucByte,
-	u32	dwHashSeed
+	BYTE	ucByte,
+	DWORD	dwHashSeed
 );
 
 
-u32
+DWORD
 Fnv1aCompute(
-	void*		pData,
-	u32			dwDataLength,
-	u32			dwDataSize,
-	u32			dwHashSeed
+	PVOID		pData,
+	DWORD		dwDataLength,
+	DWORD		dwDataSize,
+	DWORD		dwHashSeed
 )
 {
-	u32 dwBytesCount = dwDataLength * dwDataSize;
+	DWORD dwBytesCount = dwDataLength * dwDataSize;
 
 	if (pData == NULL)
 	{
 		return 0;
 	}
 
-	u8* pszCastedData = (u8*)pData;
-	u32 dwHash = dwHashSeed;
+	BYTE* pszCastedData = (BYTE*)pData;
+	DWORD dwHash = dwHashSeed;
 
 	while (dwBytesCount--)
 	{
@@ -35,10 +35,10 @@ Fnv1aCompute(
 }
 
 
-u32
+DWORD
 Fnv1aCodeOneByte(
-	i8	ucByte,
-	u32	dwHashSeed
+	BYTE	ucByte,
+	DWORD	dwHashSeed
 )
 {
 	return (ucByte ^ dwHashSeed) * FNV_1A_PRIME;

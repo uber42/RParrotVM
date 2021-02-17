@@ -21,7 +21,7 @@ typedef struct _SParrotMagicCookie
 {
 	EParrotMagicCookieType	eType;
 	
-	pvoid					pData;
+	PVOID					pData;
 } SParrotMagicCookie, *PSParrotMagicCookie;
 
 #endif

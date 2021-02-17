@@ -67,7 +67,7 @@ typedef enum _EProcessorOperation
 typedef struct _SVirtualStack
 {
 	SList	sEntry;
-	u8		sCell[0];
+	BYTE	sCell[0];
 } SVirtualStack, *PSVirtualStack;
 
 /**
@@ -75,18 +75,18 @@ typedef struct _SVirtualStack
  */
 typedef struct _SVirtualProcessor
 {
-	u64							I[REGISTERS_COUNT];
-	u8							S[REGISTERS_COUNT][STRING_MAX_LENGTH];
-	f64							N[REGISTERS_COUNT];
+	UINT						I[REGISTERS_COUNT];
+	CHAR						S[REGISTERS_COUNT][STRING_MAX_LENGTH];
+	DOUBLE						N[REGISTERS_COUNT];
 	//SParrotMagicCookie			P[REGISTERS_COUNT];
 
-	u64							IP;
+	UINT64						IP;
 } SVirtualProcessor, *PSVirtualProcessor;
 
 /**
  * Виртуальная оперативная память
  */
-static u8* g_bVirtualMemory = (u8*)0;
+static BYTE* g_bVirtualMemory = (BYTE*)0;
 
 
 
