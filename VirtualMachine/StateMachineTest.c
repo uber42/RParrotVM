@@ -70,3 +70,48 @@ StateMachineTestParsedLexems()
 	bResult = StateMachineDriveLexemes(&sContainer);
 	assert(!bResult);
 }
+
+VOID
+StateMachineTestComplexLayers()
+{
+	SLexemeContainer sContainer;
+	memset(&sContainer, 0, sizeof(SLexemeContainer));
+	PrepareCommand("add I0, I2, 151", &sContainer);
+	BOOL bResult = StateMachineDriveLexemes(&sContainer);
+	assert(bResult);
+
+	memset(&sContainer, 0, sizeof(SLexemeContainer));
+	PrepareCommand("add I0, 152, 151", &sContainer);
+	bResult = StateMachineDriveLexemes(&sContainer);
+	assert(!bResult);
+
+	memset(&sContainer, 0, sizeof(SLexemeContainer));
+	PrepareCommand("add I0, 152", &sContainer);
+	bResult = StateMachineDriveLexemes(&sContainer);
+	assert(bResult);
+
+	memset(&sContainer, 0, sizeof(SLexemeContainer));
+	PrepareCommand("add I0, I3", &sContainer);
+	bResult = StateMachineDriveLexemes(&sContainer);
+	assert(bResult);
+
+	memset(&sContainer, 0, sizeof(SLexemeContainer));
+	PrepareCommand("set [0x0152], I3", &sContainer);
+	bResult = StateMachineDriveLexemes(&sContainer);
+	assert(bResult);
+
+	memset(&sContainer, 0, sizeof(SLexemeContainer));
+	PrepareCommand("set I2, [0x0152]", &sContainer);
+	bResult = StateMachineDriveLexemes(&sContainer);
+	assert(bResult);
+
+	memset(&sContainer, 0, sizeof(SLexemeContainer));
+	PrepareCommand("set I2, I3", &sContainer);
+	bResult = StateMachineDriveLexemes(&sContainer);
+	assert(bResult);
+
+	memset(&sContainer, 0, sizeof(SLexemeContainer));
+	PrepareCommand("new P0, .Integer", &sContainer);
+	bResult = StateMachineDriveLexemes(&sContainer);
+	assert(bResult);
+}

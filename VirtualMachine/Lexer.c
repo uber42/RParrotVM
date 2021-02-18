@@ -1,6 +1,6 @@
-#include "global.h"
+п»ї#include "global.h"
 
-/** Операции */
+/** РћРїРµСЂР°С†РёРё */
 static const DWORD keywords[] =
 {
 	0x28999611, 0xC6270703, 0xA8E99C47, 0xC25979D3,
@@ -18,7 +18,7 @@ typedef struct _SPmcMatch
 	ETokenType	eToken;
 } SPmcMatch;
 
-/** Типы PMC */
+/** РўРёРїС‹ PMC */
 static const SPmcMatch pmc_types[] =
 {
 	{ 0x8A8F117F, PMC_INTEGER	},
@@ -51,7 +51,7 @@ PrepareCommand(
 	{
 		CHAR c = pszCommandLine[i];
 
-		/** Пропускаем пробелы и запятые */
+		/** РџСЂРѕРїСѓСЃРєР°РµРј РїСЂРѕР±РµР»С‹ Рё Р·Р°РїСЏС‚С‹Рµ */
 		if (CheckWhiteSpace(pszCommandLine[i]))
 		{
 			if (!psLexemeContainer->dwCount && pszCommandLine[i] == ',')
@@ -70,7 +70,7 @@ PrepareCommand(
 			continue;
 		}
 
-		/** Комментарий */
+		/** РљРѕРјРјРµРЅС‚Р°СЂРёР№ */
 		if (pszCommandLine[i] == '#')
 		{
 			return TRUE;
@@ -88,7 +88,7 @@ PrepareCommand(
 
 		DWORD dwCurrentCount = psLexemeContainer->dwCount;
 
-		/** Операция или метка */
+		/** РћРїРµСЂР°С†РёСЏ РёР»Рё РјРµС‚РєР° */
 		if (!dwCurrentCount)
 		{
 			DWORD j = i;
@@ -102,13 +102,13 @@ PrepareCommand(
 				return FALSE;
 			}
 
-			/** Валидация */
+			/** Р’Р°Р»РёРґР°С†РёСЏ */
 			if (j - i < 2)
 			{
 				return FALSE;
 			}
 
-			/** Метка */
+			/** РњРµС‚РєР° */
 			if (pszCommandLine[j - 1] == ':')
 			{
 				for (DWORD k = i; k < j - 1; k++)
@@ -123,7 +123,7 @@ PrepareCommand(
 				memcpy(psLexemeContainer->szLexemes[dwCurrentCount], pszCommandLine + i, j - i - 1);
 				psLexemeContainer->eToken[dwCurrentCount] = EMT_MARKER;
 			}
-			/** Операция */
+			/** РћРїРµСЂР°С†РёСЏ */
 			else
 			{
 				CHAR szTemp[16] = { 0 };
@@ -158,7 +158,7 @@ PrepareCommand(
 
 			i = j;
 		}
-		/** Числовые литералы */
+		/** Р§РёСЃР»РѕРІС‹Рµ Р»РёС‚РµСЂР°Р»С‹ */
 		else if (isdigit(pszCommandLine[i]))
 		{
 			DWORD j = i;
@@ -177,7 +177,7 @@ PrepareCommand(
 
 			i = j - 1;
 		}
-		/** Строковые литералы */
+		/** РЎС‚СЂРѕРєРѕРІС‹Рµ Р»РёС‚РµСЂР°Р»С‹ */
 		else if (pszCommandLine[i] == '\"')
 		{
 			DWORD j = i + 1;
@@ -193,13 +193,13 @@ PrepareCommand(
 
 			i = j;
 		}
-		/** Маркеры и регистры */
+		/** РњР°СЂРєРµСЂС‹ Рё СЂРµРіРёСЃС‚СЂС‹ */
 		else if (isalpha(pszCommandLine[i]))
 		{
 			DWORD j = i;
 			for (; j < dwLength && !CheckWhiteSpace(pszCommandLine[j]); j++);
 
-			/** Маркеры */
+			/** РњР°СЂРєРµСЂС‹ */
 			if (j - 1 - i > 2)
 			{
 				for (DWORD k = i; k < j; k++)
@@ -216,7 +216,7 @@ PrepareCommand(
 
 				i = j - 1;
 			}
-			/** Целочисленные регистры */
+			/** Р¦РµР»РѕС‡РёСЃР»РµРЅРЅС‹Рµ СЂРµРіРёСЃС‚СЂС‹ */
 			else if (pszCommandLine[i] == 'I')
 			{
 				if (pszCommandLine[i + 1] < '0' || pszCommandLine[i + 1] > '3')
@@ -235,7 +235,7 @@ PrepareCommand(
 
 				i++;
 			}
-			/** Регистры чисел с плавающей запятой */
+			/** Р РµРіРёСЃС‚СЂС‹ С‡РёСЃРµР» СЃ РїР»Р°РІР°СЋС‰РµР№ Р·Р°РїСЏС‚РѕР№ */
 			else if (pszCommandLine[i] == 'N')
 			{
 				if (pszCommandLine[i + 1] < '0' || pszCommandLine[i + 1] > '3')
@@ -254,7 +254,7 @@ PrepareCommand(
 
 				i++;
 			}
-			/** Строковые регистры */
+			/** РЎС‚СЂРѕРєРѕРІС‹Рµ СЂРµРіРёСЃС‚СЂС‹ */
 			else if (pszCommandLine[i] == 'S')
 			{
 				if (pszCommandLine[i + 1] < '0' || pszCommandLine[i + 1] > '3')
@@ -273,7 +273,7 @@ PrepareCommand(
 
 				i++;
 			}
-			/** PMC регистры */
+			/** PMC СЂРµРіРёСЃС‚СЂС‹ */
 			else if (pszCommandLine[i] == 'P')
 			{
 				if (pszCommandLine[i + 1] < '0' || pszCommandLine[i + 1] > '3')
@@ -293,7 +293,7 @@ PrepareCommand(
 				i++;
 			}
 		}
-		/** Обращения к виртуальной памяти */
+		/** РћР±СЂР°С‰РµРЅРёСЏ Рє РІРёСЂС‚СѓР°Р»СЊРЅРѕР№ РїР°РјСЏС‚Рё */
 		else if (pszCommandLine[i] == '[')
 		{
 			DWORD j = i + 1;
@@ -303,7 +303,7 @@ PrepareCommand(
 				return FALSE;
 			}
 
-			/** Валидация */
+			/** Р’Р°Р»РёРґР°С†РёСЏ */
 			if (pszCommandLine[i + 1] != '0' || pszCommandLine[i + 2] != 'x')
 			{
 				return FALSE;
@@ -323,7 +323,7 @@ PrepareCommand(
 
 			i = j;
 		}
-		/** Типы PMC */
+		/** РўРёРїС‹ PMC */
 		else if (pszCommandLine[i] == '.')
 		{
 			DWORD j = i + 1;

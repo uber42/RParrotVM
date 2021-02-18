@@ -2,7 +2,6 @@
 #define VIRTUAL_CONTEXT_H
 
 #define REGISTERS_COUNT		1 << 2
-#define STRING_MAX_LENGTH	256
 
 typedef enum _EProcessorOperation
 {
@@ -15,8 +14,10 @@ typedef enum _EProcessorOperation
 	EPO_INC,
 	/** Декремент */
 	EPO_DEC,
-	/** Сложение */
-	EPO_ADD,
+	/** Сложение с двумя параметрами */
+	EPO_ADD_2,
+	/** Сложение с тремя параметрами */
+	EPO_ADD_3,
 	/** Разность */
 	EPO_SUB,
 	/** Произведение */

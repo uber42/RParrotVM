@@ -11,6 +11,8 @@
 #include "List.h"
 #include "Fnv1a.h"
 
+#define STRING_MAX_LENGTH	256
+
 #include "Token.h"
 #include "PMC.h"
 #include "VirtualContext.h"

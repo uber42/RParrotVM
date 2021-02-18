@@ -33,5 +33,22 @@ typedef enum _ETokenType
 #define PMC_TYPE_MASK			0x00001F00
 #define INTEGERS_MASK			0x00000089
 
+#define LINE_MAX_LEXEME_COUNT 5
+
+
+typedef struct _SLexemeContainer
+{
+	/** Количество лексем */
+	DWORD				dwCount;
+
+	/** Лексемы */
+	CHAR				szLexemes[LINE_MAX_LEXEME_COUNT][STRING_MAX_LENGTH];
+
+	/** Токен */
+	ETokenType			eToken[LINE_MAX_LEXEME_COUNT];
+
+	/** Выделенная операция на виртуальном процессоре */
+	EProcessorOperation eEndPointOperation;
+} SLexemeContainer, * PSLexemeContainer;
 
 #endif

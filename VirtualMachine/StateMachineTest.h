@@ -4,4 +4,7 @@
 VOID
 StateMachineTestParsedLexems();
 
+VOID
+StateMachineTestComplexLayers();
+
 #endif

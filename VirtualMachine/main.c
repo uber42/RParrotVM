@@ -5,8 +5,8 @@
 
 int main()
 {
-	//LexerCommandsTest();
-	StateMachineTestParsedLexems();
+	InititalizeStateMachineTables();
+	StateMachineTestComplexLayers();
 
 	//system("PAUSE");
 }

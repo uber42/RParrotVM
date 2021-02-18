@@ -35,10 +35,10 @@ typedef struct _SMiddleStateLayer
 	union
 	{
 		/** Переход на следующую таблицу */
-		WORD nNextState;
+		WORD				nNextState;
 
 		/** Переход на список состояний */
-		VOID* sTable;
+		VOID*				sTable;
 	} uNextState;
 
 	/** Номер ошибки (Если закончилось без ошибки то 0) */
@@ -63,7 +63,7 @@ typedef struct _SStateMachineTransition
 		WORD				nNextState;
 
 		/** Переход на список состояний */
-		VOID*	sTable;
+		VOID*				sTable;
 	} uNextState;
 
 	/** Номер ошибки (Если закончилось без ошибки то 0) */
@@ -75,6 +75,18 @@ typedef struct _SStateMachineTransition
 	/** Тип перехода */
 	ENextStateType			eTransitionType;
 } SStateMachineTransition, *PSStateMachineTransition;
+
+typedef struct _SMiddleLayerContainer
+{
+	/** Таблица */
+	VOID*	psTable;
+
+	/** Количество */
+	DWORD	dwCount;
+} SMiddleLayerContainer, *PSMiddleLayerContainer;
+
+VOID
+InititalizeStateMachineTables();
 
 BOOL
 StateMachineDriveLexemes(
