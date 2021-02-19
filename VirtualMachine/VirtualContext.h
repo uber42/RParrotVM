@@ -14,16 +14,18 @@ typedef enum _EProcessorOperation
 	EPO_INC,
 	/** Декремент */
 	EPO_DEC,
-	/** Сложение с двумя параметрами */
+	/** Сложение */
 	EPO_ADD_2,
-	/** Сложение с тремя параметрами */
 	EPO_ADD_3,
 	/** Разность */
-	EPO_SUB,
+	EPO_SUB_2,
+	EPO_SUB_3,
 	/** Произведение */
-	EPO_MUL,
+	EPO_MUL_2,
+	EPO_MUL_3,
 	/** Частное */
-	EPO_DIV,
+	EPO_DIV_2,
+	EPO_DIV_3,
 
 	/** Длина строки */
 	EPO_LENGTH,
@@ -35,15 +37,20 @@ typedef enum _EProcessorOperation
 	/** Перемещение по метке */
 	EPO_BRANCH,
 	/** Логическое условие */
-	EPO_IF,
+	EPO_IF_2,
+	EPO_IF_3,
 	/** Не равно */
-	EPO_NE,
+	EPO_NE_3,
+	EPO_NE_4,
 	/** Равно */
-	EPO_EQ,
+	EPO_EQ_3,
+	EPO_EQ_4,
 	/** Больше */
-	EPO_GT,
+	EPO_GT_3,
+	EPO_GT_4,
 	/** Меньше */
-	EPO_LT,
+	EPO_LT_3,
+	EPO_LT_4,
 
 	/** Вызов подпрограммы */
 	EPO_BSR,
@@ -54,9 +61,19 @@ typedef enum _EProcessorOperation
 	EPO_PRINT,
 
 	/** Вставить в стек */
-	EPO_PUSH,
+	EPO_PUSH_STACK,
 	/** Вытащить из стека */
-	EPO_POP,
+	EPO_POP_STACK,
+
+	/** Вставить в список */
+	EPO_PUSH_LIST,
+	/** Вытащить из списка */
+	EPO_POP_LIST,
+
+	/** Вставить в хэш-таблицу */
+	EPO_PUSH_LIST,
+	/** Вытащить из хэш-таблицы */
+	EPO_POP_LIST,
 
 	/** Конец программы */
 	EPO_END
