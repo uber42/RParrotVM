@@ -113,4 +113,12 @@ LexerCommandsTest()
 	assert(sContainer.eToken[2] == EMT_NUMBER_LITERAL);
 	assert(sContainer.eToken[3] == EMT_MARKER);
 	assert(sContainer.eToken[4] == EMT_MARKER);
+
+	memset(&sContainer, 0, sizeof(SLexemeContainer));
+	bResult = PrepareCommand("push P0, 1", &sContainer);
+	assert(bResult);
+	assert(sContainer.dwCount == 3);
+	assert(sContainer.eToken[0] == EMT_COMMAND);
+	assert(sContainer.eToken[1] == EMT_P);
+	assert(sContainer.eToken[2] == EMT_NUMBER_LITERAL);
 }

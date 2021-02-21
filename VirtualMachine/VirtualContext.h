@@ -71,9 +71,9 @@ typedef enum _EProcessorOperation
 	EPO_POP_LIST,
 
 	/** Вставить в хэш-таблицу */
-	EPO_PUSH_LIST,
+	EPO_PUSH_TABLE,
 	/** Вытащить из хэш-таблицы */
-	EPO_POP_LIST,
+	EPO_POP_TABLE,
 
 	/** Конец программы */
 	EPO_END

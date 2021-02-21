@@ -114,4 +114,24 @@ StateMachineTestComplexLayers()
 	PrepareCommand("new P0, .Integer", &sContainer);
 	bResult = StateMachineDriveLexemes(&sContainer);
 	assert(bResult);
+
+	memset(&sContainer, 0, sizeof(SLexemeContainer));
+	PrepareCommand("push P0, \"New List Item\"", &sContainer);
+	bResult = StateMachineDriveLexemes(&sContainer);
+	assert(bResult);
+
+	memset(&sContainer, 0, sizeof(SLexemeContainer));
+	PrepareCommand("push P0, 1", &sContainer);
+	bResult = StateMachineDriveLexemes(&sContainer);
+	assert(bResult);
+
+	memset(&sContainer, 0, sizeof(SLexemeContainer));
+	PrepareCommand("push P0, 1, 1", &sContainer);
+	bResult = StateMachineDriveLexemes(&sContainer);
+	assert(!bResult);
+
+	memset(&sContainer, 0, sizeof(SLexemeContainer));
+	PrepareCommand("push P0", &sContainer);
+	bResult = StateMachineDriveLexemes(&sContainer);
+	assert(!bResult);
 }

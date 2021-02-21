@@ -32,6 +32,8 @@ typedef enum _ETokenType
 #define ALL_NUMBER_MASK			0x0000008B
 #define PMC_TYPE_MASK			0x00001F00
 #define INTEGERS_MASK			0x00000089
+#define NATIVE_REG_MASK			EMT_I | EMT_N | EMT_S
+#define NATIVE_MASK				NATIVE_REG_MASK | ALL_LITERAL_MASK
 
 #define LINE_MAX_LEXEME_COUNT 5
 
@@ -48,7 +50,7 @@ typedef struct _SLexemeContainer
 	ETokenType			eToken[LINE_MAX_LEXEME_COUNT];
 
 	/** Выделенная операция на виртуальном процессоре */
-	EProcessorOperation eEndPointOperation;
+	//EProcessorOperation eEndPointOperation;
 } SLexemeContainer, * PSLexemeContainer;
 
 #endif

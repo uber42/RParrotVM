@@ -81,7 +81,7 @@ PrepareCommand(
 			return FALSE;
 		}
 
-		if (i + 1 >= dwLength)
+		if (i + 1 > dwLength)
 		{
 			return FALSE;
 		}

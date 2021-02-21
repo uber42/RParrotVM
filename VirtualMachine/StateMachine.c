@@ -35,7 +35,7 @@ static const SStateMahcineCommand machine_operators[] =
 	{ -1 ,	"end",		0x6A8E75AA }
 };
 
-static SMiddleLayerContainer tables[3];
+static SMiddleLayerContainer tables[6];
 
 static const SMiddleStateLayer set_table[] =
 {
@@ -50,7 +50,7 @@ static const SMiddleStateLayer math_table[] =
 {
 	{ EMT_I, ALL_NUMBER_MASK,	{ .sTable = tables + 1	},		15,		1, ENST_TABLE  },
 	{ EMT_N, ALL_NUMBER_MASK,	{ .sTable = tables + 1	},		15,		1, ENST_TABLE  },
-	{ EMT_P, ALL_NUMBER_MASK,	{ .sTable = tables + 1	},		15,		1, ENST_TABLE  },
+	{ EMT_P, ALL_NUMBER_MASK,	{ .sTable = tables + 1	},		15,		1, ENST_TABLE  }
 };
 
 static const SMiddleStateLayer math_table_2[] =
@@ -59,6 +59,29 @@ static const SMiddleStateLayer math_table_2[] =
 	{ EMT_N, ALL_NUMBER_MASK,	{ .nNextState = -1		},		15,		1, ENST_NUMBER },
 	{ EMT_P, ALL_NUMBER_MASK,	{ .nNextState = -1		},		15,		1, ENST_NUMBER },
 	{ EMT_NUMBER_LITERAL, 0,	{ .nNextState = -1		},		15,		1, ENST_NUMBER }
+};
+
+static const SMiddleStateLayer push_table[] =
+{
+	{ NATIVE_MASK, 0,			{ .nNextState = -1		},		66,		1, ENST_NUMBER },	// push [ANY_NUMBER]
+	{ EMT_P, NATIVE_MASK,		{ .nNextState = -1		},		66,		1, ENST_NUMBER }	// push [PMC_REGISTER], [ANY_BEFORE]
+};
+
+static const SMiddleStateLayer pop_table[] =
+{
+	{ EMT_I, 0,					{ .sTable = tables + 5	},		66,		0, ENST_TABLE  },	// pop [NUMBER_REGISTER]
+	{ EMT_P, NATIVE_MASK,		{ .nNextState = -1		},		66,		1, ENST_NUMBER }	// pop [PMC_REGISTER], [ANY_BEFORE]
+};
+
+static const SMiddleStateLayer pop_table_2[] =
+{
+	{ EMT_P, EMT_STRING_LITERAL,{ .nNextState = -1		},		66,		1, ENST_NUMBER },	// pop [PMC_REGISTER], [ANY_BEFORE]
+	{ 0, -1,					{ .nNextState = -1		},		66,		1, ENST_NUMBER }	// pop [NUMBER_REGISTER]
+};
+
+static const SMiddleStateLayer pop_table_3[] =
+{
+	{  }
 };
 
 static const SStateMachineTransition transition_1[] =
@@ -88,8 +111,8 @@ static const SStateMachineTransition transition_1[] =
 
 	{ EMT_S | EMT_STRING_LITERAL,	{ .nNextState = -1			},		12,		1,		ENST_NUMBER	},		// print [REG, STRING_LITERAL]
 
-	{ ALL_NUMBER_MASK,				{ .nNextState = -1			},		13,		1,		ENST_NUMBER	},		// push [REG, ANY_LITERAL]
-	{ REGISTERS_MASK,				{ .nNextState = -1			},		13,		1,		ENST_NUMBER	}		// pop  [REG]
+	{ NATIVE_MASK | EMT_P,			{ .sTable = tables + 3		},		13,		1,		ENST_TABLE	},		// push [ANY], [???]
+	{ REGISTERS_MASK,				{ .sTable = tables + 4		},		13,		1,		ENST_TABLE	}		// pop  [REG], [???]
 };
 
 static const SStateMachineTransition transition_2[] =
@@ -117,7 +140,7 @@ static const SStateMachineTransition transition_3[] =
 static const SStateMachineTransition transition_4[] =
 {
 	{ EMT_I | EMT_NUMBER_LITERAL,	{ .nNextState = -1 },		21,		1,		ENST_NUMBER },				// substr
-	{ EMT_MARKER,					{ .nNextState = -1 },		22,		1,		ENST_NUMBER }				// if, ne, eq, gt, lt
+	{ EMT_MARKER,					{ .nNextState = -1 },		22,		1,		ENST_NUMBER }				// ne, eq, gt, lt
 };
 
 static const PSStateMachineTransition trasitions[] =
@@ -168,6 +191,9 @@ InititalizeStateMachineTables()
 	tables[0] = (SMiddleLayerContainer) { .psTable = math_table,	.dwCount = 4 };
 	tables[1] = (SMiddleLayerContainer) { .psTable = math_table_2,	.dwCount = 4 };
 	tables[2] = (SMiddleLayerContainer) { .psTable = set_table,		.dwCount = 5 };
+	tables[3] = (SMiddleLayerContainer) { .psTable = push_table,	.dwCount = 2 };
+	tables[4] = (SMiddleLayerContainer) { .psTable = pop_table,		.dwCount = 2 };
+	tables[5] = (SMiddleLayerContainer) { .psTable = pop_table_2,	.dwCount = 2 };
 }
 
 static 
