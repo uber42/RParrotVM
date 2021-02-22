@@ -96,7 +96,7 @@ typedef struct _SVirtualProcessor
 	UINT						I[REGISTERS_COUNT];
 	CHAR						S[REGISTERS_COUNT][STRING_MAX_LENGTH];
 	DOUBLE						N[REGISTERS_COUNT];
-	//SParrotMagicCookie			P[REGISTERS_COUNT];
+	SParrotMagicCookie			P[REGISTERS_COUNT];
 
 	UINT64						IP;
 } SVirtualProcessor, *PSVirtualProcessor;

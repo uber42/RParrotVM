@@ -26,9 +26,6 @@
     <ClInclude Include="StateMachineTest.h">
       <Filter>Compiler\StateMachine</Filter>
     </ClInclude>
-    <ClInclude Include="Bytecode.h">
-      <Filter>Compiler</Filter>
-    </ClInclude>
     <ClInclude Include="Compiler.h">
       <Filter>Compiler</Filter>
     </ClInclude>
@@ -58,9 +55,6 @@
     </ClCompile>
     <ClCompile Include="StateMachineTest.c">
       <Filter>Compiler\StateMachine</Filter>
-    </ClCompile>
-    <ClCompile Include="Bytecode.c">
-      <Filter>Compiler</Filter>
     </ClCompile>
     <ClCompile Include="Compiler.c">
       <Filter>Compiler</Filter>

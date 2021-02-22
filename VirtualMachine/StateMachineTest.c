@@ -69,6 +69,11 @@ StateMachineTestParsedLexems()
 	PrepareCommand("substr I0, S1, 2, 6", &sContainer);
 	bResult = StateMachineDriveLexemes(&sContainer);
 	assert(!bResult);
+
+	memset(&sContainer, 0, sizeof(SLexemeContainer));
+	PrepareCommand("ret", &sContainer);
+	bResult = StateMachineDriveLexemes(&sContainer);
+	assert(bResult);
 }
 
 VOID
@@ -79,6 +84,7 @@ StateMachineTestComplexLayers()
 	PrepareCommand("add I0, I2, 151", &sContainer);
 	BOOL bResult = StateMachineDriveLexemes(&sContainer);
 	assert(bResult);
+	assert(sContainer.eEndPointOperation == EPO_ADD_3);
 
 	memset(&sContainer, 0, sizeof(SLexemeContainer));
 	PrepareCommand("add I0, 152, 151", &sContainer);
@@ -89,31 +95,37 @@ StateMachineTestComplexLayers()
 	PrepareCommand("add I0, 152", &sContainer);
 	bResult = StateMachineDriveLexemes(&sContainer);
 	assert(bResult);
+	assert(sContainer.eEndPointOperation == EPO_ADD_2);
 
 	memset(&sContainer, 0, sizeof(SLexemeContainer));
 	PrepareCommand("add I0, I3", &sContainer);
 	bResult = StateMachineDriveLexemes(&sContainer);
 	assert(bResult);
+	assert(sContainer.eEndPointOperation == EPO_ADD_2);
 
 	memset(&sContainer, 0, sizeof(SLexemeContainer));
 	PrepareCommand("set [0x0152], I3", &sContainer);
 	bResult = StateMachineDriveLexemes(&sContainer);
 	assert(bResult);
+	assert(sContainer.eEndPointOperation == EPO_SET);
 
 	memset(&sContainer, 0, sizeof(SLexemeContainer));
 	PrepareCommand("set I2, [0x0152]", &sContainer);
 	bResult = StateMachineDriveLexemes(&sContainer);
 	assert(bResult);
+	assert(sContainer.eEndPointOperation == EPO_SET);
 
 	memset(&sContainer, 0, sizeof(SLexemeContainer));
 	PrepareCommand("set I2, I3", &sContainer);
 	bResult = StateMachineDriveLexemes(&sContainer);
 	assert(bResult);
+	assert(sContainer.eEndPointOperation == EPO_SET);
 
 	memset(&sContainer, 0, sizeof(SLexemeContainer));
 	PrepareCommand("new P0, .Integer", &sContainer);
 	bResult = StateMachineDriveLexemes(&sContainer);
 	assert(bResult);
+	assert(sContainer.eEndPointOperation == EPO_NEW);
 
 	memset(&sContainer, 0, sizeof(SLexemeContainer));
 	PrepareCommand("push P0, \"New List Item\"", &sContainer);
@@ -124,26 +136,31 @@ StateMachineTestComplexLayers()
 	PrepareCommand("push P0, \"New List Item\", 1", &sContainer);
 	bResult = StateMachineDriveLexemes(&sContainer);
 	assert(bResult);
+	assert(sContainer.eEndPointOperation == EPO_PMC_PUSH);
 
 	memset(&sContainer, 0, sizeof(SLexemeContainer));
 	PrepareCommand("push P0, \"New List Item\", I0", &sContainer);
 	bResult = StateMachineDriveLexemes(&sContainer);
 	assert(bResult);
+	assert(sContainer.eEndPointOperation == EPO_PMC_PUSH);
 
 	memset(&sContainer, 0, sizeof(SLexemeContainer));
 	PrepareCommand("push P0, \"New List Item\", P1", &sContainer);
 	bResult = StateMachineDriveLexemes(&sContainer);
 	assert(bResult);
+	assert(sContainer.eEndPointOperation == EPO_PMC_PUSH);
 
 	memset(&sContainer, 0, sizeof(SLexemeContainer));
 	PrepareCommand("push P0, S1, P1", &sContainer);
 	bResult = StateMachineDriveLexemes(&sContainer);
 	assert(bResult);
+	assert(sContainer.eEndPointOperation == EPO_PMC_PUSH);
 
 	memset(&sContainer, 0, sizeof(SLexemeContainer));
 	PrepareCommand("push P0", &sContainer);
 	bResult = StateMachineDriveLexemes(&sContainer);
 	assert(bResult);
+	assert(sContainer.eEndPointOperation == EPO_PUSH_STACK);
 
 	memset(&sContainer, 0, sizeof(SLexemeContainer));
 	PrepareCommand("push P0, 1, 1", &sContainer);
@@ -154,16 +171,19 @@ StateMachineTestComplexLayers()
 	PrepareCommand("push I0", &sContainer);
 	bResult = StateMachineDriveLexemes(&sContainer);
 	assert(bResult);
+	assert(sContainer.eEndPointOperation == EPO_PUSH_STACK);
 
 	memset(&sContainer, 0, sizeof(SLexemeContainer));
 	PrepareCommand("pop I0", &sContainer);
 	bResult = StateMachineDriveLexemes(&sContainer);
 	assert(bResult);
+	assert(sContainer.eEndPointOperation == EPO_POP_STACK);
 
 	memset(&sContainer, 0, sizeof(SLexemeContainer));
 	PrepareCommand("pop I0, P0, S0", &sContainer);
 	bResult = StateMachineDriveLexemes(&sContainer);
 	assert(bResult);
+	assert(sContainer.eEndPointOperation == EPO_PMC_POP);
 
 	memset(&sContainer, 0, sizeof(SLexemeContainer));
 	PrepareCommand("pop I0, P0, N0", &sContainer);
@@ -174,4 +194,5 @@ StateMachineTestComplexLayers()
 	PrepareCommand("pop N2, P0, S0", &sContainer);
 	bResult = StateMachineDriveLexemes(&sContainer);
 	assert(bResult);
+	assert(sContainer.eEndPointOperation == EPO_PMC_POP);
 }

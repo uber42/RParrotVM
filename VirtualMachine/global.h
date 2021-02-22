@@ -13,9 +13,9 @@
 
 #define STRING_MAX_LENGTH	256
 
-#include "Token.h"
 #include "PMC.h"
 #include "VirtualContext.h"
+#include "Token.h"
 #include "Lexer.h"
 #include "StateMachine.h"
 #include "Compiler.h"

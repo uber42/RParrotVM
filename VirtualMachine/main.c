@@ -6,6 +6,7 @@
 int main()
 {
 	InititalizeStateMachineTables();
+	StateMachineTestParsedLexems();
 	StateMachineTestComplexLayers();
 
 	//system("PAUSE");
