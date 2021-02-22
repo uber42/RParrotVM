@@ -49,6 +49,9 @@ typedef struct _SMiddleStateLayer
 
 	/** Тип перехода */
 	ENextStateType			eTransitionType;
+
+	/** Процессорная операция */
+	EProcessorOperation		eEndPointOp;
 } SMiddleStateLayer, *PSMiddleStateLayer;
 
 typedef struct _SStateMachineTransition
@@ -74,6 +77,9 @@ typedef struct _SStateMachineTransition
 
 	/** Тип перехода */
 	ENextStateType			eTransitionType;
+
+	/** Процессорная операция */
+	EProcessorOperation		eEndPointOp;
 } SStateMachineTransition, *PSStateMachineTransition;
 
 typedef struct _SMiddleLayerContainer

@@ -123,6 +123,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Bytecode.h" />
+    <ClInclude Include="Compiler.h" />
     <ClInclude Include="Fnv1a.h" />
     <ClInclude Include="global.h" />
     <ClInclude Include="Lexer.h" />
@@ -135,6 +137,8 @@
     <ClInclude Include="VirtualContext.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Bytecode.c" />
+    <ClCompile Include="Compiler.c" />
     <ClCompile Include="Fnv1a.c" />
     <ClCompile Include="Lexer.c" />
     <ClCompile Include="LexerTest.c" />

@@ -118,10 +118,30 @@ StateMachineTestComplexLayers()
 	memset(&sContainer, 0, sizeof(SLexemeContainer));
 	PrepareCommand("push P0, \"New List Item\"", &sContainer);
 	bResult = StateMachineDriveLexemes(&sContainer);
+	assert(!bResult);
+
+	memset(&sContainer, 0, sizeof(SLexemeContainer));
+	PrepareCommand("push P0, \"New List Item\", 1", &sContainer);
+	bResult = StateMachineDriveLexemes(&sContainer);
 	assert(bResult);
 
 	memset(&sContainer, 0, sizeof(SLexemeContainer));
-	PrepareCommand("push P0, 1", &sContainer);
+	PrepareCommand("push P0, \"New List Item\", I0", &sContainer);
+	bResult = StateMachineDriveLexemes(&sContainer);
+	assert(bResult);
+
+	memset(&sContainer, 0, sizeof(SLexemeContainer));
+	PrepareCommand("push P0, \"New List Item\", P1", &sContainer);
+	bResult = StateMachineDriveLexemes(&sContainer);
+	assert(bResult);
+
+	memset(&sContainer, 0, sizeof(SLexemeContainer));
+	PrepareCommand("push P0, S1, P1", &sContainer);
+	bResult = StateMachineDriveLexemes(&sContainer);
+	assert(bResult);
+
+	memset(&sContainer, 0, sizeof(SLexemeContainer));
+	PrepareCommand("push P0", &sContainer);
 	bResult = StateMachineDriveLexemes(&sContainer);
 	assert(bResult);
 
@@ -131,7 +151,27 @@ StateMachineTestComplexLayers()
 	assert(!bResult);
 
 	memset(&sContainer, 0, sizeof(SLexemeContainer));
-	PrepareCommand("push P0", &sContainer);
+	PrepareCommand("push I0", &sContainer);
+	bResult = StateMachineDriveLexemes(&sContainer);
+	assert(bResult);
+
+	memset(&sContainer, 0, sizeof(SLexemeContainer));
+	PrepareCommand("pop I0", &sContainer);
+	bResult = StateMachineDriveLexemes(&sContainer);
+	assert(bResult);
+
+	memset(&sContainer, 0, sizeof(SLexemeContainer));
+	PrepareCommand("pop I0, P0, S0", &sContainer);
+	bResult = StateMachineDriveLexemes(&sContainer);
+	assert(bResult);
+
+	memset(&sContainer, 0, sizeof(SLexemeContainer));
+	PrepareCommand("pop I0, P0, N0", &sContainer);
 	bResult = StateMachineDriveLexemes(&sContainer);
 	assert(!bResult);
+
+	memset(&sContainer, 0, sizeof(SLexemeContainer));
+	PrepareCommand("pop N2, P0, S0", &sContainer);
+	bResult = StateMachineDriveLexemes(&sContainer);
+	assert(bResult);
 }

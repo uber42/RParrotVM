@@ -12,28 +12,34 @@
       <Filter>Generic</Filter>
     </ClInclude>
     <ClInclude Include="StateMachine.h">
-      <Filter>Parser\StateMachine</Filter>
+      <Filter>Compiler\StateMachine</Filter>
     </ClInclude>
     <ClInclude Include="Fnv1a.h">
       <Filter>Generic</Filter>
     </ClInclude>
-    <ClInclude Include="Token.h">
-      <Filter>Parser</Filter>
-    </ClInclude>
     <ClInclude Include="Lexer.h">
-      <Filter>Parser\Lexer</Filter>
+      <Filter>Compiler\Lexer</Filter>
     </ClInclude>
     <ClInclude Include="LexerTest.h">
-      <Filter>Parser\Lexer</Filter>
+      <Filter>Compiler\Lexer</Filter>
     </ClInclude>
     <ClInclude Include="StateMachineTest.h">
-      <Filter>Parser\StateMachine</Filter>
+      <Filter>Compiler\StateMachine</Filter>
+    </ClInclude>
+    <ClInclude Include="Bytecode.h">
+      <Filter>Compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="Compiler.h">
+      <Filter>Compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="Token.h">
+      <Filter>Compiler</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.c" />
     <ClCompile Include="StateMachine.c">
-      <Filter>Parser\StateMachine</Filter>
+      <Filter>Compiler\StateMachine</Filter>
     </ClCompile>
     <ClCompile Include="Fnv1a.c">
       <Filter>Generic</Filter>
@@ -45,13 +51,19 @@
       <Filter>Core\ParrotMagicCookie</Filter>
     </ClCompile>
     <ClCompile Include="Lexer.c">
-      <Filter>Parser\Lexer</Filter>
+      <Filter>Compiler\Lexer</Filter>
     </ClCompile>
     <ClCompile Include="LexerTest.c">
-      <Filter>Parser\Lexer</Filter>
+      <Filter>Compiler\Lexer</Filter>
     </ClCompile>
     <ClCompile Include="StateMachineTest.c">
-      <Filter>Parser\StateMachine</Filter>
+      <Filter>Compiler\StateMachine</Filter>
+    </ClCompile>
+    <ClCompile Include="Bytecode.c">
+      <Filter>Compiler</Filter>
+    </ClCompile>
+    <ClCompile Include="Compiler.c">
+      <Filter>Compiler</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -61,17 +73,17 @@
     <Filter Include="Generic">
       <UniqueIdentifier>{8d20b813-dbef-4965-a54d-58c38e243989}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Parser">
-      <UniqueIdentifier>{a18662e6-efe9-4bad-b3ab-4bcb87155057}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Parser\StateMachine">
-      <UniqueIdentifier>{0ef28495-2a23-48d0-9b7c-44407e53ecdc}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Core\ParrotMagicCookie">
       <UniqueIdentifier>{1f2721af-80fd-4372-a46b-b6bf0086d155}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Parser\Lexer">
+    <Filter Include="Compiler">
+      <UniqueIdentifier>{1136b497-6d71-4ff4-80ff-7fd0922c9e0c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Compiler\Lexer">
       <UniqueIdentifier>{625a6916-36df-4cbd-8588-e98eb5848722}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Compiler\StateMachine">
+      <UniqueIdentifier>{0ef28495-2a23-48d0-9b7c-44407e53ecdc}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

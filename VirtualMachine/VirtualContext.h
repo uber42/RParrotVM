@@ -6,7 +6,7 @@
 typedef enum _EProcessorOperation
 {
 	/** Инициализировать PMC */
-	EPO_NEW,
+	EPO_NEW = 1,
 	/** Установить значение */
 	EPO_SET,
 
@@ -65,18 +65,18 @@ typedef enum _EProcessorOperation
 	/** Вытащить из стека */
 	EPO_POP_STACK,
 
-	/** Вставить в список */
-	EPO_PUSH_LIST,
-	/** Вытащить из списка */
-	EPO_POP_LIST,
-
-	/** Вставить в хэш-таблицу */
-	EPO_PUSH_TABLE,
-	/** Вытащить из хэш-таблицы */
-	EPO_POP_TABLE,
+	/** Вставить в PMC */
+	EPO_PMC_PUSH,
+	/** Вытащить из PMC */
+	EPO_PMC_POP,
+	/** Удалить из PMC */
+	EPO_PMC_ERASE,
 
 	/** Конец программы */
-	EPO_END
+	EPO_END,
+
+	/** Тип PMC регистра */
+	EPO_TYPEOF
 } EProcessorOperation, *PEProcessorOperation;
 
 /** 

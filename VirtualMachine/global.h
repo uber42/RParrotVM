@@ -18,7 +18,7 @@
 #include "VirtualContext.h"
 #include "Lexer.h"
 #include "StateMachine.h"
-
+#include "Compiler.h"
 
 #include "LexerTest.h"
 #include "StateMachineTest.h"

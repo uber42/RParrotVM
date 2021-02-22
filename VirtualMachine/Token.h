@@ -50,7 +50,7 @@ typedef struct _SLexemeContainer
 	ETokenType			eToken[LINE_MAX_LEXEME_COUNT];
 
 	/** Выделенная операция на виртуальном процессоре */
-	//EProcessorOperation eEndPointOperation;
+	EProcessorOperation eEndPointOperation;
 } SLexemeContainer, * PSLexemeContainer;
 
 #endif
