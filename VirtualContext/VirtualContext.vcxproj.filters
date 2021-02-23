@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Core">
+      <UniqueIdentifier>{095a44f2-98aa-4939-82f4-7fb4c12d3b16}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\ParrotMagicCookie">
+      <UniqueIdentifier>{92a14075-4013-417c-a987-5a92f6e59035}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Generic">
+      <UniqueIdentifier>{c82d60d5-80ad-4caf-a193-d82435189633}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Fnv1a.h">
+      <Filter>Generic</Filter>
+    </ClInclude>
+    <ClInclude Include="List.h">
+      <Filter>Generic</Filter>
+    </ClInclude>
+    <ClInclude Include="VirtualContext.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="PMC.h">
+      <Filter>Core\ParrotMagicCookie</Filter>
+    </ClInclude>
+    <ClInclude Include="global.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Fnv1a.c">
+      <Filter>Generic</Filter>
+    </ClCompile>
+    <ClCompile Include="VirtualContext.c">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="PMC.c">
+      <Filter>Core\ParrotMagicCookie</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

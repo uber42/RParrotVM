@@ -9,13 +9,13 @@
 #include <assert.h>
 #include <stdlib.h>
 
-#include "List.h"
-#include "Fnv1a.h"
+#include "../VirtualContext/List.h"
+#include "../VirtualContext/Fnv1a.h"
 
 #define STRING_MAX_LENGTH	256
 
-#include "PMC.h"
-#include "VirtualContext.h"
+#include "../VirtualContext/PMC.h"
+#include "../VirtualContext/VirtualContext.h"
 #include "Token.h"
 #include "Lexer.h"
 #include "StateMachine.h"

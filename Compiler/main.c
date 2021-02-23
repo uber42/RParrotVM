@@ -7,7 +7,7 @@ int main()
 {
 	COMPILER hCompiler = NULL;
 	BOOL bResult = CreateCompiler(
-		&hCompiler, "C:\\Users\\uber42\\source\\repos\\Parrot\\VirtualMachine\\Examples\\loop.pasm");
+		&hCompiler, "C:\\Users\\uber42\\source\\repos\\Parrot\\Compiler\\Examples\\loop.pasm");
 	if (!bResult)
 	{
 		return FALSE;

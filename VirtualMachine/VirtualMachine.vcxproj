@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -20,10 +20,9 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
-    <ProjectGuid>{7196D0EE-18F7-47A1-8357-B1F4FF5128AA}</ProjectGuid>
-    <RootNamespace>Compiler</RootNamespace>
+    <ProjectGuid>{D008CBC4-D2FE-42A0-BC7B-86B28D8A7165}</ProjectGuid>
+    <RootNamespace>VirtualMachine</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>Compiler</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -80,7 +79,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -107,7 +105,6 @@
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -125,23 +122,6 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClInclude Include="Compiler.h" />
-    <ClInclude Include="global.h" />
-    <ClInclude Include="Lexer.h" />
-    <ClInclude Include="LexerTest.h" />
-    <ClInclude Include="StateMachine.h" />
-    <ClInclude Include="StateMachineTest.h" />
-    <ClInclude Include="Token.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="Compiler.c" />
-    <ClCompile Include="Lexer.c" />
-    <ClCompile Include="LexerTest.c" />
-    <ClCompile Include="main.c" />
-    <ClCompile Include="StateMachine.c" />
-    <ClCompile Include="StateMachineTest.c" />
-  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\VirtualContext\VirtualContext.vcxproj">
       <Project>{548964dc-7747-4eed-81c0-f61751cbc7cd}</Project>

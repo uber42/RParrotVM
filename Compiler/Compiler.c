@@ -88,17 +88,13 @@ ChompString(
 	PCHAR szLine
 ) 
 {
-	BOOL bSuccess = FALSE;
 	PCHAR pChar = strchr(szLine, '\n');
 
 	if (pChar != NULL)
 	{
 		INT index = (INT)(pChar - szLine);
 		szLine[index] = '\0';
-		bSuccess = TRUE;
 	}
-
-	return bSuccess;
 }
 
 static
@@ -124,7 +120,7 @@ HandleLexemes(
 		strcpy(psMarkerEntry->szMarker, psLexemeContainer->szLexemes[0]);
 		psMarkerEntry->dwOffset = sizeof(SBytecode) * psCompilerContext->dwLexemeCount;
 
-		ListAddToEnd(psMarkerEntry, &psCompilerContext->sMarkersList);
+		ListAddToEnd(&psMarkerEntry->sEntry, &psCompilerContext->sMarkersList);
 		return TRUE;
 	}
 
@@ -296,7 +292,7 @@ CreateCompiler(
 		return FALSE;
 	}
 
-	strcpy(psCompilerContext->szFileName, szFileName, MAX_PATH);
+	strcpy(psCompilerContext->szFileName, szFileName);
 
 	ListHeadInit(&psCompilerContext->sLexemeList);
 	ListHeadInit(&psCompilerContext->sMarkersList);
