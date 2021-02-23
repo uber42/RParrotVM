@@ -1,5 +1,11 @@
 ﻿#include "global.h"
 
+
+#define BYTECODE_STRING_LITERAL_FLAG	1 << 30
+#define BYTECODE_NUMBER_LITERAL_FLAG	1 << 29
+#define BYTECODE_VIRTUAL_MEMORY_FLAG	1 << 28
+#define BYTECODE_REGISTER_FLAG			1 << 27
+
 typedef struct _SBytecode
 {
 	/** Операция */
@@ -15,9 +21,6 @@ typedef struct _SByteStringList
 
 	/** Текстовый литерал */
 	CHAR	szString[STRING_MAX_LENGTH];
-
-	/** Номер строки в базе */
-	DWORD	dwNumber;
 } SByteStringList, *PSByteStringList;
 
 typedef struct _SByteMarkerList
@@ -88,6 +91,11 @@ HandleLexemes(
 {
 	if (psLexemeContainer->eToken[0] == EMT_MARKER)
 	{
+		if (psLexemeContainer->dwCount != 1)
+		{
+			return FALSE;
+		}
+
 		PSByteMarkerList psMarkerEntry = malloc(sizeof(SByteMarkerList));
 		if (!psMarkerEntry)
 		{
@@ -163,11 +171,92 @@ ReadAssemblerLines(
 
 static
 BOOL
-CompileLine(
-	PSLexemeContainer psContainer
+CompileAssembler(
+	PSCompilerContext	psCompilerContext
 )
 {
+	for (PSList psCurrentEntry = psCompilerContext->sLexemeList.pFlink;
+		psCurrentEntry != &psCompilerContext->sLexemeList;
+		psCurrentEntry = psCurrentEntry->pFlink)
+	{
+		PSBytecode psCurrentBytecode = malloc(sizeof(SBytecode));
+		if (!psCurrentBytecode)
+		{
+			return FALSE;
+		}
+		memset(psCurrentBytecode, 0, sizeof(SBytecode));
 
+		PSLexemeList psContainingEntry = CONTAINING_RECORD(
+			psCurrentEntry, SLexemeList, sEntry);
+		psCurrentBytecode->dwOperation = psContainingEntry->sLexeme.eEndPointOperation;
+		for (DWORD i = 1; i < psContainingEntry->sLexeme.dwCount; i++)
+		{
+			if (psContainingEntry->sLexeme.eToken[i] == EMT_STRING_LITERAL)
+			{
+				PSByteStringList psByteString = malloc(sizeof(SByteStringList));
+				if (!psByteString)
+				{
+					free(psCurrentBytecode);
+					return FALSE;
+				}
+				memset(psByteString, 0, sizeof(SByteStringList));
+				strcpy(psByteString, psContainingEntry->sLexeme.szLexemes[i]);
+
+				psCurrentBytecode->dwOperands[i - 1] = psCompilerContext->dwStringLiteralCount;
+				psCurrentBytecode->dwOperands[i - 1] |= BYTECODE_STRING_LITERAL_FLAG;
+				
+				psCompilerContext->dwStringLiteralCount++;
+
+				ListAddToEnd(&psByteString->sEntry, &psCompilerContext->sStringList);
+			}
+			else if(psContainingEntry->sLexeme.eToken[i] == EMT_MARKER)
+			{
+				DWORD dwOffset = -1;
+				for (PSList psCurrentMarker = psCompilerContext->sMarkersList.pFlink;
+					psCurrentMarker != &psCompilerContext->sMarkersList;
+					psCurrentMarker = psCurrentMarker->pFlink)
+				{
+					PSByteMarkerList psMarker = CONTAINING_RECORD(
+						psCurrentMarker, SByteMarkerList, sEntry);
+					if (!strcmp(psMarker->szMarker, psContainingEntry->sLexeme.szLexemes[i]))
+					{
+						dwOffset = psMarker->dwOffset;
+						break;
+					}
+				}
+
+				if (dwOffset == (DWORD)-1)
+				{
+					free(psCurrentBytecode);
+					return FALSE;
+				}
+
+				psCurrentBytecode->dwOperands[i - 1] = dwOffset;
+			}
+			else if((psContainingEntry->sLexeme.eToken[i] & REGISTERS_MASK) == psContainingEntry->sLexeme.eToken[i])
+			{
+				DWORD dwRegisterNumber = ((int)psContainingEntry->sLexeme.szLexemes[1] - 48);
+
+				psCurrentBytecode->dwOperands[i - 1] = psContainingEntry->sLexeme.eToken[i];
+				psCurrentBytecode->dwOperands[i - 1] |= BYTECODE_REGISTER_FLAG;
+				psCurrentBytecode->dwOperands[i - 1] |= (dwRegisterNumber << 25);
+			}
+			else if ((psContainingEntry->sLexeme.eToken[i] & EMT_VIRTUAL_MEMORY) == psContainingEntry->sLexeme.eToken[i])
+			{
+				psCurrentBytecode->dwOperands[i - 1] = strtol(psContainingEntry->sLexeme.szLexemes[i], NULL, 16);
+				psCurrentBytecode->dwOperands[i - 1] |= BYTECODE_VIRTUAL_MEMORY_FLAG;
+			}
+			else if ((psContainingEntry->sLexeme.eToken[i] & EMT_NUMBER_LITERAL) == psContainingEntry->sLexeme.eToken[i])
+			{
+				psCurrentBytecode->dwOperands[i - 1] = strtol(psContainingEntry->sLexeme.szLexemes[i], NULL, 10);
+				psCurrentBytecode->dwOperands[i - 1] |= BYTECODE_NUMBER_LITERAL_FLAG;
+			}
+			else
+			{
+				psCurrentBytecode->dwOperands[i - 1] = psContainingEntry->sLexeme.eToken[i];
+			}
+		}
+	}
 }
 
 BOOL
@@ -208,6 +297,12 @@ CompileProgram(
 	PSCompilerContext psCompilerContext = hCompilerContext;
 
 	BOOL bResult = ReadAssemblerLines(psCompilerContext);
+	if (!bResult)
+	{
+		return FALSE;
+	}
+
+	bResult = CompileAssembler(psCompilerContext);
 	if (!bResult)
 	{
 		return FALSE;
