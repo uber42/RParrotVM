@@ -144,6 +144,10 @@ ReadAssemblerLines(
 			bSuccess = FALSE;
 			break;
 		}
+		if (sLexemeContainer.dwCount == 0)
+		{
+			continue;
+		}
 
 		bResult = HandleLexemes(psCompilerContext, &sLexemeContainer);
 		if (!bResult)

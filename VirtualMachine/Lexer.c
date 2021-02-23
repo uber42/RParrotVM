@@ -380,5 +380,6 @@ PrepareCommand(
 		}
 	}
 
-	return (psLexemeContainer->dwCount == 1 && bNextLexeme) || !bNextLexeme;
+	return (psLexemeContainer->dwCount == 1 && bNextLexeme) || !bNextLexeme || 
+		   (psLexemeContainer->dwCount == 0 && bNextLexeme);
 }

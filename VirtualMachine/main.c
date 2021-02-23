@@ -14,12 +14,8 @@ int main()
 	}
 
 	bResult = CompileProgram(hCompiler);
-	if (!bResult)
-	{
-		return FALSE;
-	}
+	assert(bResult);
 
 	CloseCompiler(hCompiler);
 	return TRUE;
-	//system("PAUSE");
 }
