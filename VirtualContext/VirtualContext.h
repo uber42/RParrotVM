@@ -101,11 +101,5 @@ typedef struct _SVirtualProcessor
 	UINT64						IP;
 } SVirtualProcessor, *PSVirtualProcessor;
 
-/**
- * Виртуальная оперативная память
- */
-static BYTE* g_bVirtualMemory = (BYTE*)0;
-
-
 
 #endif

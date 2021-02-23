@@ -338,7 +338,7 @@ SaveBytecodeToFile(
 )
 {
 	PSCompilerContext psCompilerContext = hCompiler;
-	FILE* pFile = fopen(szFileName, "a+");
+	FILE* pFile = fopen(szFileName, "wb");
 	if (pFile == NULL)
 	{
 		return FALSE;
