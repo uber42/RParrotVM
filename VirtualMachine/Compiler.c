@@ -1,60 +1,160 @@
-#include "global.h"
+ï»¿#include "global.h"
 
 typedef struct _SBytecode
 {
-	/** Îïåðàöèÿ */
-	BYTE	dwOperation : 6;
+	/** ÐžÐ¿ÐµÑ€Ð°Ñ†Ð¸Ñ */
+	BYTE	dwOperation;
 
-	/** Äàííûå */
-	BYTE	pOperands[0];
-};
+	/** Ð”Ð°Ð½Ð½Ñ‹Ðµ */
+	DWORD	dwOperands[4];
+} SBytecode, *PSBytecode;
 
 typedef struct _SByteStringList
 {
 	SList	sEntry;
 
-	/** Òåêñòîâûé ëèòåðàë */
+	/** Ð¢ÐµÐºÑÑ‚Ð¾Ð²Ñ‹Ð¹ Ð»Ð¸Ñ‚ÐµÑ€Ð°Ð» */
 	CHAR	szString[STRING_MAX_LENGTH];
 
-	/** Íîìåð ñòðîêè â áàçå */
+	/** ÐÐ¾Ð¼ÐµÑ€ ÑÑ‚Ñ€Ð¾ÐºÐ¸ Ð² Ð±Ð°Ð·Ðµ */
 	DWORD	dwNumber;
-};
+} SByteStringList, *PSByteStringList;
 
 typedef struct _SByteMarkerList
 {
 	SList	sEntry;
 
-	/** Ìàðêåð */
+	/** ÐœÐ°Ñ€ÐºÐµÑ€ */
 	CHAR	szMarker[STRING_MAX_LENGTH];
 
-	/** Ñìåùåíèå ìàðêåðà */
+	/** Ð¡Ð¼ÐµÑ‰ÐµÐ½Ð¸Ðµ Ð¼Ð°Ñ€ÐºÐµÑ€Ð° */
 	DWORD	dwOffset;
-};
+} SByteMarkerList, *PSByteMarkerList;
 
 typedef struct _SLexemeList
 {
 	SList				sEntry;
 
-	/** Ëåêñåìû â ðàìêàõ îäíîé îïåðàöèè */
+	/** Ð›ÐµÐºÑÐµÐ¼Ñ‹ Ð² Ñ€Ð°Ð¼ÐºÐ°Ñ… Ð¾Ð´Ð½Ð¾Ð¹ Ð¾Ð¿ÐµÑ€Ð°Ñ†Ð¸Ð¸ */
 	SLexemeContainer	sLexeme;
-};
+} SLexemeList, *PSLexemeList;
 
 typedef struct _SCompilerContext
 {
-	/** Ñïèñîê ìåòîê */
+	/** Ð¤Ð°Ð¹Ð» Ñ Ð¿Ñ€Ð¾Ð³Ñ€Ð°Ð¼Ð¼Ð¾Ð¹ */
+	CHAR	szFileName[MAX_PATH];
+
+	/** ÐšÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²Ð¾ ÑÑ‚Ñ€Ð¾ÐºÐ¾Ð²Ñ‹Ñ… Ð»Ð¸Ñ‚ÐµÑ€Ð°Ð¾Ð»Ð² */
+	DWORD	dwStringLiteralCount;
+
+	/** Ð¡Ð¿Ð¸ÑÐ¾Ðº Ð¼ÐµÑ‚Ð¾Ðº */
 	SList	sMarkersList;
 
-	/** Ñïèñîê ëèòåðàëîâ ñòðîê */
+	/** Ð¡Ð¿Ð¸ÑÐ¾Ðº Ð»Ð¸Ñ‚ÐµÑ€Ð°Ð»Ð¾Ð² ÑÑ‚Ñ€Ð¾Ðº */
 	SList	sStringList;
-};
+
+	/** ÐšÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²Ð¾ Ð»ÐµÐºÑÐµÐ¼ */
+	DWORD	dwLexemeCount;
+
+	/** Ð¡Ð¿Ð¸ÑÐ¾Ðº Ð»ÐµÐºÑÐµÐ¼ */
+	SList	sLexemeList;
+} SCompilerContext, *PSCompilerContext;
+
+static
+VOID
+ChompString(
+	PCHAR szLine
+) 
+{
+	BOOL bSuccess = FALSE;
+	PCHAR pChar = strchr(szLine, '\n');
+
+	if (pChar != NULL)
+	{
+		INT index = (INT)(pChar - szLine);
+		szLine[index] = '\0';
+		bSuccess = TRUE;
+	}
+
+	return bSuccess;
+}
 
 static
 BOOL
-ReadAssemblerLine(
-	PSLexemeContainer psContainer
+HandleLexemes(
+	PSCompilerContext	psCompilerContext,
+	PSLexemeContainer   psLexemeContainer
 )
 {
+	BOOL bResult = StateMachineDriveLexemes(psLexemeContainer);
+	if (!bResult)
+	{
+		return FALSE;
+	}
 
+	if (psLexemeContainer->eToken[0] == EMT_MARKER)
+	{
+		PSByteMarkerList psMarkerEntry = malloc(sizeof(SByteMarkerList));
+		if (!psMarkerEntry)
+		{
+			return FALSE;
+		}
+
+		strcpy(psMarkerEntry->szMarker, psLexemeContainer->szLexemes[0]);
+		psMarkerEntry->dwOffset = sizeof(SBytecode) * psCompilerContext->dwLexemeCount;
+
+		ListAddToEnd(psMarkerEntry, &psCompilerContext->sMarkersList);
+		return TRUE;
+	}
+
+	PSLexemeList psLexemeEntry = malloc(sizeof(SLexemeList));
+	if (!psLexemeEntry)
+	{
+		return FALSE;
+	}
+
+	memcpy(&psLexemeEntry->sLexeme, psLexemeContainer, sizeof(SLexemeContainer));
+	ListAddToEnd(&psLexemeEntry->sEntry, &psCompilerContext->sLexemeList);
+
+	psCompilerContext->dwLexemeCount++;
+	return TRUE;
+}
+
+static
+BOOL
+ReadAssemblerLines(
+	PSCompilerContext	psCompilerContext
+)
+{
+	CHAR szBuffer[STRING_MAX_LENGTH * 2];
+	FILE* pFile = fopen(psCompilerContext->szFileName, "r");
+	if (pFile == NULL)
+	{
+		return FALSE;
+	}
+
+	BOOL bSuccess = TRUE;
+	while (fgets(szBuffer, sizeof(szBuffer), pFile) != NULL)
+	{
+		ChompString(szBuffer);
+		SLexemeContainer sLexemeContainer = { 0 };
+		BOOL bResult = PrepareCommand(szBuffer, &sLexemeContainer);
+		if (!bResult)
+		{
+			bSuccess = FALSE;
+			break;
+		}
+
+		bResult = HandleLexemes(psCompilerContext, &sLexemeContainer);
+		if (!bResult)
+		{
+			bSuccess = FALSE;
+			break;
+		}
+	}
+
+	 fclose(pFile);
+	 return TRUE;
 }
 
 static
@@ -67,7 +167,75 @@ CompileLine(
 }
 
 BOOL
-CompileProgram()
+CreateCompiler(
+	PCOMPILER	hCompilerContext,
+	CHAR		szFileName[MAX_PATH]
+)
 {
+	assert(hCompilerContext);
 
+	PSCompilerContext psCompilerContext = malloc(sizeof(SCompilerContext));
+	if (!psCompilerContext)
+	{
+		return FALSE;
+	}
+
+	strcpy(psCompilerContext->szFileName, szFileName, MAX_PATH);
+
+	ListHeadInit(&psCompilerContext->sLexemeList);
+	ListHeadInit(&psCompilerContext->sMarkersList);
+	ListHeadInit(&psCompilerContext->sStringList);
+
+	InititalizeStateMachineTables();
+
+	psCompilerContext->dwStringLiteralCount = 0;
+	psCompilerContext->dwLexemeCount = 0;
+
+	*hCompilerContext = psCompilerContext;
+
+	return TRUE;
+}
+
+BOOL
+CompileProgram(
+	COMPILER	hCompilerContext
+)
+{
+	PSCompilerContext psCompilerContext = hCompilerContext;
+
+	BOOL bResult = ReadAssemblerLines(psCompilerContext);
+	if (!bResult)
+	{
+		return FALSE;
+	}
+
+	return TRUE;
+}
+
+static
+VOID
+FreeList(
+	PSList psHead
+)
+{
+	while (!ListIsEmpty(psHead))
+	{
+		PSList psCurrentEntry = psHead->pFlink;
+		ListNodeDelete(psHead->pFlink);
+
+		free(psCurrentEntry);
+	}
+}
+
+VOID
+CloseCompiler(
+	COMPILER	hCompiler
+)
+{
+	PSCompilerContext psCompilerContext = hCompiler;
+	FreeList(&psCompilerContext->sLexemeList);
+	FreeList(&psCompilerContext->sStringList);
+	FreeList(&psCompilerContext->sMarkersList);
+
+	free(psCompilerContext);
 }

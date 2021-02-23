@@ -7,6 +7,7 @@
 #include <Windows.h>
 #include <string.h>
 #include <assert.h>
+#include <stdlib.h>
 
 #include "List.h"
 #include "Fnv1a.h"

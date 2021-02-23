@@ -77,6 +77,7 @@ LexerCommandsTest()
 
 	memset(&sContainer, 0, sizeof(SLexemeContainer));
 	bResult = PrepareCommand(" MARKER: ", &sContainer);
+	assert(sContainer.eToken[0] == EMT_MARKER);
 	assert(bResult);
 
 	memset(&sContainer, 0, sizeof(SLexemeContainer));
@@ -149,4 +150,8 @@ LexerCommandsTest()
 	memset(&sContainer, 0, sizeof(SLexemeContainer));
 	bResult = PrepareCommand("set N2, .3", &sContainer);
 	assert(!bResult);
+
+	memset(&sContainer, 0, sizeof(SLexemeContainer));
+	bResult = PrepareCommand("set I2, 0", &sContainer);
+	assert(bResult);
 }
