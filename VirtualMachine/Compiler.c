@@ -86,12 +86,6 @@ HandleLexemes(
 	PSLexemeContainer   psLexemeContainer
 )
 {
-	BOOL bResult = StateMachineDriveLexemes(psLexemeContainer);
-	if (!bResult)
-	{
-		return FALSE;
-	}
-
 	if (psLexemeContainer->eToken[0] == EMT_MARKER)
 	{
 		PSByteMarkerList psMarkerEntry = malloc(sizeof(SByteMarkerList));
@@ -105,6 +99,12 @@ HandleLexemes(
 
 		ListAddToEnd(psMarkerEntry, &psCompilerContext->sMarkersList);
 		return TRUE;
+	}
+
+	BOOL bResult = StateMachineDriveLexemes(psLexemeContainer);
+	if (!bResult)
+	{
+		return FALSE;
 	}
 
 	PSLexemeList psLexemeEntry = malloc(sizeof(SLexemeList));
@@ -154,7 +154,7 @@ ReadAssemblerLines(
 	}
 
 	 fclose(pFile);
-	 return TRUE;
+	 return bSuccess;
 }
 
 static

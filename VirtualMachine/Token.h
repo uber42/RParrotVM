@@ -1,4 +1,4 @@
-#ifndef TOKEN_H
+п»ї#ifndef TOKEN_H
 #define TOKEN_H
 
 typedef enum _ETokenType
@@ -40,16 +40,16 @@ typedef enum _ETokenType
 
 typedef struct _SLexemeContainer
 {
-	/** Количество лексем */
+	/** РљРѕР»РёС‡РµСЃС‚РІРѕ Р»РµРєСЃРµРј */
 	DWORD				dwCount;
 
-	/** Лексемы */
+	/** Р›РµРєСЃРµРјС‹ */
 	CHAR				szLexemes[LINE_MAX_LEXEME_COUNT][STRING_MAX_LENGTH];
 
-	/** Токен */
+	/** РўРѕРєРµРЅ */
 	ETokenType			eToken[LINE_MAX_LEXEME_COUNT];
 
-	/** Выделенная операция на виртуальном процессоре */
+	/** Р’С‹РґРµР»РµРЅРЅР°СЏ РѕРїРµСЂР°С†РёСЏ РЅР° РІРёСЂС‚СѓР°Р»СЊРЅРѕРј РїСЂРѕС†РµСЃСЃРѕСЂРµ */
 	EProcessorOperation eEndPointOperation;
 } SLexemeContainer, * PSLexemeContainer;
 

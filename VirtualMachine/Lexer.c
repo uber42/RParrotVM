@@ -211,7 +211,7 @@ PrepareCommand(
 			for (; j < dwLength && !CheckWhiteSpace(pszCommandLine[j]); j++);
 
 			/** Маркеры */
-			if (j - 1 - i > 2)
+			if (j - i > 2)
 			{
 				for (DWORD k = i; k < j; k++)
 				{
