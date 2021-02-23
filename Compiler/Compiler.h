@@ -14,6 +14,12 @@ CompileProgram(
 	COMPILER	hCompilerContext
 );
 
+BOOL
+SaveBytecodeToFile(
+	COMPILER	hCompiler,
+	CHAR		szFileName[MAX_PATH]
+);
+
 VOID
 CloseCompiler(
 	COMPILER	hCompiler

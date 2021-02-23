@@ -6,6 +6,15 @@
 #define BYTECODE_VIRTUAL_MEMORY_FLAG	1 << 28
 #define BYTECODE_REGISTER_FLAG			1 << 27
 
+typedef struct _SFrozenFileHeader
+{
+	/** Количество литералов */
+	DWORD	dwLiteralsCount;
+
+	/** Смещение к коду */
+	DWORD	dwCodeMapOffset;
+} SFrozenFileHeader;
+
 typedef struct _SBytecode
 {
 	/** Операция */
@@ -14,6 +23,13 @@ typedef struct _SBytecode
 	/** Данные */
 	DWORD	dwOperands[4];
 } SBytecode, *PSBytecode;
+
+typedef struct _SBytecodeList
+{
+	SList		sEntry;
+
+	SBytecode	sBytecode;
+} SBytecodeList, *PSBytecodeList;
 
 typedef struct _SByteStringList
 {
@@ -61,6 +77,9 @@ typedef struct _SCompilerContext
 
 	/** Список лексем */
 	SList	sLexemeList;
+
+	/** Байткод */
+	SList	sBytecode;
 } SCompilerContext, *PSCompilerContext;
 
 static
@@ -179,7 +198,7 @@ CompileAssembler(
 		psCurrentEntry != &psCompilerContext->sLexemeList;
 		psCurrentEntry = psCurrentEntry->pFlink)
 	{
-		PSBytecode psCurrentBytecode = malloc(sizeof(SBytecode));
+		PSBytecodeList psCurrentBytecode = malloc(sizeof(SBytecodeList));
 		if (!psCurrentBytecode)
 		{
 			return FALSE;
@@ -188,7 +207,7 @@ CompileAssembler(
 
 		PSLexemeList psContainingEntry = CONTAINING_RECORD(
 			psCurrentEntry, SLexemeList, sEntry);
-		psCurrentBytecode->dwOperation = psContainingEntry->sLexeme.eEndPointOperation;
+		psCurrentBytecode->sBytecode.dwOperation = psContainingEntry->sLexeme.eEndPointOperation;
 		for (DWORD i = 1; i < psContainingEntry->sLexeme.dwCount; i++)
 		{
 			if (psContainingEntry->sLexeme.eToken[i] == EMT_STRING_LITERAL)
@@ -200,10 +219,10 @@ CompileAssembler(
 					return FALSE;
 				}
 				memset(psByteString, 0, sizeof(SByteStringList));
-				strcpy(psByteString, psContainingEntry->sLexeme.szLexemes[i]);
+				strcpy(psByteString->szString, psContainingEntry->sLexeme.szLexemes[i]);
 
-				psCurrentBytecode->dwOperands[i - 1] = psCompilerContext->dwStringLiteralCount;
-				psCurrentBytecode->dwOperands[i - 1] |= BYTECODE_STRING_LITERAL_FLAG;
+				psCurrentBytecode->sBytecode.dwOperands[i - 1] = psCompilerContext->dwStringLiteralCount;
+				psCurrentBytecode->sBytecode.dwOperands[i - 1] |= BYTECODE_STRING_LITERAL_FLAG;
 				
 				psCompilerContext->dwStringLiteralCount++;
 
@@ -231,32 +250,36 @@ CompileAssembler(
 					return FALSE;
 				}
 
-				psCurrentBytecode->dwOperands[i - 1] = dwOffset;
+				psCurrentBytecode->sBytecode.dwOperands[i - 1] = dwOffset;
 			}
 			else if((psContainingEntry->sLexeme.eToken[i] & REGISTERS_MASK) == psContainingEntry->sLexeme.eToken[i])
 			{
 				DWORD dwRegisterNumber = ((int)psContainingEntry->sLexeme.szLexemes[1] - 48);
 
-				psCurrentBytecode->dwOperands[i - 1] = psContainingEntry->sLexeme.eToken[i];
-				psCurrentBytecode->dwOperands[i - 1] |= BYTECODE_REGISTER_FLAG;
-				psCurrentBytecode->dwOperands[i - 1] |= (dwRegisterNumber << 25);
+				psCurrentBytecode->sBytecode.dwOperands[i - 1] = psContainingEntry->sLexeme.eToken[i];
+				psCurrentBytecode->sBytecode.dwOperands[i - 1] |= BYTECODE_REGISTER_FLAG;
+				psCurrentBytecode->sBytecode.dwOperands[i - 1] |= (dwRegisterNumber << 25);
 			}
 			else if ((psContainingEntry->sLexeme.eToken[i] & EMT_VIRTUAL_MEMORY) == psContainingEntry->sLexeme.eToken[i])
 			{
-				psCurrentBytecode->dwOperands[i - 1] = strtol(psContainingEntry->sLexeme.szLexemes[i], NULL, 16);
-				psCurrentBytecode->dwOperands[i - 1] |= BYTECODE_VIRTUAL_MEMORY_FLAG;
+				psCurrentBytecode->sBytecode.dwOperands[i - 1] = strtol(psContainingEntry->sLexeme.szLexemes[i], NULL, 16);
+				psCurrentBytecode->sBytecode.dwOperands[i - 1] |= BYTECODE_VIRTUAL_MEMORY_FLAG;
 			}
 			else if ((psContainingEntry->sLexeme.eToken[i] & EMT_NUMBER_LITERAL) == psContainingEntry->sLexeme.eToken[i])
 			{
-				psCurrentBytecode->dwOperands[i - 1] = strtol(psContainingEntry->sLexeme.szLexemes[i], NULL, 10);
-				psCurrentBytecode->dwOperands[i - 1] |= BYTECODE_NUMBER_LITERAL_FLAG;
+				psCurrentBytecode->sBytecode.dwOperands[i - 1] = strtol(psContainingEntry->sLexeme.szLexemes[i], NULL, 10);
+				psCurrentBytecode->sBytecode.dwOperands[i - 1] |= BYTECODE_NUMBER_LITERAL_FLAG;
 			}
 			else
 			{
-				psCurrentBytecode->dwOperands[i - 1] = psContainingEntry->sLexeme.eToken[i];
+				psCurrentBytecode->sBytecode.dwOperands[i - 1] = psContainingEntry->sLexeme.eToken[i];
 			}
 		}
+
+		ListAddToEnd(&psCurrentBytecode->sEntry, &psCompilerContext->sBytecode);
 	}
+
+	return TRUE;
 }
 
 BOOL
@@ -278,6 +301,7 @@ CreateCompiler(
 	ListHeadInit(&psCompilerContext->sLexemeList);
 	ListHeadInit(&psCompilerContext->sMarkersList);
 	ListHeadInit(&psCompilerContext->sStringList);
+	ListHeadInit(&psCompilerContext->sBytecode);
 
 	InititalizeStateMachineTables();
 
@@ -311,6 +335,62 @@ CompileProgram(
 	return TRUE;
 }
 
+BOOL
+SaveBytecodeToFile(
+	COMPILER	hCompiler,
+	CHAR		szFileName[MAX_PATH]
+)
+{
+	PSCompilerContext psCompilerContext = hCompiler;
+	FILE* pFile = fopen(szFileName, "a+");
+	if (pFile == NULL)
+	{
+		return FALSE;
+	}
+
+	SFrozenFileHeader sHeader = { 0 };
+	sHeader.dwCodeMapOffset = sizeof(SFrozenFileHeader) + psCompilerContext->dwStringLiteralCount * STRING_MAX_LENGTH;
+	sHeader.dwLiteralsCount = psCompilerContext->dwStringLiteralCount;
+
+	SIZE_T nCountWrote = fwrite(&sHeader, sizeof(SFrozenFileHeader), 1, pFile);
+	if (!nCountWrote)
+	{
+		fclose(pFile);
+		return FALSE;
+	}
+
+	for (PSList psCurrentEntry = psCompilerContext->sStringList.pFlink;
+		psCurrentEntry != &psCompilerContext->sStringList;
+		psCurrentEntry = psCurrentEntry->pFlink)
+	{
+		PSByteStringList psString = CONTAINING_RECORD(
+			psCurrentEntry, SByteStringList, sEntry);
+		SIZE_T nCountWrote = fwrite(psString->szString, STRING_MAX_LENGTH, 1, pFile);
+		if (!nCountWrote)
+		{
+			fclose(pFile);
+			return FALSE;
+		}
+	}
+
+	for (PSList psCurrentEntry = psCompilerContext->sBytecode.pFlink;
+		psCurrentEntry != &psCompilerContext->sBytecode;
+		psCurrentEntry = psCurrentEntry->pFlink)
+	{
+		PSBytecodeList psString = CONTAINING_RECORD(
+			psCurrentEntry, SBytecodeList, sEntry);
+		SIZE_T nCountWrote = fwrite(&psString->sBytecode, sizeof(SBytecode), 1, pFile);
+		if (!nCountWrote)
+		{
+			fclose(pFile);
+			return FALSE;
+		}
+	}
+
+	fclose(pFile);
+	return TRUE;
+}
+
 static
 VOID
 FreeList(
@@ -335,6 +415,7 @@ CloseCompiler(
 	FreeList(&psCompilerContext->sLexemeList);
 	FreeList(&psCompilerContext->sStringList);
 	FreeList(&psCompilerContext->sMarkersList);
+	FreeList(&psCompilerContext->sBytecode);
 
 	free(psCompilerContext);
 }

@@ -16,6 +16,9 @@ int main()
 	bResult = CompileProgram(hCompiler);
 	assert(bResult);
 
+	bResult = SaveBytecodeToFile(hCompiler, "./Bytecode.bin");
+	assert(bResult);
+
 	CloseCompiler(hCompiler);
 	return TRUE;
 }
