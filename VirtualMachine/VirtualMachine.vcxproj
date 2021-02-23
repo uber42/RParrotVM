@@ -127,6 +127,16 @@
       <Project>{548964dc-7747-4eed-81c0-f61751cbc7cd}</Project>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="HashTable.c" />
+    <ClCompile Include="main.c" />
+    <ClCompile Include="Runtime.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="global.h" />
+    <ClInclude Include="HashTable.h" />
+    <ClInclude Include="Runtime.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
