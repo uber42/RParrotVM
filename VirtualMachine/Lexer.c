@@ -161,14 +161,25 @@ PrepareCommand(
 		/** Числовые литералы */
 		else if (isdigit(pszCommandLine[i]))
 		{
+			BOOL bHasDot = FALSE;
 			DWORD j = i;
 			for (; j < dwLength && !CheckWhiteSpace(pszCommandLine[j]); j++);
 			for (DWORD k = i; k < j; k++)
 			{
 				if (!isdigit(pszCommandLine[k]))
 				{
+					if (!bHasDot && pszCommandLine[k] == '.')
+					{
+						bHasDot = TRUE;
+						continue;
+					}
 					return FALSE;
 				}
+			}
+
+			if (pszCommandLine[j - 1] == '.')
+			{
+				return FALSE;
 			}
 
 			memset(psLexemeContainer->szLexemes[dwCurrentCount], 0, STRING_MAX_LENGTH);

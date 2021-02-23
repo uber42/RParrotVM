@@ -121,4 +121,32 @@ LexerCommandsTest()
 	assert(sContainer.eToken[0] == EMT_COMMAND);
 	assert(sContainer.eToken[1] == EMT_P);
 	assert(sContainer.eToken[2] == EMT_NUMBER_LITERAL);
+
+	memset(&sContainer, 0, sizeof(SLexemeContainer));
+	bResult = PrepareCommand("set N2, 3.14", &sContainer);
+	assert(bResult);
+	assert(sContainer.dwCount == 3);
+	assert(sContainer.eToken[0] == EMT_COMMAND);
+	assert(sContainer.eToken[1] == EMT_N);
+	assert(sContainer.eToken[2] == EMT_NUMBER_LITERAL);
+
+	memset(&sContainer, 0, sizeof(SLexemeContainer));
+	bResult = PrepareCommand("set N2, .314", &sContainer);
+	assert(!bResult);
+
+	memset(&sContainer, 0, sizeof(SLexemeContainer));
+	bResult = PrepareCommand("set N2, 314.", &sContainer);
+	assert(!bResult);
+
+	memset(&sContainer, 0, sizeof(SLexemeContainer));
+	bResult = PrepareCommand("set N2, 3.", &sContainer);
+	assert(!bResult);
+
+	memset(&sContainer, 0, sizeof(SLexemeContainer));
+	bResult = PrepareCommand("set N2, .", &sContainer);
+	assert(!bResult);
+
+	memset(&sContainer, 0, sizeof(SLexemeContainer));
+	bResult = PrepareCommand("set N2, .3", &sContainer);
+	assert(!bResult);
 }
