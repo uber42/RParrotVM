@@ -117,7 +117,7 @@ static const SStateMachineTransition transition_1[] =
 
 	{ EMT_MARKER,							{ .nNextState = -1			},		9,		1,		ENST_NUMBER,	EPO_BSR			},		// bsr [MARKER]
 
-	{ EMT_S | EMT_STRING_LITERAL,			{ .nNextState = -1			},		12,		1,		ENST_NUMBER,	EPO_PRINT		},		// print [REG, STRING_LITERAL]
+	{ NATIVE_MASK,							{ .nNextState = -1			},		12,		1,		ENST_NUMBER,	EPO_PRINT		},		// print [REG, STRING_LITERAL]
 
 	{ EMT_NUMBER_LITERAL | EMT_I | EMT_P,	{ .nNextState = 9			},		13,		1,		ENST_NUMBER,	EPO_PUSH_STACK	},		// push
 	{ REGISTERS_MASK,						{ .nNextState = 10			},		13,		1,		ENST_NUMBER,	EPO_POP_STACK	},		// pop
