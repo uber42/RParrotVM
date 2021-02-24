@@ -18,6 +18,7 @@
 #include "../VirtualContext/VirtualContext.h"
 
 #include "HashTable.h"
+#include "Operations.h"
 #include "Runtime.h"
 
 #endif

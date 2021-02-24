@@ -132,11 +132,13 @@
   <ItemGroup>
     <ClCompile Include="HashTable.c" />
     <ClCompile Include="main.c" />
+    <ClCompile Include="Operations.c" />
     <ClCompile Include="Runtime.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="global.h" />
     <ClInclude Include="HashTable.h" />
+    <ClInclude Include="Operations.h" />
     <ClInclude Include="Runtime.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

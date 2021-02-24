@@ -95,7 +95,8 @@ static
 BOOL
 HandleLexemes(
 	PSCompilerContext	psCompilerContext,
-	PSLexemeContainer   psLexemeContainer
+	PSLexemeContainer   psLexemeContainer,
+	PDWORD				pdwCurrentOffset
 )
 {
 	if (psLexemeContainer->eToken[0] == EMT_MARKER)
@@ -112,7 +113,7 @@ HandleLexemes(
 		}
 
 		strcpy(psMarkerEntry->szMarker, psLexemeContainer->szLexemes[0]);
-		psMarkerEntry->dwOffset = sizeof(SBytecode) * psCompilerContext->dwLexemeCount;
+		psMarkerEntry->dwOffset = *pdwCurrentOffset;
 
 		ListAddToEnd(&psMarkerEntry->sEntry, &psCompilerContext->sMarkersList);
 		return TRUE;
@@ -134,6 +135,7 @@ HandleLexemes(
 	ListAddToEnd(&psLexemeEntry->sEntry, &psCompilerContext->sLexemeList);
 
 	psCompilerContext->dwLexemeCount++;
+	*pdwCurrentOffset += sizeof(BYTE) + sizeof(DWORD) * (psLexemeContainer->dwCount - 1);
 	return TRUE;
 }
 
@@ -151,6 +153,7 @@ ReadAssemblerLines(
 	}
 
 	BOOL bSuccess = TRUE;
+	DWORD dwOffset = 0;
 	while (fgets(szBuffer, sizeof(szBuffer), pFile) != NULL)
 	{
 		ChompString(szBuffer);
@@ -166,7 +169,7 @@ ReadAssemblerLines(
 			continue;
 		}
 
-		bResult = HandleLexemes(psCompilerContext, &sLexemeContainer);
+		bResult = HandleLexemes(psCompilerContext, &sLexemeContainer, &dwOffset);
 		if (!bResult)
 		{
 			bSuccess = FALSE;

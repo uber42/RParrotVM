@@ -1,7 +1,7 @@
-#ifndef HASH_TABLE_H
+п»ї#ifndef HASH_TABLE_H
 #define	HASH_TABLE_H
 
-/** Максимальная высота */
+/** РњР°РєСЃРёРјР°Р»СЊРЅР°СЏ РІС‹СЃРѕС‚Р° */
 #define SKIP_LIST_MAX_HEIGHT 11
 
 typedef int FSkipListComp(
@@ -27,37 +27,37 @@ typedef VOID FSkipListNodeValueChanger(
 
 typedef struct _SkipList
 {
-	/** Количество записей */
+	/** РљРѕР»РёС‡РµСЃС‚РІРѕ Р·Р°РїРёСЃРµР№ */
 	DWORD  dwCount;
 
-	/** Высота */
+	/** Р’С‹СЃРѕС‚Р° */
 	DWORD  dwHeight;
 
-	/** Компаратор */
+	/** РљРѕРјРїР°СЂР°С‚РѕСЂ */
 	FSkipListComp* pfComparator;
 
-	/** Функция удаления узла */
+	/** Р¤СѓРЅРєС†РёСЏ СѓРґР°Р»РµРЅРёСЏ СѓР·Р»Р° */
 	FSkipListNodeEraser* pfEraser;
 
-	/** Функция изменения значения узла */
+	/** Р¤СѓРЅРєС†РёСЏ РёР·РјРµРЅРµРЅРёСЏ Р·РЅР°С‡РµРЅРёСЏ СѓР·Р»Р° */
 	FSkipListNodeValueChanger* pfValueChanger;
 
-	/** Список уровней */
+	/** РЎРїРёСЃРѕРє СѓСЂРѕРІРЅРµР№ */
 	SList  pHead[SKIP_LIST_MAX_HEIGHT];
 } SSkipList, * PSSkipList;
 
 /**
- * Структура узела списка с пропусками
+ * РЎС‚СЂСѓРєС‚СѓСЂР° СѓР·РµР»Р° СЃРїРёСЃРєР° СЃ РїСЂРѕРїСѓСЃРєР°РјРё
  */
 typedef struct _SSkipListNode
 {
-	/** Ключ */
+	/** РљР»СЋС‡ */
 	PVOID pKey;
 
-	/** Значение */
+	/** Р—РЅР°С‡РµРЅРёРµ */
 	PVOID pValue;
 
-	/** Список узлов */
+	/** РЎРїРёСЃРѕРє СѓР·Р»РѕРІ */
 	SList pLink[];
 } SSkipListNode, * PSSkipListNode;
 

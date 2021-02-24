@@ -1,17 +1,17 @@
-#include "global.h"
+ï»¿#include "global.h"
 
 /**
- * Âèðòóàëüíàÿ îïåðàòèâíàÿ ïàìÿòü
+ * Ð’Ð¸Ñ€Ñ‚ÑƒÐ°Ð»ÑŒÐ½Ð°Ñ Ð¾Ð¿ÐµÑ€Ð°Ñ‚Ð¸Ð²Ð½Ð°Ñ Ð¿Ð°Ð¼ÑÑ‚ÑŒ
  */
 static BYTE*				g_bVirtualMemory = NULL;
 
 /**
- * Âèðòóàëüíûé ïðîöåññîð
+ * Ð’Ð¸Ñ€Ñ‚ÑƒÐ°Ð»ÑŒÐ½Ñ‹Ð¹ Ð¿Ñ€Ð¾Ñ†ÐµÑÑÐ¾Ñ€
  */
 static SVirtualProcessor	g_sVirtualProcessor = { 0 };
 
 /**
- * Êîíòåêñò âðåìåíè èñïîëíåíèÿ 
+ * ÐšÐ¾Ð½Ñ‚ÐµÐºÑÑ‚ Ð²Ñ€ÐµÐ¼ÐµÐ½Ð¸ Ð¸ÑÐ¿Ð¾Ð»Ð½ÐµÐ½Ð¸Ñ 
  */
 static SRuntimeContext		g_sRuntimeContext = { 0 };
 
@@ -54,7 +54,7 @@ LoadProgram(
 	fseek(pFile, 0, SEEK_END);
 	SIZE_T nFileSize = ftell(pFile);
 
-	/** Äîñòàòî÷íî ëè îïåðàòèâíîé ïàìÿòè â âèðòóàëüíîé ìàøèíå */
+	/** Ð”Ð¾ÑÑ‚Ð°Ñ‚Ð¾Ñ‡Ð½Ð¾ Ð»Ð¸ Ð¾Ð¿ÐµÑ€Ð°Ñ‚Ð¸Ð²Ð½Ð¾Ð¹ Ð¿Ð°Ð¼ÑÑ‚Ð¸ Ð² Ð²Ð¸Ñ€Ñ‚ÑƒÐ°Ð»ÑŒÐ½Ð¾Ð¹ Ð¼Ð°ÑˆÐ¸Ð½Ðµ */
 	if (nFileSize + g_sRuntimeContext.dwStackSize + g_sRuntimeContext.dwHeapSize > g_sRuntimeContext.dwMemorySize)
 	{
 		fclose(pFile);
@@ -76,6 +76,106 @@ LoadProgram(
 	memcpy(&sHeader, g_sRuntimeContext.pCodeMap, sizeof(SFrozenFileHeader));
 
 	g_sRuntimeContext.pInstruction = g_sRuntimeContext.pCodeMap + sHeader.dwCodeMapOffset;
+
+	return TRUE;
+}
+
+BOOL
+StartProgram()
+{
+	for (; g_sRuntimeContext.pInstruction + g_sVirtualProcessor.IP < g_sRuntimeContext.pHeap;
+		g_sVirtualProcessor.IP += sizeof(BYTE))
+	{
+		PBYTE pCurrentInstruction = g_sRuntimeContext.pInstruction + g_sVirtualProcessor.IP;
+		EProcessorOperation eOperation = 0;
+		memcpy(&eOperation, pCurrentInstruction, sizeof(BYTE));
+
+		DWORD dwResult = -1;
+		DWORD dwError = 0;
+
+		switch (eOperation)
+		{
+		case EPO_NEW:
+			break;
+		case EPO_SET:
+			dwResult = PasmSet(pCurrentInstruction, &dwError);
+			break;
+		case EPO_INC:
+			break;
+		case EPO_DEC:
+			break;
+		case EPO_ADD_2:
+			break;
+		case EPO_ADD_3:
+			break;
+		case EPO_SUB_2:
+			break;
+		case EPO_SUB_3:
+			break;
+		case EPO_MUL_2:
+			break;
+		case EPO_MUL_3:
+			break;
+		case EPO_DIV_2:
+			break;
+		case EPO_DIV_3:
+			break;
+		case EPO_LENGTH:
+			break;
+		case EPO_CONCAT:
+			break;
+		case EPO_SUBSTR:
+			break;
+		case EPO_BRANCH:
+			break;
+		case EPO_IF_2:
+			break;
+		case EPO_IF_3:
+			break;
+		case EPO_NE_3:
+			break;
+		case EPO_NE_4:
+			break;
+		case EPO_EQ_3:
+			break;
+		case EPO_EQ_4:
+			break;
+		case EPO_GT_3:
+			break;
+		case EPO_GT_4:
+			break;
+		case EPO_LT_3:
+			break;
+		case EPO_LT_4:
+			break;
+		case EPO_BSR:
+			break;
+		case EPO_RET:
+			break;
+		case EPO_PRINT:
+			break;
+		case EPO_PUSH_STACK:
+			break;
+		case EPO_POP_STACK:
+			break;
+		case EPO_PMC_PUSH:
+			break;
+		case EPO_PMC_POP:
+			break;
+		case EPO_PMC_ERASE:
+			break;
+		case EPO_END:
+			break;
+		case EPO_TYPEOF:
+			break;
+		}
+
+		if (dwResult == (DWORD)-1)
+		{
+			// HandleError(dwError);
+			return FALSE;
+		}
+	}
 
 	return TRUE;
 }
