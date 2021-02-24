@@ -1,19 +1,6 @@
 ﻿#include "global.h"
 
-
-#define BYTECODE_STRING_LITERAL_FLAG	1 << 30
-#define BYTECODE_NUMBER_LITERAL_FLAG	1 << 29
-#define BYTECODE_VIRTUAL_MEMORY_FLAG	1 << 28
-#define BYTECODE_REGISTER_FLAG			1 << 27
-
-typedef struct _SFrozenFileHeader
-{
-	/** Количество литералов */
-	DWORD	dwLiteralsCount;
-
-	/** Смещение к коду */
-	DWORD	dwCodeMapOffset;
-} SFrozenFileHeader;
+#pragma pack(push, 1)
 
 typedef struct _SBytecode
 {
@@ -28,12 +15,17 @@ typedef struct _SBytecodeList
 {
 	SList		sEntry;
 
+	DWORD		dwCount;
+
 	SBytecode	sBytecode;
 } SBytecodeList, *PSBytecodeList;
 
 typedef struct _SByteStringList
 {
 	SList	sEntry;
+
+	/** Длина строки */
+	SIZE_T	nLength;
 
 	/** Текстовый литерал */
 	CHAR	szString[STRING_MAX_LENGTH];
@@ -81,6 +73,8 @@ typedef struct _SCompilerContext
 	/** Байткод */
 	SList	sBytecode;
 } SCompilerContext, *PSCompilerContext;
+
+#pragma pack(pop)
 
 static
 VOID
@@ -203,7 +197,9 @@ CompileAssembler(
 
 		PSLexemeList psContainingEntry = CONTAINING_RECORD(
 			psCurrentEntry, SLexemeList, sEntry);
+
 		psCurrentBytecode->sBytecode.dwOperation = psContainingEntry->sLexeme.eEndPointOperation;
+		psCurrentBytecode->dwCount = psContainingEntry->sLexeme.dwCount;
 		for (DWORD i = 1; i < psContainingEntry->sLexeme.dwCount; i++)
 		{
 			if (psContainingEntry->sLexeme.eToken[i] == EMT_STRING_LITERAL)
@@ -216,6 +212,7 @@ CompileAssembler(
 				}
 				memset(psByteString, 0, sizeof(SByteStringList));
 				strcpy(psByteString->szString, psContainingEntry->sLexeme.szLexemes[i]);
+				psByteString->nLength = strlen(psContainingEntry->sLexeme.szLexemes[i]);
 
 				psCurrentBytecode->sBytecode.dwOperands[i - 1] = psCompilerContext->dwStringLiteralCount;
 				psCurrentBytecode->sBytecode.dwOperands[i - 1] |= BYTECODE_STRING_LITERAL_FLAG;
@@ -345,14 +342,24 @@ SaveBytecodeToFile(
 	}
 
 	SFrozenFileHeader sHeader = { 0 };
-	sHeader.dwCodeMapOffset = sizeof(SFrozenFileHeader) + psCompilerContext->dwStringLiteralCount * STRING_MAX_LENGTH;
 	sHeader.dwLiteralsCount = psCompilerContext->dwStringLiteralCount;
 
-	SIZE_T nCountWrote = fwrite(&sHeader, sizeof(SFrozenFileHeader), 1, pFile);
-	if (!nCountWrote)
+	fseek(pFile, sizeof(SFrozenFileHeader), SEEK_SET);
+
+	DWORD dwOffset = sizeof(SFrozenFileHeader) + psCompilerContext->dwStringLiteralCount * sizeof(DWORD);
+	for (PSList psCurrentEntry = psCompilerContext->sStringList.pFlink;
+		psCurrentEntry != &psCompilerContext->sStringList;
+		psCurrentEntry = psCurrentEntry->pFlink)
 	{
-		fclose(pFile);
-		return FALSE;
+		PSByteStringList psString = CONTAINING_RECORD(
+			psCurrentEntry, SByteStringList, sEntry);
+		SIZE_T nCountWrote = fwrite(&dwOffset, sizeof(DWORD), 1, pFile);
+		if (!nCountWrote)
+		{
+			fclose(pFile);
+			return FALSE;
+		}
+		dwOffset += psString->nLength + 1;
 	}
 
 	for (PSList psCurrentEntry = psCompilerContext->sStringList.pFlink;
@@ -361,7 +368,7 @@ SaveBytecodeToFile(
 	{
 		PSByteStringList psString = CONTAINING_RECORD(
 			psCurrentEntry, SByteStringList, sEntry);
-		SIZE_T nCountWrote = fwrite(psString->szString, STRING_MAX_LENGTH, 1, pFile);
+		SIZE_T nCountWrote = fwrite(psString->szString, psString->nLength + 1, 1, pFile);
 		if (!nCountWrote)
 		{
 			fclose(pFile);
@@ -373,14 +380,25 @@ SaveBytecodeToFile(
 		psCurrentEntry != &psCompilerContext->sBytecode;
 		psCurrentEntry = psCurrentEntry->pFlink)
 	{
-		PSBytecodeList psString = CONTAINING_RECORD(
+		PSBytecodeList psBytecode = CONTAINING_RECORD(
 			psCurrentEntry, SBytecodeList, sEntry);
-		SIZE_T nCountWrote = fwrite(&psString->sBytecode, sizeof(SBytecode), 1, pFile);
+
+		SIZE_T nSize = sizeof(SBytecode) - (4 - (psBytecode->dwCount - 1)) * sizeof(DWORD);
+		SIZE_T nCountWrote = fwrite(&psBytecode->sBytecode, nSize, 1, pFile);
 		if (!nCountWrote)
 		{
 			fclose(pFile);
 			return FALSE;
 		}
+	}
+
+	sHeader.dwCodeMapOffset = dwOffset;
+	fseek(pFile, 0, SEEK_SET);
+	SIZE_T nCountWrote = fwrite(&sHeader, sizeof(SFrozenFileHeader), 1, pFile);
+	if (!nCountWrote)
+	{
+		fclose(pFile);
+		return FALSE;
 	}
 
 	fclose(pFile);

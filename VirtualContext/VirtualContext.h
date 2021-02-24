@@ -3,6 +3,13 @@
 
 #define REGISTERS_COUNT		1 << 2
 
+#define BYTECODE_STRING_LITERAL_FLAG	1 << 30
+#define BYTECODE_NUMBER_LITERAL_FLAG	1 << 29
+#define BYTECODE_VIRTUAL_MEMORY_FLAG	1 << 28
+#define BYTECODE_REGISTER_FLAG			1 << 27
+
+#define PROCESSOR_STACK_SIZE			0x20000
+
 typedef enum _EProcessorOperation
 {
 	/** Инициализировать PMC */
@@ -79,27 +86,34 @@ typedef enum _EProcessorOperation
 	EPO_TYPEOF
 } EProcessorOperation, *PEProcessorOperation;
 
-/** 
- *	Структура записи стека
- */
-typedef struct _SVirtualStack
-{
-	SList	sEntry;
-	BYTE	sCell[0];
-} SVirtualStack, *PSVirtualStack;
-
 /**
  * Структура виртуального процессора Parrot
  */
 typedef struct _SVirtualProcessor
 {
+	/** Регистры общего назначения */
 	UINT						I[REGISTERS_COUNT];
 	CHAR						S[REGISTERS_COUNT][STRING_MAX_LENGTH];
 	DOUBLE						N[REGISTERS_COUNT];
+	/** Parrot Magic Cookie регистр */
 	SParrotMagicCookie			P[REGISTERS_COUNT];
 
-	UINT64						IP;
+	/** Регистр инструкций */
+	DWORD						IP;
+	/** Регистр указатель стека */
+	DWORD						SP;
 } SVirtualProcessor, *PSVirtualProcessor;
 
+/**
+ * Заголовок фалйа программы
+ */
+typedef struct _SFrozenFileHeader
+{
+	/** Количество литералов */
+	DWORD	dwLiteralsCount;
+
+	/** Смещение к коду */
+	DWORD	dwCodeMapOffset;
+} SFrozenFileHeader;
 
 #endif

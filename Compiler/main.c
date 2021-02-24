@@ -10,15 +10,23 @@ int main()
 		&hCompiler, "C:\\Users\\uber42\\source\\repos\\Parrot\\Compiler\\Examples\\loop.pasm");
 	if (!bResult)
 	{
-		return FALSE;
+		ExitProcess(-1);
 	}
 
 	bResult = CompileProgram(hCompiler);
-	assert(bResult);
+	if (!bResult)
+	{
+		CloseCompiler(hCompiler);
+		ExitProcess(-1);
+	}
 
 	bResult = SaveBytecodeToFile(hCompiler, "./Bytecode.bin");
-	assert(bResult);
+	if (!bResult)
+	{
+		CloseCompiler(hCompiler);
+		ExitProcess(-1);
+	}
 
 	CloseCompiler(hCompiler);
-	return TRUE;
+	return 0;
 }

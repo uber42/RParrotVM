@@ -18,23 +18,23 @@
     <ClInclude Include="List.h">
       <Filter>Generic</Filter>
     </ClInclude>
-    <ClInclude Include="VirtualContext.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="PMC.h">
       <Filter>Core\ParrotMagicCookie</Filter>
     </ClInclude>
     <ClInclude Include="global.h" />
+    <ClInclude Include="VirtualContext.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Fnv1a.c">
       <Filter>Generic</Filter>
     </ClCompile>
-    <ClCompile Include="VirtualContext.c">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="PMC.c">
       <Filter>Core\ParrotMagicCookie</Filter>
+    </ClCompile>
+    <ClCompile Include="VirtualContext.c">
+      <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
