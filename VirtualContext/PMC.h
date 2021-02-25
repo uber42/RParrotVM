@@ -1,8 +1,8 @@
-#ifndef PMC_H
+п»ї#ifndef PMC_H
 #define PMC_H
 
 /**
- * Типы данных возможные для хранения в регистрах PMC
+ * РўРёРїС‹ РґР°РЅРЅС‹С… РІРѕР·РјРѕР¶РЅС‹Рµ РґР»СЏ С…СЂР°РЅРµРЅРёСЏ РІ СЂРµРіРёСЃС‚СЂР°С… PMC
  */
 typedef enum _EParrotMagicCookieType
 {
