@@ -1709,3 +1709,61 @@ PasmRet(
 	psVirtualProcessor->IP = dwMarker;
 	return TRUE;
 }
+
+BOOL
+PasmPushStack(
+	PSVirtualProcessor	psVirtualProcessor,
+	PBYTE				pCurrentInstruction,
+	PBYTE				pStack
+)
+{
+	DWORD dwOperand;
+	memcpy(&dwOperand, pCurrentInstruction, sizeof(DWORD));
+
+	DWORD dwSize = 0;
+	PBYTE pTargetMemory = NULL;
+	EOperandTypes eOperandType = RecognizeOperand(dwOperand);
+	ERegisterTypes eRegisterType = RecognizeRegister(
+		dwOperand,
+		psVirtualProcessor,
+		&pTargetMemory,
+		&dwSize);
+	if (!eRegisterType)
+	{
+		return FALSE;
+	}
+
+	memcpy(pStack + psVirtualProcessor->SP, pTargetMemory, dwSize);
+	psVirtualProcessor->SP += dwSize;
+
+	return TRUE;
+}
+
+BOOL
+PasmPopStack(
+	PSVirtualProcessor	psVirtualProcessor,
+	PBYTE				pCurrentInstruction,
+	PBYTE				pStack
+)
+{
+	DWORD dwOperand;
+	memcpy(&dwOperand, pCurrentInstruction, sizeof(DWORD));
+
+	DWORD dwSize = 0;
+	PBYTE pTargetMemory = NULL;
+	EOperandTypes eOperandType = RecognizeOperand(dwOperand);
+	ERegisterTypes eRegisterType = RecognizeRegister(
+		dwOperand,
+		psVirtualProcessor,
+		&pTargetMemory,
+		&dwSize);
+	if (!eRegisterType)
+	{
+		return FALSE;
+	}
+
+	psVirtualProcessor->SP -= dwSize;
+	memcpy(pTargetMemory, pStack + psVirtualProcessor->SP, dwSize);
+	
+	return TRUE;
+}

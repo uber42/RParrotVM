@@ -178,5 +178,18 @@ PasmRet(
 	PBYTE				pStack
 );
 
+BOOL
+PasmPushStack(
+	PSVirtualProcessor	psVirtualProcessor,
+	PBYTE				pCurrentInstruction,
+	PBYTE				pStack
+);
+
+BOOL
+PasmPopStack(
+	PSVirtualProcessor	psVirtualProcessor,
+	PBYTE				pCurrentInstruction,
+	PBYTE				pStack
+);
 
 #endif

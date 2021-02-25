@@ -257,8 +257,16 @@ StartProgram()
 				g_sRuntimeContext.pIndexTable);
 			break;
 		case EPO_PUSH_STACK:
+			bResult = PasmPushStack(
+				&g_sVirtualProcessor,
+				pCurrentInstruction + sizeof(BYTE),
+				g_sRuntimeContext.pStack);
 			break;
 		case EPO_POP_STACK:
+			bResult = PasmPopStack(
+				&g_sVirtualProcessor,
+				pCurrentInstruction + sizeof(BYTE),
+				g_sRuntimeContext.pStack);
 			break;
 		case EPO_PMC_PUSH:
 			break;
