@@ -121,20 +121,35 @@ StartProgram()
 				pCurrentInstruction + sizeof(BYTE));
 			break;
 		case EPO_DEC:
+			bResult = PasmDec(
+				&g_sVirtualProcessor,
+				pCurrentInstruction + sizeof(BYTE));
 			break;
 		case EPO_ADD_2:
+			bResult = PasmAdd2(
+				&g_sVirtualProcessor,
+				pCurrentInstruction + sizeof(BYTE));
 			break;
 		case EPO_ADD_3:
 			break;
 		case EPO_SUB_2:
+			bResult = PasmSub2(
+				&g_sVirtualProcessor,
+				pCurrentInstruction + sizeof(BYTE));
 			break;
 		case EPO_SUB_3:
 			break;
 		case EPO_MUL_2:
+			bResult = PasmMul2(
+				&g_sVirtualProcessor,
+				pCurrentInstruction + sizeof(BYTE));
 			break;
 		case EPO_MUL_3:
 			break;
 		case EPO_DIV_2:
+			bResult = PasmDiv2(
+				&g_sVirtualProcessor,
+				pCurrentInstruction + sizeof(BYTE));
 			break;
 		case EPO_DIV_3:
 			break;
@@ -151,6 +166,9 @@ StartProgram()
 		case EPO_IF_3:
 			break;
 		case EPO_NE_3:
+			bResult = PasmNe3(
+				&g_sVirtualProcessor,
+				pCurrentInstruction + sizeof(BYTE));
 			break;
 		case EPO_NE_4:
 			bResult = PasmNe4(
@@ -158,6 +176,9 @@ StartProgram()
 				pCurrentInstruction + sizeof(BYTE));
 			break;
 		case EPO_EQ_3:
+			bResult = PasmEq3(
+				&g_sVirtualProcessor,
+				pCurrentInstruction + sizeof(BYTE));
 			break;
 		case EPO_EQ_4:
 			bResult = PasmEq4(
@@ -165,6 +186,9 @@ StartProgram()
 				pCurrentInstruction + sizeof(BYTE));
 			break;
 		case EPO_GT_3:
+			bResult = PasmGt3(
+				&g_sVirtualProcessor,
+				pCurrentInstruction + sizeof(BYTE));
 			break;
 		case EPO_GT_4:
 			bResult = PasmGt4(
@@ -172,6 +196,9 @@ StartProgram()
 				pCurrentInstruction + sizeof(BYTE));
 			break;
 		case EPO_LT_3:
+			bResult = PasmLt3(
+				&g_sVirtualProcessor,
+				pCurrentInstruction + sizeof(BYTE));
 			break;
 		case EPO_LT_4:
 			bResult = PasmLt4(
