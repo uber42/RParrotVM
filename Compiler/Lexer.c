@@ -28,6 +28,24 @@ static const SPmcMatch pmc_types[] =
 	{ 0xC98C9CD1, PMC_HASHTABLE	}
 };
 
+static
+VOID
+PrepareString(
+	PCHAR	szString
+)
+{
+	SIZE_T nLength = strlen(szString);
+	for (DWORD i = 0; i < nLength - 1; i++)
+	{
+		if (szString[i] == '\\' && szString[i + 1] == 'n')
+		{
+			szString[i] = '\n';
+			memcpy(szString + i + 1, szString + i + 2, nLength - i + 1);
+			nLength--;
+		}
+	}
+}
+
 static 
 BOOL 
 CheckWhiteSpace(
@@ -200,6 +218,7 @@ PrepareCommand(
 
 			memset(psLexemeContainer->szLexemes[dwCurrentCount], 0, STRING_MAX_LENGTH);
 			memcpy(psLexemeContainer->szLexemes[dwCurrentCount], pszCommandLine + i + 1, j - 1 - i);
+			PrepareString(psLexemeContainer->szLexemes[dwCurrentCount]);
 			psLexemeContainer->eToken[dwCurrentCount] = EMT_STRING_LITERAL;
 
 			i = j;
