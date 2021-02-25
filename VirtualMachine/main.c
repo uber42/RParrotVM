@@ -21,5 +21,14 @@ int main()
 		ExitProcess(-1);
 	}
 
+	bResult = StartProgram();
+	if (!bResult)
+	{
+		DeinitializeRuntime();
+		ExitProcess(-1);
+	}
+
 	DeinitializeRuntime();
+
+	system("PAUSE");
 }

@@ -1,5 +1,15 @@
 ﻿#include "global.h"
 
+
+static const DWORD dwOperationStepMap[] =
+{
+	-1, 9, 9, 5, 5, 9, 13, 9,
+	13, 9, 13, 9, 13, 9, 9,
+	17, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 1,
+	5, 5, 5, 13, 13, 9, 1, 9
+};
+
 /**
  * Виртуальная оперативная память
  */
@@ -37,6 +47,11 @@ InititalizeRuntime(
 	g_sRuntimeContext.pStack = g_bVirtualMemory;
 	g_sRuntimeContext.pCodeMap = g_bVirtualMemory + dwStackSize;
 
+	for (DWORD i = 0; i < sizeof(g_sVirtualProcessor.P) / sizeof(SParrotMagicCookie); i++)
+	{
+		PmcInitialize(&g_sVirtualProcessor.P[i]);
+	}
+		
 	return TRUE;
 }
 
@@ -69,7 +84,7 @@ LoadProgram(
 		return FALSE;
 	}
 
-	g_sRuntimeContext.pHeap = g_bVirtualMemory + nFileSize;
+	g_sRuntimeContext.pHeap = g_sRuntimeContext.pCodeMap + nFileSize;
 	g_sRuntimeContext.pIndexTable = g_sRuntimeContext.pCodeMap + sizeof(SFrozenFileHeader);
 
 	SFrozenFileHeader sHeader = { 0 };
@@ -83,24 +98,27 @@ LoadProgram(
 BOOL
 StartProgram()
 {
-	for (; g_sRuntimeContext.pInstruction + g_sVirtualProcessor.IP < g_sRuntimeContext.pHeap;
-		g_sVirtualProcessor.IP += sizeof(BYTE))
+	for (; g_sRuntimeContext.pInstruction + g_sVirtualProcessor.IP < g_sRuntimeContext.pHeap;)
 	{
 		PBYTE pCurrentInstruction = g_sRuntimeContext.pInstruction + g_sVirtualProcessor.IP;
 		EProcessorOperation eOperation = 0;
 		memcpy(&eOperation, pCurrentInstruction, sizeof(BYTE));
 
-		DWORD dwResult = -1;
-		DWORD dwError = 0;
-
+		BOOL  bResult = FALSE;
 		switch (eOperation)
 		{
 		case EPO_NEW:
 			break;
 		case EPO_SET:
-			dwResult = PasmSet(pCurrentInstruction, &dwError);
+			bResult = PasmSet(
+				&g_sVirtualProcessor, g_sRuntimeContext.pHeap,
+				g_sRuntimeContext.pIndexTable,
+				pCurrentInstruction + sizeof(BYTE));
 			break;
 		case EPO_INC:
+			bResult = PasmInc(
+				&g_sVirtualProcessor,
+				pCurrentInstruction + sizeof(BYTE));
 			break;
 		case EPO_DEC:
 			break;
@@ -143,6 +161,9 @@ StartProgram()
 		case EPO_GT_3:
 			break;
 		case EPO_GT_4:
+			bResult = PasmGt4(
+				&g_sVirtualProcessor,
+				pCurrentInstruction + sizeof(BYTE));
 			break;
 		case EPO_LT_3:
 			break;
@@ -153,6 +174,10 @@ StartProgram()
 		case EPO_RET:
 			break;
 		case EPO_PRINT:
+			bResult = PasmPrint(
+				&g_sVirtualProcessor,
+				pCurrentInstruction + sizeof(BYTE),
+				g_sRuntimeContext.pIndexTable);
 			break;
 		case EPO_PUSH_STACK:
 			break;
@@ -165,16 +190,18 @@ StartProgram()
 		case EPO_PMC_ERASE:
 			break;
 		case EPO_END:
-			break;
+			return TRUE;
 		case EPO_TYPEOF:
 			break;
 		}
 
-		if (dwResult == (DWORD)-1)
+		if (!bResult)
 		{
-			// HandleError(dwError);
 			return FALSE;
 		}
+
+		DWORD dwNumber = (DWORD)eOperation;
+		g_sVirtualProcessor.IP += dwOperationStepMap[dwNumber];
 	}
 
 	return TRUE;

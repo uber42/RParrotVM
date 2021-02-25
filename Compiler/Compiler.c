@@ -250,7 +250,7 @@ CompileAssembler(
 			}
 			else if((psContainingEntry->sLexeme.eToken[i] & REGISTERS_MASK) == psContainingEntry->sLexeme.eToken[i])
 			{
-				DWORD dwRegisterNumber = ((int)psContainingEntry->sLexeme.szLexemes[1] - 48);
+				DWORD dwRegisterNumber = ((int)psContainingEntry->sLexeme.szLexemes[i][1] - 48);
 
 				psCurrentBytecode->sBytecode.dwOperands[i - 1] = psContainingEntry->sLexeme.eToken[i];
 				psCurrentBytecode->sBytecode.dwOperands[i - 1] |= BYTECODE_REGISTER_FLAG;

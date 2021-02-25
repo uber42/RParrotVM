@@ -92,16 +92,16 @@ typedef enum _EProcessorOperation
 typedef struct _SVirtualProcessor
 {
 	/** Регистры общего назначения */
-	UINT						I[REGISTERS_COUNT];
-	CHAR						S[REGISTERS_COUNT][STRING_MAX_LENGTH];
-	DOUBLE						N[REGISTERS_COUNT];
+	INT						I[REGISTERS_COUNT];
+	CHAR					S[REGISTERS_COUNT][STRING_MAX_LENGTH];
+	FLOAT					N[REGISTERS_COUNT];
 	/** Parrot Magic Cookie регистр */
-	SParrotMagicCookie			P[REGISTERS_COUNT];
+	SParrotMagicCookie		P[REGISTERS_COUNT];
 
 	/** Регистр инструкций */
-	DWORD						IP;
+	DWORD					IP;
 	/** Регистр указатель стека */
-	DWORD						SP;
+	DWORD					SP;
 } SVirtualProcessor, *PSVirtualProcessor;
 
 /**

@@ -1,10 +1,31 @@
 #ifndef OPERATIONS_H
 #define OPERATIONS_H
 
-DWORD
+BOOL
 PasmSet(
-	PBYTE	pCurrentInstruction,
-	PDWORD	pdwError
+	PSVirtualProcessor	psVirtualProcessor,
+	PBYTE				psHeap,
+	PBYTE				psIndexTable,
+	PBYTE				pCurrentInstruction
+);
+
+BOOL
+PasmInc(
+	PSVirtualProcessor	psVirtualProcessor,
+	PBYTE				pCurrentInstruction
+);
+
+BOOL
+PasmPrint(
+	PSVirtualProcessor	psVirtualProcessor,
+	PBYTE				pCurrentInstruction,
+	PBYTE				psIndexTable
+);
+
+BOOL
+PasmGt4(
+	PSVirtualProcessor	psVirtualProcessor,
+	PBYTE				pCurrentInstruction
 );
 
 

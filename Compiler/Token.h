@@ -1,6 +1,10 @@
 ﻿#ifndef TOKEN_H
 #define TOKEN_H
 
+#ifdef __cplusplus
+extern "C"
+#endif
+
 typedef enum _ETokenType
 {
 	EMT_I				= 1 << 0,
