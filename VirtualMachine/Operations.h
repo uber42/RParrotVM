@@ -164,5 +164,19 @@ PasmNe4(
 	PBYTE				pCurrentInstruction
 );
 
+BOOL
+PasmBsr(
+	PSVirtualProcessor	psVirtualProcessor,
+	PBYTE				pCurrentInstruction,
+	PBYTE				pStack
+);
+
+BOOL
+PasmRet(
+	PSVirtualProcessor	psVirtualProcessor,
+	PBYTE				pCurrentInstruction,
+	PBYTE				pStack
+);
+
 
 #endif

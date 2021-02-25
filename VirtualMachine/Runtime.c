@@ -239,8 +239,16 @@ StartProgram()
 				pCurrentInstruction + sizeof(BYTE));
 			break;
 		case EPO_BSR:
+			bResult = PasmBsr(
+				&g_sVirtualProcessor,
+				pCurrentInstruction + sizeof(BYTE),
+				g_sRuntimeContext.pStack);
 			break;
 		case EPO_RET:
+			bResult = PasmRet(
+				&g_sVirtualProcessor,
+				pCurrentInstruction + sizeof(BYTE),
+				g_sRuntimeContext.pStack);
 			break;
 		case EPO_PRINT:
 			bResult = PasmPrint(

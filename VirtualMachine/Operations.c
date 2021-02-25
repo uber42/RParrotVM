@@ -1675,3 +1675,37 @@ PasmNe4(
 
 	return TRUE;
 }
+
+BOOL
+PasmBsr(
+	PSVirtualProcessor	psVirtualProcessor,
+	PBYTE				pCurrentInstruction,
+	PBYTE				pStack
+)
+{
+	DWORD dwMarker;
+	memcpy(&dwMarker, pCurrentInstruction, sizeof(DWORD));
+
+	DWORD dwNextInsruction = psVirtualProcessor->IP + sizeof(DWORD) + sizeof(BYTE);
+	memcpy(pStack + psVirtualProcessor->SP, &dwNextInsruction, sizeof(DWORD));
+
+	psVirtualProcessor->IP = dwMarker;
+	psVirtualProcessor->SP += sizeof(dwMarker);
+
+	return TRUE;
+}
+
+BOOL
+PasmRet(
+	PSVirtualProcessor	psVirtualProcessor,
+	PBYTE				pCurrentInstruction,
+	PBYTE				pStack
+)
+{
+	DWORD dwMarker;
+	psVirtualProcessor->SP -= sizeof(DWORD);
+	memcpy(&dwMarker, pStack + psVirtualProcessor->SP, sizeof(DWORD));
+
+	psVirtualProcessor->IP = dwMarker;
+	return TRUE;
+}
