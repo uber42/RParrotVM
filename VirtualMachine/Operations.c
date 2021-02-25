@@ -542,3 +542,162 @@ PasmGt4(
 
 	return TRUE;
 }
+
+BOOL
+PasmLt4(
+	PSVirtualProcessor	psVirtualProcessor,
+	PBYTE				pCurrentInstruction
+)
+{
+	DWORD pdwOperands[2];
+	DWORD pdwMarkerks[2];
+
+	memcpy(pdwOperands, pCurrentInstruction, sizeof(pdwOperands));
+	memcpy(pdwMarkerks, pCurrentInstruction + sizeof(pdwOperands), sizeof(pdwMarkerks));
+
+	EOperandTypes peTypes[2] =
+	{
+		RecognizeOperand(pdwOperands[0]),
+		RecognizeOperand(pdwOperands[1])
+	};
+
+	DWORD dwLeftNumber = 0;
+	DWORD dwRightNumber = 0;
+
+	BOOL bResult = GetNativeNumber(
+		psVirtualProcessor,
+		peTypes[0],
+		pdwOperands[0],
+		&dwLeftNumber);
+	if (!bResult)
+	{
+		return FALSE;
+	}
+
+	bResult = GetNativeNumber(
+		psVirtualProcessor,
+		peTypes[1],
+		pdwOperands[1],
+		&dwRightNumber);
+	if (!bResult)
+	{
+		return FALSE;
+	}
+
+	if (dwLeftNumber < dwRightNumber)
+	{
+		psVirtualProcessor->IP = pdwMarkerks[0];
+	}
+	else
+	{
+		psVirtualProcessor->IP = pdwMarkerks[1];
+	}
+
+	return TRUE;
+}
+
+BOOL
+PasmEq4(
+	PSVirtualProcessor	psVirtualProcessor,
+	PBYTE				pCurrentInstruction
+)
+{
+	DWORD pdwOperands[2];
+	DWORD pdwMarkerks[2];
+
+	memcpy(pdwOperands, pCurrentInstruction, sizeof(pdwOperands));
+	memcpy(pdwMarkerks, pCurrentInstruction + sizeof(pdwOperands), sizeof(pdwMarkerks));
+
+	EOperandTypes peTypes[2] =
+	{
+		RecognizeOperand(pdwOperands[0]),
+		RecognizeOperand(pdwOperands[1])
+	};
+
+	DWORD dwLeftNumber = 0;
+	DWORD dwRightNumber = 0;
+
+	BOOL bResult = GetNativeNumber(
+		psVirtualProcessor,
+		peTypes[0],
+		pdwOperands[0],
+		&dwLeftNumber);
+	if (!bResult)
+	{
+		return FALSE;
+	}
+
+	bResult = GetNativeNumber(
+		psVirtualProcessor,
+		peTypes[1],
+		pdwOperands[1],
+		&dwRightNumber);
+	if (!bResult)
+	{
+		return FALSE;
+	}
+
+	if (dwLeftNumber == dwRightNumber)
+	{
+		psVirtualProcessor->IP = pdwMarkerks[0];
+	}
+	else
+	{
+		psVirtualProcessor->IP = pdwMarkerks[1];
+	}
+
+	return TRUE;
+}
+
+BOOL
+PasmNe4(
+	PSVirtualProcessor	psVirtualProcessor,
+	PBYTE				pCurrentInstruction
+)
+{
+	DWORD pdwOperands[2];
+	DWORD pdwMarkerks[2];
+
+	memcpy(pdwOperands, pCurrentInstruction, sizeof(pdwOperands));
+	memcpy(pdwMarkerks, pCurrentInstruction + sizeof(pdwOperands), sizeof(pdwMarkerks));
+
+	EOperandTypes peTypes[2] =
+	{
+		RecognizeOperand(pdwOperands[0]),
+		RecognizeOperand(pdwOperands[1])
+	};
+
+	DWORD dwLeftNumber = 0;
+	DWORD dwRightNumber = 0;
+
+	BOOL bResult = GetNativeNumber(
+		psVirtualProcessor,
+		peTypes[0],
+		pdwOperands[0],
+		&dwLeftNumber);
+	if (!bResult)
+	{
+		return FALSE;
+	}
+
+	bResult = GetNativeNumber(
+		psVirtualProcessor,
+		peTypes[1],
+		pdwOperands[1],
+		&dwRightNumber);
+	if (!bResult)
+	{
+		return FALSE;
+	}
+
+	if (dwLeftNumber != dwRightNumber)
+	{
+		psVirtualProcessor->IP = pdwMarkerks[0];
+	}
+	else
+	{
+		psVirtualProcessor->IP = pdwMarkerks[1];
+	}
+
+	return TRUE;
+}

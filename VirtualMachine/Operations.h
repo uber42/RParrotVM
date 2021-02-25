@@ -28,5 +28,23 @@ PasmGt4(
 	PBYTE				pCurrentInstruction
 );
 
+BOOL
+PasmLt4(
+	PSVirtualProcessor	psVirtualProcessor,
+	PBYTE				pCurrentInstruction
+);
+
+BOOL
+PasmEq4(
+	PSVirtualProcessor	psVirtualProcessor,
+	PBYTE				pCurrentInstruction
+);
+
+BOOL
+PasmNe4(
+	PSVirtualProcessor	psVirtualProcessor,
+	PBYTE				pCurrentInstruction
+);
+
 
 #endif

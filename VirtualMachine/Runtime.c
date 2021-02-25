@@ -153,10 +153,16 @@ StartProgram()
 		case EPO_NE_3:
 			break;
 		case EPO_NE_4:
+			bResult = PasmNe4(
+				&g_sVirtualProcessor,
+				pCurrentInstruction + sizeof(BYTE));
 			break;
 		case EPO_EQ_3:
 			break;
 		case EPO_EQ_4:
+			bResult = PasmEq4(
+				&g_sVirtualProcessor,
+				pCurrentInstruction + sizeof(BYTE));
 			break;
 		case EPO_GT_3:
 			break;
@@ -168,6 +174,9 @@ StartProgram()
 		case EPO_LT_3:
 			break;
 		case EPO_LT_4:
+			bResult = PasmLt4(
+				&g_sVirtualProcessor,
+				pCurrentInstruction + sizeof(BYTE));
 			break;
 		case EPO_BSR:
 			break;
