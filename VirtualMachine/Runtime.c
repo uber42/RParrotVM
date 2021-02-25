@@ -131,6 +131,9 @@ StartProgram()
 				pCurrentInstruction + sizeof(BYTE));
 			break;
 		case EPO_ADD_3:
+			bResult = PasmAdd3(
+				&g_sVirtualProcessor,
+				pCurrentInstruction + sizeof(BYTE));
 			break;
 		case EPO_SUB_2:
 			bResult = PasmSub2(
@@ -138,6 +141,9 @@ StartProgram()
 				pCurrentInstruction + sizeof(BYTE));
 			break;
 		case EPO_SUB_3:
+			bResult = PasmSub3(
+				&g_sVirtualProcessor,
+				pCurrentInstruction + sizeof(BYTE));
 			break;
 		case EPO_MUL_2:
 			bResult = PasmMul2(
@@ -145,6 +151,9 @@ StartProgram()
 				pCurrentInstruction + sizeof(BYTE));
 			break;
 		case EPO_MUL_3:
+			bResult = PasmMul3(
+				&g_sVirtualProcessor,
+				pCurrentInstruction + sizeof(BYTE));
 			break;
 		case EPO_DIV_2:
 			bResult = PasmDiv2(
@@ -152,18 +161,42 @@ StartProgram()
 				pCurrentInstruction + sizeof(BYTE));
 			break;
 		case EPO_DIV_3:
+			bResult = PasmDiv3(
+				&g_sVirtualProcessor,
+				pCurrentInstruction + sizeof(BYTE));
 			break;
 		case EPO_LENGTH:
+			bResult = PasmLength(
+				&g_sVirtualProcessor,
+				pCurrentInstruction + sizeof(BYTE),
+				g_sRuntimeContext.pIndexTable);
 			break;
 		case EPO_CONCAT:
+			bResult = PasmConcat(
+				&g_sVirtualProcessor,
+				pCurrentInstruction + sizeof(BYTE),
+				g_sRuntimeContext.pIndexTable);
 			break;
 		case EPO_SUBSTR:
+			bResult = PasmSubstr(
+				&g_sVirtualProcessor,
+				pCurrentInstruction + sizeof(BYTE),
+				g_sRuntimeContext.pIndexTable);
 			break;
 		case EPO_BRANCH:
+			bResult = PasmBranch(
+				&g_sVirtualProcessor,
+				pCurrentInstruction + sizeof(BYTE));
 			break;
 		case EPO_IF_2:
+			bResult = PasmIf2(
+				&g_sVirtualProcessor,
+				pCurrentInstruction + sizeof(BYTE));
 			break;
 		case EPO_IF_3:
+			bResult = PasmIf3(
+				&g_sVirtualProcessor,
+				pCurrentInstruction + sizeof(BYTE));
 			break;
 		case EPO_NE_3:
 			bResult = PasmNe3(

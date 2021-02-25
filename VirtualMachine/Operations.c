@@ -22,28 +22,6 @@ typedef enum _ERegisterTypes
 	ERT_P = 1 << 3
 } ERegisterTypes, *PERegisterTypes;
 
-
-//typedef enum _ETokenType
-//{
-//	EMT_I = 1 << 0,
-//	EMT_N = 1 << 1,
-//	EMT_S = 1 << 2,
-//	EMT_P = 1 << 3,
-//
-//	EMT_VIRTUAL_MEMORY = 1 << 4,
-//
-//	EMT_MARKER = 1 << 5,
-//
-//	EMT_STRING_LITERAL = 1 << 6,
-//	EMT_NUMBER_LITERAL = 1 << 7,
-//
-//	PMC_INTEGER = 1 << 8,
-//	PMC_FLOAT = 1 << 9,
-//	PMC_STRING = 1 << 10,
-//	PMC_LIST = 1 << 11,
-//	PMC_HASHTABLE = 1 << 12
-//} ETokenType, * PETokenType;
-
 static
 EOperandTypes
 RecognizeOperand(
@@ -86,7 +64,7 @@ RecognizeRegister(
 		return dwRegisterType;
 	case ERT_N:
 		*pbTargetMemory = &psVirtualProcessor->N[dwRegisterNumber];
-		*pdwSize = sizeof(DOUBLE);
+		*pdwSize = sizeof(FLOAT);
 		return dwRegisterType;
 	case ERT_S:
 		*pbTargetMemory = &psVirtualProcessor->S[dwRegisterNumber];
@@ -124,6 +102,41 @@ GetStringLitral(
 
 	memcpy(&dwOffset, psIndexTable + dwNumber * sizeof(DWORD), sizeof(DWORD));
 	return psIndexTable + dwOffset - sizeof(SFrozenFileHeader);
+}
+
+static
+PCHAR
+ExtractString(
+	DWORD				dwOperand,
+	PSVirtualProcessor  psVirtualProcessor,
+	PBYTE				pIndexTable
+)
+{
+	EOperandTypes eOperandType = RecognizeOperand(dwOperand);
+	switch (eOperandType)
+	{
+	case EOT_REGISTER:
+	{
+		DWORD dwSize = 0;
+		PBYTE pTargetMemory = NULL;
+		ERegisterTypes eRegisterType = RecognizeRegister(
+			dwOperand,
+			psVirtualProcessor,
+			&pTargetMemory,
+			&dwSize);
+		if (eRegisterType != ERT_S)
+		{
+			return NULL;
+		}
+
+		return pTargetMemory;
+	}
+	case EOT_STRING:
+		return GetStringLitral(
+			dwOperand, pIndexTable);
+	default:
+		return NULL;
+	}
 }
 
 static
@@ -483,6 +496,242 @@ PasmDec(
 }
 
 BOOL
+PasmAdd3(
+	PSVirtualProcessor	psVirtualProcessor,
+	PBYTE				pCurrentInstruction
+)
+{
+	DWORD dwOperand[3];
+	memcpy(dwOperand, pCurrentInstruction, sizeof(dwOperand));
+
+	DWORD dwSize = 0;
+	PBYTE pTargetMemory = NULL;
+	ERegisterTypes eRegisterType = RecognizeRegister(
+		dwOperand[0], psVirtualProcessor,
+		&pTargetMemory, &dwSize);
+
+	INT dwNumber = 0;
+	EOperandTypes eOperandType[2] =
+	{
+		RecognizeOperand(dwOperand[1]),
+		RecognizeOperand(dwOperand[2])
+	};
+
+	DWORD dwFirstNumber = 0;
+	DWORD dwSecondNumber = 0;
+
+	BOOL bResult = GetNativeNumber(
+		psVirtualProcessor,
+		eOperandType[0],
+		dwOperand[1],
+		&dwFirstNumber);
+	if (!bResult)
+	{
+		return FALSE;
+	}
+	
+	bResult = GetNativeNumber(
+		psVirtualProcessor,
+		eOperandType[1],
+		dwOperand[2],
+		&dwSecondNumber);
+	if (!bResult)
+	{
+		return FALSE;
+	}
+
+	DWORD dwResult = dwFirstNumber + dwSecondNumber;
+	switch (eRegisterType)
+	{
+	case ERT_I:
+	case ERT_N:
+		memcpy(pTargetMemory, &dwResult, sizeof(DWORD));
+		return TRUE;
+	case ERT_P:
+		return TRUE; // PmcIncrement(pTargetMemory)
+	default:
+		return FALSE;
+	}
+}
+
+BOOL
+PasmSub3(
+	PSVirtualProcessor	psVirtualProcessor,
+	PBYTE				pCurrentInstruction
+)
+{
+	DWORD dwOperand[3];
+	memcpy(dwOperand, pCurrentInstruction, sizeof(dwOperand));
+
+	DWORD dwSize = 0;
+	PBYTE pTargetMemory = NULL;
+	ERegisterTypes eRegisterType = RecognizeRegister(
+		dwOperand[0], psVirtualProcessor,
+		&pTargetMemory, &dwSize);
+
+	INT dwNumber = 0;
+	EOperandTypes eOperandType[2] =
+	{
+		RecognizeOperand(dwOperand[1]),
+		RecognizeOperand(dwOperand[2])
+	};
+
+	DWORD dwFirstNumber = 0;
+	DWORD dwSecondNumber = 0;
+
+	BOOL bResult = GetNativeNumber(
+		psVirtualProcessor,
+		eOperandType[0],
+		dwOperand[1],
+		&dwFirstNumber);
+	if (!bResult)
+	{
+		return FALSE;
+	}
+
+	bResult = GetNativeNumber(
+		psVirtualProcessor,
+		eOperandType[1],
+		dwOperand[2],
+		&dwSecondNumber);
+	if (!bResult)
+	{
+		return FALSE;
+	}
+
+	DWORD dwResult = dwFirstNumber - dwSecondNumber;
+	switch (eRegisterType)
+	{
+	case ERT_I:
+	case ERT_N:
+		memcpy(pTargetMemory, &dwResult, sizeof(DWORD));
+		return TRUE;
+	case ERT_P:
+		return TRUE; // PmcIncrement(pTargetMemory)
+	default:
+		return FALSE;
+	}
+}
+
+BOOL
+PasmMul3(
+	PSVirtualProcessor	psVirtualProcessor,
+	PBYTE				pCurrentInstruction
+)
+{
+	DWORD dwOperand[3];
+	memcpy(dwOperand, pCurrentInstruction, sizeof(dwOperand));
+
+	DWORD dwSize = 0;
+	PBYTE pTargetMemory = NULL;
+	ERegisterTypes eRegisterType = RecognizeRegister(
+		dwOperand[0], psVirtualProcessor,
+		&pTargetMemory, &dwSize);
+
+	INT dwNumber = 0;
+	EOperandTypes eOperandType[2] =
+	{
+		RecognizeOperand(dwOperand[1]),
+		RecognizeOperand(dwOperand[2])
+	};
+
+	DWORD dwFirstNumber = 0;
+	DWORD dwSecondNumber = 0;
+
+	BOOL bResult = GetNativeNumber(
+		psVirtualProcessor,
+		eOperandType[0],
+		dwOperand[1],
+		&dwFirstNumber);
+	if (!bResult)
+	{
+		return FALSE;
+	}
+
+	bResult = GetNativeNumber(
+		psVirtualProcessor,
+		eOperandType[1],
+		dwOperand[2],
+		&dwSecondNumber);
+	if (!bResult)
+	{
+		return FALSE;
+	}
+
+	DWORD dwResult = dwFirstNumber * dwSecondNumber;
+	switch (eRegisterType)
+	{
+	case ERT_I:
+	case ERT_N:
+		memcpy(pTargetMemory, &dwResult, sizeof(DWORD));
+		return TRUE;
+	case ERT_P:
+		return TRUE; // PmcIncrement(pTargetMemory)
+	default:
+		return FALSE;
+	}
+}
+
+BOOL
+PasmDiv3(
+	PSVirtualProcessor	psVirtualProcessor,
+	PBYTE				pCurrentInstruction
+)
+{
+	DWORD dwOperand[3];
+	memcpy(dwOperand, pCurrentInstruction, sizeof(dwOperand));
+
+	DWORD dwSize = 0;
+	PBYTE pTargetMemory = NULL;
+	ERegisterTypes eRegisterType = RecognizeRegister(
+		dwOperand[0], psVirtualProcessor,
+		&pTargetMemory, &dwSize);
+
+	INT dwNumber = 0;
+	EOperandTypes eOperandType[2] =
+	{
+		RecognizeOperand(dwOperand[1]),
+		RecognizeOperand(dwOperand[2])
+	};
+
+	DWORD dwFirstNumber = 0;
+	DWORD dwSecondNumber = 0;
+
+	BOOL bResult = GetNativeNumber(
+		psVirtualProcessor,
+		eOperandType[0],
+		dwOperand[1],
+		&dwFirstNumber);
+	if (!bResult)
+	{
+		return FALSE;
+	}
+
+	bResult = GetNativeNumber(
+		psVirtualProcessor,
+		eOperandType[1],
+		dwOperand[2],
+		&dwSecondNumber);
+	if (!bResult)
+	{
+		return FALSE;
+	}
+
+	DWORD dwResult = dwFirstNumber / dwSecondNumber;
+	switch (eRegisterType)
+	{
+	case ERT_I:
+	case ERT_N:
+		memcpy(pTargetMemory, &dwResult, sizeof(DWORD));
+		return TRUE;
+	case ERT_P:
+		return TRUE; // PmcIncrement(pTargetMemory)
+	default:
+		return FALSE;
+	}
+}
+
+BOOL
 PasmAdd2(
 	PSVirtualProcessor	psVirtualProcessor,
 	PBYTE				pCurrentInstruction
@@ -771,6 +1020,236 @@ PasmPrint(
 	default:
 		return FALSE;
 	}
+}
+
+BOOL
+PasmLength(
+	PSVirtualProcessor	psVirtualProcessor,
+	PBYTE				pCurrentInstruction,
+	PBYTE				psIndexTable
+)
+{
+	DWORD dwOperand[2];
+	memcpy(dwOperand, pCurrentInstruction, sizeof(dwOperand));
+
+	DWORD dwSize = 0;
+	PBYTE pTargetMemory = NULL;
+	BOOL bResult = RecognizeRegister(
+		dwOperand[0],
+		psVirtualProcessor,
+		&pTargetMemory,
+		&dwSize);
+	if (!bResult)
+	{
+		return FALSE;
+	}
+
+	PCHAR pString = GetStringLitral(
+		dwOperand[1],
+		psIndexTable);
+	if (!bResult)
+	{
+		return FALSE;
+	}
+
+	SIZE_T nLength = strlen(pString);
+	memcpy(pTargetMemory, nLength, dwSize);
+
+	return TRUE;
+}
+
+BOOL
+PasmConcat(
+	PSVirtualProcessor	psVirtualProcessor,
+	PBYTE				pCurrentInstruction,
+	PBYTE				psIndexTable
+)
+{
+	DWORD dwOperand[2];
+	memcpy(dwOperand, pCurrentInstruction, sizeof(dwOperand));
+
+	DWORD dwSize = 0;
+	PBYTE pTargetMemory = NULL;
+	BOOL bResult = RecognizeRegister(
+		dwOperand[0],
+		psVirtualProcessor,
+		&pTargetMemory,
+		&dwSize);
+	if (!bResult)
+	{
+		return FALSE;
+	}
+
+	PCHAR pDestString = GetStringLitral(
+		dwOperand[1],
+		psIndexTable);
+	if (!bResult)
+	{
+		return FALSE;
+	}
+
+	CHAR szCurrentString[STRING_MAX_LENGTH];
+	strcpy(szCurrentString, pTargetMemory);
+	strcat(szCurrentString, pDestString);
+	memcpy(pTargetMemory, szCurrentString, sizeof(szCurrentString));
+
+	return TRUE;
+}
+
+BOOL
+PasmSubstr(
+	PSVirtualProcessor	psVirtualProcessor,
+	PBYTE				pCurrentInstruction,
+	PBYTE				psIndexTable
+)
+{
+	DWORD dwOperand[4];
+	memcpy(dwOperand, pCurrentInstruction, sizeof(dwOperand));
+
+	DWORD dwSize = 0;
+	PBYTE pTargetMemory = NULL;
+	BOOL bResult = RecognizeRegister(
+		dwOperand[0],
+		psVirtualProcessor,
+		&pTargetMemory,
+		&dwSize);
+	if (!bResult)
+	{
+		return FALSE;
+	}
+
+	PCHAR pString = ExtractString(
+		dwOperand[1],
+		psVirtualProcessor,
+		psIndexTable);
+	if (!pString)
+	{
+		return FALSE;
+	}
+
+	EOperandTypes peTypes[2] =
+	{
+		RecognizeOperand(dwOperand[2]),
+		RecognizeOperand(dwOperand[3])
+	};
+
+	DWORD dwLowerBound = 0;
+	bResult = GetNativeNumber(
+		psVirtualProcessor,
+		peTypes[0],
+		dwOperand[2],
+		&dwLowerBound);
+	if (!bResult)
+	{
+		return FALSE;
+	}
+
+	DWORD dwCharCount = 0;
+	bResult = GetNativeNumber(
+		psVirtualProcessor,
+		peTypes[1],
+		dwOperand[3],
+		&dwCharCount);
+	if (!bResult)
+	{
+		return FALSE;
+	}
+
+	if (dwLowerBound + dwCharCount > STRING_MAX_LENGTH)
+	{
+		return FALSE;
+	}
+
+	memcpy(pTargetMemory, pString + dwLowerBound, dwCharCount);
+
+	return TRUE;
+}
+
+BOOL
+PasmBranch(
+	PSVirtualProcessor	psVirtualProcessor,
+	PBYTE				pCurrentInstruction
+)
+{
+	DWORD dwMarker;
+	memcpy(&dwMarker, pCurrentInstruction, sizeof(DWORD));
+
+	psVirtualProcessor->IP = dwMarker;
+	return TRUE;
+}
+
+BOOL
+PasmIf2(
+	PSVirtualProcessor	psVirtualProcessor,
+	PBYTE				pCurrentInstruction
+)
+{
+	DWORD dwOperand;
+	DWORD dwMarker;
+
+	memcpy(&dwOperand, pCurrentInstruction, sizeof(DWORD));
+	memcpy(&dwMarker, pCurrentInstruction + sizeof(dwOperand), sizeof(DWORD));
+
+	EOperandTypes peType = RecognizeOperand(dwOperand);
+
+	DWORD dwNumber = 0;
+	BOOL bResult = GetNativeNumber(
+		psVirtualProcessor,
+		peType,
+		dwOperand,
+		&dwNumber);
+	if (!bResult)
+	{
+		return FALSE;
+	}
+
+	if (dwNumber)
+	{
+		psVirtualProcessor->IP = dwMarker;
+	}
+	else
+	{
+		psVirtualProcessor->IP += sizeof(dwOperand) + sizeof(dwMarker) + sizeof(BYTE);
+	}
+
+	return TRUE;
+}
+
+BOOL
+PasmIf3(
+	PSVirtualProcessor	psVirtualProcessor,
+	PBYTE				pCurrentInstruction
+)
+{
+	DWORD dwOperand;
+	DWORD dwMarkers[2];
+
+	memcpy(&dwOperand, pCurrentInstruction, sizeof(DWORD));
+	memcpy(dwMarkers, pCurrentInstruction + sizeof(dwOperand), sizeof(dwMarkers));
+
+	EOperandTypes peType = RecognizeOperand(dwOperand);
+
+	DWORD dwNumber = 0;
+	BOOL bResult = GetNativeNumber(
+		psVirtualProcessor,
+		peType,
+		dwOperand,
+		&dwNumber);
+	if (!bResult)
+	{
+		return FALSE;
+	}
+
+	if (dwNumber)
+	{
+		psVirtualProcessor->IP = dwMarkers[0];
+	}
+	else
+	{
+		psVirtualProcessor->IP = dwMarkers[1];
+	}
+
+	return TRUE;
 }
 
 BOOL

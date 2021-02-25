@@ -22,6 +22,30 @@ PasmDec(
 );
 
 BOOL
+PasmAdd3(
+	PSVirtualProcessor	psVirtualProcessor,
+	PBYTE				pCurrentInstruction
+);
+
+BOOL
+PasmMul3(
+	PSVirtualProcessor	psVirtualProcessor,
+	PBYTE				pCurrentInstruction
+);
+
+BOOL
+PasmDiv3(
+	PSVirtualProcessor	psVirtualProcessor,
+	PBYTE				pCurrentInstruction
+);
+
+BOOL
+PasmSub3(
+	PSVirtualProcessor	psVirtualProcessor,
+	PBYTE				pCurrentInstruction
+);
+
+BOOL
 PasmAdd2(
 	PSVirtualProcessor	psVirtualProcessor,
 	PBYTE				pCurrentInstruction
@@ -46,10 +70,49 @@ PasmDiv2(
 );
 
 BOOL
+PasmLength(
+	PSVirtualProcessor	psVirtualProcessor,
+	PBYTE				pCurrentInstruction,
+	PBYTE				psIndexTable
+);
+
+BOOL
+PasmConcat(
+	PSVirtualProcessor	psVirtualProcessor,
+	PBYTE				pCurrentInstruction,
+	PBYTE				psIndexTable
+);
+
+BOOL
+PasmSubstr(
+	PSVirtualProcessor	psVirtualProcessor,
+	PBYTE				pCurrentInstruction,
+	PBYTE				psIndexTable
+);
+
+BOOL
 PasmPrint(
 	PSVirtualProcessor	psVirtualProcessor,
 	PBYTE				pCurrentInstruction,
 	PBYTE				psIndexTable
+);
+
+BOOL
+PasmBranch(
+	PSVirtualProcessor	psVirtualProcessor,
+	PBYTE				pCurrentInstruction
+);
+
+BOOL
+PasmIf2(
+	PSVirtualProcessor	psVirtualProcessor,
+	PBYTE				pCurrentInstruction
+);
+
+BOOL
+PasmIf3(
+	PSVirtualProcessor	psVirtualProcessor,
+	PBYTE				pCurrentInstruction
 );
 
 BOOL
