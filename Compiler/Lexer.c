@@ -131,7 +131,7 @@ PrepareCommand(
 			{
 				for (DWORD k = i; k < j - 1; k++)
 				{
-					if (!isalpha(pszCommandLine[k]))
+					if (!isalpha(pszCommandLine[k]) && pszCommandLine[k] != '_')
 					{
 						return FALSE;
 					}

@@ -287,6 +287,7 @@ StateMachineDriveLexemes(
 
 	BOOL bStateFound = FALSE;
 	DWORD dwCurrentState = 0;
+	DWORD dwIndexFound = 0;
 	DWORD dwLength = strlen(psLexemeContainer->szLexemes[0]);
 	DWORD dwHash = Fnv1aCompute(psLexemeContainer->szLexemes[0], dwLength, sizeof(CHAR), FNV_1A_SEED);
 	for (DWORD i = 0; i < sizeof(machine_operators) / sizeof(SStateMahcineCommand); i++)
@@ -295,6 +296,7 @@ StateMachineDriveLexemes(
 		{
 			bStateFound = TRUE;
 			dwCurrentState = machine_operators[i].nOpCode;
+			dwIndexFound = i;
 			break;
 		}
 	}
@@ -306,6 +308,17 @@ StateMachineDriveLexemes(
 
 	if (dwCurrentState == (WORD)-1)
 	{
+		switch (machine_operators[dwIndexFound].dwHash)
+		{
+		case 0x30F467AC:
+			psLexemeContainer->eEndPointOperation = EPO_RET;
+			break;
+		case 0x6A8E75AA:
+			psLexemeContainer->eEndPointOperation = EPO_END;
+			break;
+		default:
+			return FALSE;
+		}
 		return TRUE;
 	}
 

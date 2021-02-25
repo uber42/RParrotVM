@@ -1720,21 +1720,21 @@ PasmPushStack(
 	DWORD dwOperand;
 	memcpy(&dwOperand, pCurrentInstruction, sizeof(DWORD));
 
-	DWORD dwSize = 0;
-	PBYTE pTargetMemory = NULL;
 	EOperandTypes eOperandType = RecognizeOperand(dwOperand);
-	ERegisterTypes eRegisterType = RecognizeRegister(
-		dwOperand,
+
+	DWORD dwNumber = 0;
+	BOOL bResult = GetNativeNumber(
 		psVirtualProcessor,
-		&pTargetMemory,
-		&dwSize);
-	if (!eRegisterType)
+		eOperandType,
+		dwOperand,
+		&dwNumber);
+	if (!bResult)
 	{
 		return FALSE;
 	}
 
-	memcpy(pStack + psVirtualProcessor->SP, pTargetMemory, dwSize);
-	psVirtualProcessor->SP += dwSize;
+	memcpy(pStack + psVirtualProcessor->SP, &dwNumber, sizeof(DWORD));
+	psVirtualProcessor->SP += sizeof(DWORD);
 
 	return TRUE;
 }
