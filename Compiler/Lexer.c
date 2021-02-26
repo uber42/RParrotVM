@@ -177,17 +177,19 @@ PrepareCommand(
 			i = j;
 		}
 		/** Числовые литералы */
-		else if (isdigit(pszCommandLine[i]))
+		else if (isdigit(pszCommandLine[i]) || pszCommandLine[i] == '-')
 		{
+			ETokenType eNumberType = EMT_INTEGER_LITERAL;
 			BOOL bHasDot = FALSE;
-			DWORD j = i;
+			DWORD j = i + 1;
 			for (; j < dwLength && !CheckWhiteSpace(pszCommandLine[j]); j++);
-			for (DWORD k = i; k < j; k++)
+			for (DWORD k = i + 1; k < j; k++)
 			{
 				if (!isdigit(pszCommandLine[k]))
 				{
 					if (!bHasDot && pszCommandLine[k] == '.')
 					{
+						eNumberType = EMT_FLOAT_LITERAL;
 						bHasDot = TRUE;
 						continue;
 					}
@@ -202,7 +204,7 @@ PrepareCommand(
 
 			memset(psLexemeContainer->szLexemes[dwCurrentCount], 0, STRING_MAX_LENGTH);
 			memcpy(psLexemeContainer->szLexemes[dwCurrentCount], pszCommandLine + i, j - i);
-			psLexemeContainer->eToken[dwCurrentCount] = EMT_NUMBER_LITERAL;
+			psLexemeContainer->eToken[dwCurrentCount] = eNumberType;
 
 			i = j - 1;
 		}

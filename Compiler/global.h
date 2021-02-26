@@ -8,6 +8,7 @@
 #include <string.h>
 #include <assert.h>
 #include <stdlib.h>
+#include <math.h>
 
 #include "../VirtualContext/List.h"
 #include "../VirtualContext/Fnv1a.h"

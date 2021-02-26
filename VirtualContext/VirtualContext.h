@@ -7,6 +7,7 @@
 #define BYTECODE_NUMBER_LITERAL_FLAG	1 << 29
 #define BYTECODE_VIRTUAL_MEMORY_FLAG	1 << 28
 #define BYTECODE_REGISTER_FLAG			1 << 27
+#define BYTECODE_FLOAT_NUMBER_FLAG		1 << 26
 
 #define PROCESSOR_STACK_SIZE			0x20000
 
@@ -92,7 +93,7 @@ typedef enum _EProcessorOperation
 typedef struct _SVirtualProcessor
 {
 	/** Регистры общего назначения */
-	INT						I[REGISTERS_COUNT];
+	SHORT					I[REGISTERS_COUNT];
 	CHAR					S[REGISTERS_COUNT][STRING_MAX_LENGTH];
 	FLOAT					N[REGISTERS_COUNT];
 	/** Parrot Magic Cookie регистр */

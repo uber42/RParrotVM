@@ -44,7 +44,7 @@ static const SMiddleStateLayer set_table[] =
 	{ EMT_VIRTUAL_MEMORY, NATIVE_REG_MASK | ALL_LITERAL_MASK,			{ .nNextState = -1 },		14,		 1,	ENST_NUMBER, EPO_SET	},
 	{ EMT_I, EMT_I | EMT_P | EMT_NUMBER_LITERAL | EMT_VIRTUAL_MEMORY,	{ .nNextState = -1 },		14,		 1,	ENST_NUMBER, EPO_SET	},
 	{ EMT_N, EMT_N | EMT_P | EMT_NUMBER_LITERAL | EMT_VIRTUAL_MEMORY,	{ .nNextState = -1 },		14,		 1,	ENST_NUMBER, EPO_SET	},
-	{ EMT_S, EMT_S | EMT_P | EMT_NUMBER_LITERAL | EMT_VIRTUAL_MEMORY,	{ .nNextState = -1 },		14,		 1,	ENST_NUMBER, EPO_SET 	},
+	{ EMT_S, EMT_S | EMT_STRING_LITERAL,								{ .nNextState = -1 },		14,		 1,	ENST_NUMBER, EPO_SET 	},
 	{ EMT_P, ALL_MEMORY_MASK | ALL_LITERAL_MASK,						{ .nNextState = -1 },		14,		 1,	ENST_NUMBER, EPO_SET	}
 };
 

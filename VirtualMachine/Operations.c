@@ -1,7 +1,7 @@
 #include "global.h"
 
-#define OPERAND_CUT_MASK		0x78000000
-#define NUMBER_CUT_MASK			0x1FFFFFFF
+#define OPERAND_CUT_MASK		0x7C000000
+#define NUMBER_CUT_MASK			0x03FFFFFF
 
 #define NO_SUCCESS_EXECUTION	((DWORD)-1)
 
@@ -9,6 +9,7 @@ typedef enum _EOperandTypes
 {
 	EOT_STRING,
 	EOT_NUMBER,
+	EOT_FLOAT,
 	EOT_REGISTER,
 	EOT_VIRTUAL_MEMORY,
 	EOT_SPECIAL
@@ -23,6 +24,23 @@ typedef enum _ERegisterTypes
 } ERegisterTypes, *PERegisterTypes;
 
 static
+DOUBLE
+DecodeFloat(
+	WORD wValue
+)
+{
+	INT nCount = wValue >> 12;
+	DOUBLE fResult = wValue & 0xFFF;
+	while (nCount > 0)
+	{
+		fResult /= 10.0;
+		nCount--;
+	}
+
+	return fResult;
+}
+
+static
 EOperandTypes
 RecognizeOperand(
 	DWORD	dwOperand
@@ -35,6 +53,8 @@ RecognizeOperand(
 		return EOT_STRING;
 	case BYTECODE_NUMBER_LITERAL_FLAG:
 		return EOT_NUMBER;
+	case BYTECODE_FLOAT_NUMBER_FLAG:
+		return EOT_FLOAT;
 	case BYTECODE_VIRTUAL_MEMORY_FLAG:
 		return EOT_VIRTUAL_MEMORY;
 	case BYTECODE_REGISTER_FLAG:
@@ -53,7 +73,7 @@ RecognizeRegister(
 	PDWORD				pdwSize
 )
 {
-	DWORD dwRegisterNumber = (dwOperand >> 25) & 0x3;
+	DWORD dwRegisterNumber = (dwOperand >> 24) & 0x3;
 	DWORD dwRegisterType = dwOperand & 0xF;
 
 	switch (dwRegisterType)
@@ -254,6 +274,13 @@ GetNativeNumber(
 {
 	switch (eOpType)
 	{
+	case EOT_FLOAT:
+	{
+		DWORD dwCompressed = GetNumberLiteral(dwOperand);
+		FLOAT fDecoded = (FLOAT)DecodeFloat((WORD)dwCompressed);
+		memcpy(pdwNumber, &fDecoded, sizeof(FLOAT));
+		return TRUE;
+	}
 	case EOT_NUMBER:
 	{
 		DWORD dwLiteral = GetNumberLiteral(dwOperand);
@@ -274,7 +301,7 @@ GetNativeNumber(
 			return FALSE;
 		}
 
-		memcpy(pdwNumber, pTargetMemory, sizeof(DWORD));
+		memcpy(pdwNumber, pTargetMemory, dwSize);
 		return TRUE;
 	}
 	default:
@@ -332,6 +359,26 @@ PasmSet(
 			memcpy(pTargetMemory, pSrcMemory, dwSrcSize);
 
 			return TRUE;
+		}
+		case EOT_FLOAT:
+		{
+			if (eDestRegister == ERT_S)
+			{
+				return FALSE;
+			}
+
+			if (eDestRegister == ERT_P)
+			{
+				// PmcCopyMem();
+				return TRUE;
+			}
+			else
+			{
+				DWORD dwNumber = GetNumberLiteral(pdwOperands[1]);
+				FLOAT fDecoded = DecodeFloat((WORD)dwNumber);
+				memcpy(pTargetMemory, &fDecoded, sizeof(FLOAT));
+				return TRUE;
+			}
 		}
 		case EOT_NUMBER:
 		{
@@ -968,6 +1015,14 @@ PasmPrint(
 	EOperandTypes eOperandType = RecognizeOperand(dwOperand);
 	switch (eOperandType)
 	{
+	case EOT_FLOAT:
+	{
+		DWORD dwNumber = GetNumberLiteral(dwOperand);
+		FLOAT fDecoded = DecodeFloat((WORD)dwNumber);
+		printf("%f", fDecoded);
+
+		return TRUE;
+	}
 	case EOT_NUMBER:
 	{
 		DWORD dwNumber = GetNumberLiteral(dwOperand);
@@ -996,11 +1051,18 @@ PasmPrint(
 		switch (eSrcRegister)
 		{
 		case ERT_I:
-		case ERT_N:
 		{
 			DWORD dwNumber = 0;
 			memcpy(&dwNumber, pSrcMemory, dwSrcSize);
 			printf("%d", dwNumber);
+
+			return TRUE;
+		}
+		case ERT_N:
+		{
+			FLOAT fNumber = 0;
+			memcpy(&fNumber, pSrcMemory, dwSrcSize);
+			printf("%f", fNumber);
 
 			return TRUE;
 		}

@@ -17,13 +17,14 @@ typedef enum _ETokenType
 	EMT_MARKER			= 1 << 5,
 
 	EMT_STRING_LITERAL	= 1 << 6,
-	EMT_NUMBER_LITERAL  = 1 << 7,
+	EMT_INTEGER_LITERAL = 1 << 7,
+	EMT_FLOAT_LITERAL	= 1 << 8,
 
-	PMC_INTEGER			= 1 << 8,
-	PMC_FLOAT			= 1 << 9,
-	PMC_STRING			= 1 << 10,
-	PMC_LIST			= 1 << 11,
-	PMC_HASHTABLE		= 1 << 12,
+	PMC_INTEGER			= 1 << 9,
+	PMC_FLOAT			= 1 << 10,
+	PMC_STRING			= 1 << 11,
+	PMC_LIST			= 1 << 12,
+	PMC_HASHTABLE		= 1 << 13,
 
 	EMT_COMMAND			= ~((WORD)-1)
 } ETokenType, *PETokenType;
@@ -38,6 +39,7 @@ typedef enum _ETokenType
 #define INTEGERS_MASK			0x00000089
 #define NATIVE_REG_MASK			EMT_I | EMT_N | EMT_S
 #define NATIVE_MASK				NATIVE_REG_MASK | ALL_LITERAL_MASK
+#define EMT_NUMBER_LITERAL		EMT_FLOAT_LITERAL | EMT_INTEGER_LITERAL
 
 #define LINE_MAX_LEXEME_COUNT 5
 

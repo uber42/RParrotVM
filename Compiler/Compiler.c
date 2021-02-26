@@ -77,6 +77,22 @@ typedef struct _SCompilerContext
 #pragma pack(pop)
 
 static
+WORD
+EncodeFloat(
+	DOUBLE fValue
+) 
+{
+	INT nCount = 0;
+	while (fValue != floor(fValue))
+	{
+		fValue *= 10.0;
+		nCount++;
+	}
+
+	return (WORD)((nCount << 12) + (INT)fValue);
+}
+
+static
 VOID
 ChompString(
 	PCHAR szLine
@@ -224,6 +240,14 @@ CompileAssembler(
 
 				ListAddToEnd(&psByteString->sEntry, &psCompilerContext->sStringList);
 			}
+			else if (psContainingEntry->sLexeme.eToken[i] == EMT_FLOAT_LITERAL)
+			{
+				DOUBLE fNumber = atof(psContainingEntry->sLexeme.szLexemes[i]);
+				WORD wCompressed = EncodeFloat(fNumber);
+
+				psCurrentBytecode->sBytecode.dwOperands[i - 1] = wCompressed;
+				psCurrentBytecode->sBytecode.dwOperands[i - 1] |= BYTECODE_FLOAT_NUMBER_FLAG;
+			}
 			else if(psContainingEntry->sLexeme.eToken[i] == EMT_MARKER)
 			{
 				DWORD dwOffset = -1;
@@ -250,18 +274,18 @@ CompileAssembler(
 			}
 			else if((psContainingEntry->sLexeme.eToken[i] & REGISTERS_MASK) == psContainingEntry->sLexeme.eToken[i])
 			{
-				DWORD dwRegisterNumber = ((int)psContainingEntry->sLexeme.szLexemes[i][1] - 48);
+				DWORD dwRegisterNumber = ((INT)psContainingEntry->sLexeme.szLexemes[i][1] - 48);
 
 				psCurrentBytecode->sBytecode.dwOperands[i - 1] = psContainingEntry->sLexeme.eToken[i];
 				psCurrentBytecode->sBytecode.dwOperands[i - 1] |= BYTECODE_REGISTER_FLAG;
-				psCurrentBytecode->sBytecode.dwOperands[i - 1] |= (dwRegisterNumber << 25);
+				psCurrentBytecode->sBytecode.dwOperands[i - 1] |= (dwRegisterNumber << 24);
 			}
 			else if ((psContainingEntry->sLexeme.eToken[i] & EMT_VIRTUAL_MEMORY) == psContainingEntry->sLexeme.eToken[i])
 			{
 				psCurrentBytecode->sBytecode.dwOperands[i - 1] = strtol(psContainingEntry->sLexeme.szLexemes[i], NULL, 16);
 				psCurrentBytecode->sBytecode.dwOperands[i - 1] |= BYTECODE_VIRTUAL_MEMORY_FLAG;
 			}
-			else if ((psContainingEntry->sLexeme.eToken[i] & EMT_NUMBER_LITERAL) == psContainingEntry->sLexeme.eToken[i])
+			else if ((psContainingEntry->sLexeme.eToken[i] & EMT_INTEGER_LITERAL) == psContainingEntry->sLexeme.eToken[i])
 			{
 				psCurrentBytecode->sBytecode.dwOperands[i - 1] = strtol(psContainingEntry->sLexeme.szLexemes[i], NULL, 10);
 				psCurrentBytecode->sBytecode.dwOperands[i - 1] |= BYTECODE_NUMBER_LITERAL_FLAG;
