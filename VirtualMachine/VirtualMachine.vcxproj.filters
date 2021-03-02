@@ -5,9 +5,6 @@
     <ClCompile Include="Runtime.c">
       <Filter>Runtime</Filter>
     </ClCompile>
-    <ClCompile Include="HashTable.c">
-      <Filter>HashTable</Filter>
-    </ClCompile>
     <ClCompile Include="Operations.c">
       <Filter>Runtime</Filter>
     </ClCompile>
@@ -17,9 +14,6 @@
     <ClInclude Include="Runtime.h">
       <Filter>Runtime</Filter>
     </ClInclude>
-    <ClInclude Include="HashTable.h">
-      <Filter>HashTable</Filter>
-    </ClInclude>
     <ClInclude Include="Operations.h">
       <Filter>Runtime</Filter>
     </ClInclude>
@@ -27,9 +21,6 @@
   <ItemGroup>
     <Filter Include="Runtime">
       <UniqueIdentifier>{87a0b7ac-5c86-43de-8756-27c228a8552f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="HashTable">
-      <UniqueIdentifier>{f816b9ec-51a0-4093-9d0e-ae998db352f7}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

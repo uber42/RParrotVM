@@ -8,6 +8,7 @@
 
 #define STRING_MAX_LENGTH	256
 
+#include "HashTable.h"
 #include "PMC.h"
 #include "VirtualContext.h"
 

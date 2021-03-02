@@ -55,7 +55,7 @@ static const SMiddleStateLayer add_table[] =
 
 static const SMiddleStateLayer add_table_2[] =
 {
-	{ EMT_I | EMT_N | EMT_P, ALL_NUMBER_MASK,	{ .nNextState = -1		},		15,		1, ENST_NUMBER, EPO_ADD_3 },
+	{ ALL_NUMBER_MASK,		ALL_NUMBER_MASK,	{ .nNextState = -1		},		15,		1, ENST_NUMBER, EPO_ADD_3 },
 	{ EMT_NUMBER_LITERAL, 0,					{ .nNextState = -1		},		15,		1, ENST_NUMBER, EPO_ADD_2 }
 };
 
@@ -66,7 +66,7 @@ static const SMiddleStateLayer sub_table[] =
 
 static const SMiddleStateLayer sub_table_2[] =
 {
-	{ EMT_I | EMT_N | EMT_P, ALL_NUMBER_MASK,	{ .nNextState = -1		},		15,		1, ENST_NUMBER, EPO_SUB_3 },
+	{ ALL_NUMBER_MASK,		ALL_NUMBER_MASK,	{ .nNextState = -1		},		15,		1, ENST_NUMBER, EPO_SUB_3 },
 	{ EMT_NUMBER_LITERAL, 0,					{ .nNextState = -1		},		15,		1, ENST_NUMBER, EPO_SUB_2 }
 };
 
@@ -77,7 +77,7 @@ static const SMiddleStateLayer mul_table[] =
 
 static const SMiddleStateLayer mul_table_2[] =
 {
-	{ EMT_I | EMT_N | EMT_P, ALL_NUMBER_MASK,	{ .nNextState = -1		},		15,		1, ENST_NUMBER, EPO_MUL_3 },
+	{ ALL_NUMBER_MASK,		ALL_NUMBER_MASK,	{ .nNextState = -1		},		15,		1, ENST_NUMBER, EPO_MUL_3 },
 	{ EMT_NUMBER_LITERAL, 0,					{ .nNextState = -1		},		15,		1, ENST_NUMBER, EPO_MUL_2 }
 };
 
@@ -88,7 +88,7 @@ static const SMiddleStateLayer div_table[] =
 
 static const SMiddleStateLayer div_table_2[] =
 {
-	{ EMT_I | EMT_N | EMT_P, ALL_NUMBER_MASK,	{ .nNextState = -1		},		15,		1, ENST_NUMBER, EPO_DIV_3 },
+	{ ALL_NUMBER_MASK,		ALL_NUMBER_MASK,	{ .nNextState = -1		},		15,		1, ENST_NUMBER, EPO_DIV_3 },
 	{ EMT_NUMBER_LITERAL, 0,					{ .nNextState = -1		},		15,		1, ENST_NUMBER, EPO_DIV_2 }
 };
 
@@ -104,7 +104,7 @@ static const SStateMachineTransition transition_1[] =
 	{ EMT_I | EMT_N | EMT_P,				{ .sTable	  = tables + 5	},		4,		0,		ENST_TABLE,		0				},		// mul [REG], [REG, NUMBER_LITERAL]!, [REG, NUMBER_LITERAL]
 	{ EMT_I | EMT_N | EMT_P,				{ .sTable	  = tables + 7	},		5,		0,		ENST_TABLE,		0				},		// div [REG], [REG, NUMBER_LITERAL]!, [REG, NUMBER_LITERAL]
 
-	{ EMT_I | EMT_P,						{ .nNextState = 1			},		6,		0,		ENST_NUMBER,	0				},		// length [REG], [REG, STRING_LITERAL]
+	{ EMT_I,								{ .nNextState = 1			},		6,		0,		ENST_NUMBER,	0				},		// length [REG], [REG, STRING_LITERAL]
 	{ EMT_S | EMT_P,						{ .nNextState = 2			},		7,		0,		ENST_NUMBER,	0				},		// concat [REG], [REG, STRING_LITERAL]
 	{ EMT_S | EMT_P,						{ .nNextState = 3			},		8,		0,		ENST_NUMBER,	0				},		// substr [REG], [REG, STRING_LITERAL], [REG, NUMBER_LITERAL], [REG, NUMBER_LITERAL]
 
@@ -129,7 +129,7 @@ static const SStateMachineTransition transition_2[] =
 {
 	{ PMC_TYPE_MASK,						{ .nNextState = -1 },		16,		1,		ENST_NUMBER, EPO_NEW	},				// new
 
-	{ EMT_I,								{ .nNextState = 8  },		17,		0,		ENST_NUMBER, 0			},				// length
+	{ EMT_S | EMT_STRING_LITERAL,			{ .nNextState = 8  },		17,		1,		ENST_NUMBER, EPO_LENGTH	},				// length
 	{ EMT_S | EMT_STRING_LITERAL,			{ .nNextState = -1 },		18,		1,		ENST_NUMBER, EPO_CONCAT },				// concat
 	{ EMT_S | EMT_STRING_LITERAL,			{ .nNextState = 0  },		19,		0,		ENST_NUMBER, 0			},				// substr
 

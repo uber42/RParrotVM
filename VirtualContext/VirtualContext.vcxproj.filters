@@ -10,6 +10,9 @@
     <Filter Include="Generic">
       <UniqueIdentifier>{c82d60d5-80ad-4caf-a193-d82435189633}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core\HashTable">
+      <UniqueIdentifier>{185675bc-113b-4ded-a54d-cb317e05160e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Fnv1a.h">
@@ -25,6 +28,9 @@
     <ClInclude Include="VirtualContext.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="HashTable.h">
+      <Filter>Core\HashTable</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Fnv1a.c">
@@ -35,6 +41,9 @@
     </ClCompile>
     <ClCompile Include="VirtualContext.c">
       <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="HashTable.c">
+      <Filter>Core\HashTable</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

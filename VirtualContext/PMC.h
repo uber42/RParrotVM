@@ -20,13 +20,25 @@ typedef struct _SParrotMagicCookie
 {
 	EParrotMagicCookieType	eType;
 	
-	PVOID					pData;
+	union 
+	{
+		PSSkipList	HashTable;
+		INT			Integer;
+		FLOAT		Float;
+		PCHAR		String;
+	} uData;
 } SParrotMagicCookie, *PSParrotMagicCookie;
 
 
 VOID
 PmcInitialize(
 	PSParrotMagicCookie psPmc
+);
+
+BOOL
+PmcNew(
+	PSParrotMagicCookie		psPmc,
+	EParrotMagicCookieType	ePmcType
 );
 
 #endif

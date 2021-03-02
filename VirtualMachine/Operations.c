@@ -80,7 +80,7 @@ RecognizeRegister(
 	{
 	case ERT_I:
 		*pbTargetMemory = &psVirtualProcessor->I[dwRegisterNumber];
-		*pdwSize = sizeof(INT);
+		*pdwSize = sizeof(DWORD);
 		return dwRegisterType;
 	case ERT_N:
 		*pbTargetMemory = &psVirtualProcessor->N[dwRegisterNumber];
@@ -161,7 +161,21 @@ ExtractString(
 
 static
 INT
-GetNumberLiteral(
+GetIntegerNumberLiteral(
+	DWORD	dwOperand
+)
+{
+	SHORT wNumber = 0;
+	DWORD dwCuted = dwOperand & NUMBER_CUT_MASK;
+	memcpy(&wNumber, &dwCuted, sizeof(SHORT));
+	
+	INT dwResult = (INT)wNumber;
+	return dwResult;
+}
+
+static
+INT
+GetFloatNumberLiteral(
 	DWORD	dwOperand
 )
 {
@@ -215,56 +229,9 @@ IsRegistersCompatibile(
 	}
 }
 
-static
-BOOL
-RegisterAdd(
-	PBYTE	pTargetMemery,
-	INT		dwAddition
-)
-{
-	INT dwCurrentValue = 0;
-	memcpy(&dwCurrentValue, pTargetMemery, sizeof(INT));
-
-	dwCurrentValue += dwAddition;
-	memcpy(pTargetMemery, &dwCurrentValue, sizeof(INT));
-
-	return TRUE;
-}
 
 static
-BOOL
-RegisterMul(
-	PBYTE	pTargetMemery,
-	INT		dwFactor
-)
-{
-	INT dwCurrentValue = 0;
-	memcpy(&dwCurrentValue, pTargetMemery, sizeof(INT));
-
-	dwCurrentValue *= dwFactor;
-	memcpy(pTargetMemery, &dwCurrentValue, sizeof(INT));
-
-	return TRUE;
-}
-
-static
-BOOL
-RegisterDiv(
-	PBYTE	pTargetMemery,
-	INT		dwNumber
-)
-{
-	INT dwCurrentValue = 0;
-	memcpy(&dwCurrentValue, pTargetMemery, sizeof(INT));
-
-	dwCurrentValue /= dwNumber;
-	memcpy(pTargetMemery, &dwCurrentValue, sizeof(INT));
-
-	return TRUE;
-}
-
-static
-BOOL
+EOperandTypes
 GetNativeNumber(
 	PSVirtualProcessor	psVirtualProcessor,
 	EOperandTypes		eOpType,
@@ -276,16 +243,16 @@ GetNativeNumber(
 	{
 	case EOT_FLOAT:
 	{
-		DWORD dwCompressed = GetNumberLiteral(dwOperand);
+		DWORD dwCompressed = GetFloatNumberLiteral(dwOperand);
 		FLOAT fDecoded = (FLOAT)DecodeFloat((WORD)dwCompressed);
 		memcpy(pdwNumber, &fDecoded, sizeof(FLOAT));
-		return TRUE;
+		return EOT_FLOAT;
 	}
 	case EOT_NUMBER:
 	{
-		DWORD dwLiteral = GetNumberLiteral(dwOperand);
-		memcpy(pdwNumber, &dwLiteral, sizeof(DWORD));
-		return TRUE;
+		DWORD dwLiteral = GetIntegerNumberLiteral(dwOperand);
+		memcpy(pdwNumber, &dwLiteral, sizeof(INT));
+		return EOT_NUMBER;
 	}
 	case EOT_REGISTER:
 	{
@@ -296,13 +263,19 @@ GetNativeNumber(
 			psVirtualProcessor,
 			&pTargetMemory,
 			&dwSize);
-		if (eSrcRegister != ERT_I)
-		{
-			return FALSE;
-		}
 
 		memcpy(pdwNumber, pTargetMemory, dwSize);
-		return TRUE;
+
+		if (eSrcRegister == ERT_I)
+		{
+			return EOT_NUMBER;
+		}
+		else if (eSrcRegister == ERT_N)
+		{
+			return EOT_FLOAT;
+		}
+
+		return FALSE;
 	}
 	default:
 		return FALSE;
@@ -374,7 +347,7 @@ PasmSet(
 			}
 			else
 			{
-				DWORD dwNumber = GetNumberLiteral(pdwOperands[1]);
+				DWORD dwNumber = GetFloatNumberLiteral(pdwOperands[1]);
 				FLOAT fDecoded = DecodeFloat((WORD)dwNumber);
 				memcpy(pTargetMemory, &fDecoded, sizeof(FLOAT));
 				return TRUE;
@@ -394,7 +367,7 @@ PasmSet(
 			}
 			else
 			{
-				DWORD dwLiteral = GetNumberLiteral(pdwOperands[1]);
+				DWORD dwLiteral = GetIntegerNumberLiteral(pdwOperands[1]);
 				memcpy(pTargetMemory, &dwLiteral, sizeof(DWORD));
 				return TRUE;
 			}
@@ -465,8 +438,15 @@ PasmSet(
 		}
 		case EOT_NUMBER:
 		{
-			DWORD dwLiteral = GetNumberLiteral(pdwOperands[1]);
+			DWORD dwLiteral = GetIntegerNumberLiteral(pdwOperands[1]);
 			memcpy(pTargetMemory, &dwLiteral, sizeof(DWORD));
+			return TRUE;
+		}
+		case EOT_FLOAT:
+		{
+			DWORD dwNumber = GetFloatNumberLiteral(pdwOperands[1]);
+			FLOAT fDecoded = DecodeFloat((WORD)dwNumber);
+			memcpy(pTargetMemory, &fDecoded, sizeof(FLOAT));
 			return TRUE;
 		}
 		case EOT_STRING:
@@ -505,9 +485,21 @@ PasmInc(
 	switch (eRegisterType)
 	{
 	case ERT_I:
+	{
+		INT nNumber = *(INT*)pTargetMemory;
+		nNumber++;
+
+		memcpy(pTargetMemory, &nNumber, sizeof(INT));
+		return TRUE;
+	}
 	case ERT_N:
-		return RegisterAdd(
-			pTargetMemory, 1);
+	{
+		FLOAT nNumber = *(FLOAT*)pTargetMemory;
+		nNumber++;
+
+		memcpy(pTargetMemory, &nNumber, sizeof(FLOAT));
+		return TRUE;
+	}
 	case ERT_P:
 		return TRUE; // PmcIncrement(pTargetMemory)
 	default:
@@ -532,9 +524,21 @@ PasmDec(
 	switch (eRegisterType)
 	{
 	case ERT_I:
+	{
+		INT nNumber = *(INT*)pTargetMemory;
+		nNumber--;
+
+		memcpy(pTargetMemory, &nNumber, sizeof(INT));
+		return TRUE;
+	}
 	case ERT_N:
-		return RegisterAdd(
-			pTargetMemory, -1);
+	{
+		FLOAT nNumber = *(FLOAT*)pTargetMemory;
+		nNumber--;
+
+		memcpy(pTargetMemory, &nNumber, sizeof(FLOAT));
+		return TRUE;
+	}
 	case ERT_P:
 		return TRUE; // PmcIncrement(pTargetMemory)
 	default:
@@ -567,33 +571,155 @@ PasmAdd3(
 	DWORD dwFirstNumber = 0;
 	DWORD dwSecondNumber = 0;
 
-	BOOL bResult = GetNativeNumber(
+	EOperandTypes eLeft = GetNativeNumber(
 		psVirtualProcessor,
 		eOperandType[0],
 		dwOperand[1],
 		&dwFirstNumber);
-	if (!bResult)
+	if (!eLeft)
 	{
 		return FALSE;
 	}
 	
-	bResult = GetNativeNumber(
+	EOperandTypes eRight = GetNativeNumber(
 		psVirtualProcessor,
 		eOperandType[1],
 		dwOperand[2],
 		&dwSecondNumber);
-	if (!bResult)
+	if (!eRight)
 	{
 		return FALSE;
 	}
 
-	DWORD dwResult = dwFirstNumber + dwSecondNumber;
+	DWORD dwResultNumber = 0;
+	EOperandTypes eTargetOpType = 0;
+	switch (eLeft)
+	{
+	case EOT_FLOAT:
+	{
+		switch (eRight)
+		{
+		case EOT_FLOAT:
+		{
+			FLOAT fLeft;
+			FLOAT fRight;
+
+			memcpy(&fLeft, &dwFirstNumber, sizeof(FLOAT));
+			memcpy(&fRight, &dwSecondNumber, sizeof(FLOAT));
+
+			fLeft += fRight;
+			memcpy(&dwResultNumber, &fLeft, sizeof(DWORD));
+			eTargetOpType = EOT_FLOAT;
+
+			break;
+		}
+		case EOT_NUMBER:
+		{
+			FLOAT fLeft;
+			INT fRight;
+
+			memcpy(&fLeft, &dwFirstNumber, sizeof(FLOAT));
+			memcpy(&fRight, &dwSecondNumber, sizeof(DWORD));
+
+			fLeft += fRight;
+			memcpy(&dwResultNumber, &fLeft, sizeof(DWORD));
+			eTargetOpType = EOT_FLOAT;
+
+			break;
+		}
+		default:
+			return FALSE;
+		}
+		break;
+	}
+	case EOT_NUMBER:
+	{
+		switch (eRight)
+		{
+		case EOT_FLOAT:
+		{
+			INT fLeft;
+			FLOAT fRight;
+
+			memcpy(&fLeft, &dwFirstNumber, sizeof(DWORD));
+			memcpy(&fRight, &dwSecondNumber, sizeof(FLOAT));
+
+			fRight += fLeft;
+			memcpy(&dwResultNumber, &fRight, sizeof(DWORD));
+			eTargetOpType = EOT_FLOAT;
+
+			break;
+		}
+		case EOT_NUMBER:
+		{
+			INT fLeft;
+			INT fRight;
+
+			memcpy(&fLeft, &dwFirstNumber, sizeof(DWORD));
+			memcpy(&fRight, &dwSecondNumber, sizeof(DWORD));
+
+			fLeft += fRight;
+			memcpy(&dwResultNumber, &fLeft, sizeof(DWORD));
+			eTargetOpType = EOT_NUMBER;
+
+			break;
+		}
+		default:
+			return FALSE;
+		}
+		break;
+	}
+	default:
+		return FALSE;
+	}
+
 	switch (eRegisterType)
 	{
 	case ERT_I:
+	{
+		switch (eTargetOpType)
+		{
+		case EOT_FLOAT:
+		{
+			INT dwSrc = 0;
+			FLOAT nResult = 0;
+			memcpy(&nResult, &dwResultNumber, sizeof(FLOAT));
+
+			dwSrc = (INT)nResult;
+			memcpy(pTargetMemory, &dwSrc, sizeof(INT));
+
+			return TRUE;
+		}
+		case EOT_NUMBER:
+		{
+			memcpy(pTargetMemory, &dwResultNumber, sizeof(INT));
+
+			return TRUE;
+		}
+		}
+		break;
+	}
 	case ERT_N:
-		memcpy(pTargetMemory, &dwResult, sizeof(DWORD));
-		return TRUE;
+		switch (eTargetOpType)
+		{
+		case EOT_NUMBER:
+		{
+			INT dwSrc = 0;
+			FLOAT nResult = 0;
+			memcpy(&dwSrc, &dwResultNumber, sizeof(INT));
+
+			nResult = (FLOAT)dwSrc;
+			memcpy(pTargetMemory, &nResult, sizeof(FLOAT));
+
+			return TRUE;
+		}
+		case EOT_FLOAT:
+		{
+			memcpy(pTargetMemory, &dwResultNumber, sizeof(FLOAT));
+
+			return TRUE;
+		}
+		}
 	case ERT_P:
 		return TRUE; // PmcIncrement(pTargetMemory)
 	default:
@@ -626,33 +752,155 @@ PasmSub3(
 	DWORD dwFirstNumber = 0;
 	DWORD dwSecondNumber = 0;
 
-	BOOL bResult = GetNativeNumber(
+	EOperandTypes eLeft = GetNativeNumber(
 		psVirtualProcessor,
 		eOperandType[0],
 		dwOperand[1],
 		&dwFirstNumber);
-	if (!bResult)
+	if (!eLeft)
 	{
 		return FALSE;
 	}
 
-	bResult = GetNativeNumber(
+	EOperandTypes eRight = GetNativeNumber(
 		psVirtualProcessor,
 		eOperandType[1],
 		dwOperand[2],
 		&dwSecondNumber);
-	if (!bResult)
+	if (!eRight)
 	{
 		return FALSE;
 	}
 
-	DWORD dwResult = dwFirstNumber - dwSecondNumber;
+	DWORD dwResultNumber = 0;
+	EOperandTypes eTargetOpType = 0;
+	switch (eLeft)
+	{
+	case EOT_FLOAT:
+	{
+		switch (eRight)
+		{
+		case EOT_FLOAT:
+		{
+			FLOAT fLeft;
+			FLOAT fRight;
+
+			memcpy(&fLeft, &dwFirstNumber, sizeof(FLOAT));
+			memcpy(&fRight, &dwSecondNumber, sizeof(FLOAT));
+
+			fLeft -= fRight;
+			memcpy(&dwResultNumber, &fLeft, sizeof(DWORD));
+			eTargetOpType = EOT_FLOAT;
+
+			break;
+		}
+		case EOT_NUMBER:
+		{
+			FLOAT fLeft;
+			INT fRight;
+
+			memcpy(&fLeft, &dwFirstNumber, sizeof(FLOAT));
+			memcpy(&fRight, &dwSecondNumber, sizeof(DWORD));
+
+			fLeft -= fRight;
+			memcpy(&dwResultNumber, &fLeft, sizeof(DWORD));
+			eTargetOpType = EOT_FLOAT;
+
+			break;
+		}
+		default:
+			return FALSE;
+		}
+		break;
+	}
+	case EOT_NUMBER:
+	{
+		switch (eRight)
+		{
+		case EOT_FLOAT:
+		{
+			INT fLeft;
+			FLOAT fRight;
+
+			memcpy(&fLeft, &dwFirstNumber, sizeof(DWORD));
+			memcpy(&fRight, &dwSecondNumber, sizeof(FLOAT));
+
+			fRight -= fLeft;
+			memcpy(&dwResultNumber, &fRight, sizeof(DWORD));
+			eTargetOpType = EOT_FLOAT;
+
+			break;
+		}
+		case EOT_NUMBER:
+		{
+			INT fLeft;
+			INT fRight;
+
+			memcpy(&fLeft, &dwFirstNumber, sizeof(DWORD));
+			memcpy(&fRight, &dwSecondNumber, sizeof(DWORD));
+
+			fLeft -= fRight;
+			memcpy(&dwResultNumber, &fLeft, sizeof(DWORD));
+			eTargetOpType = EOT_NUMBER;
+
+			break;
+		}
+		default:
+			return FALSE;
+		}
+		break;
+	}
+	default:
+		return FALSE;
+	}
+
 	switch (eRegisterType)
 	{
 	case ERT_I:
+	{
+		switch (eTargetOpType)
+		{
+		case EOT_FLOAT:
+		{
+			INT dwSrc = 0;
+			FLOAT nResult = 0;
+			memcpy(&nResult, &dwResultNumber, sizeof(FLOAT));
+
+			dwSrc = (INT)nResult;
+			memcpy(pTargetMemory, &dwSrc, sizeof(INT));
+
+			return TRUE;
+		}
+		case EOT_NUMBER:
+		{
+			memcpy(pTargetMemory, &dwResultNumber, sizeof(INT));
+
+			return TRUE;
+		}
+		}
+		break;
+	}
 	case ERT_N:
-		memcpy(pTargetMemory, &dwResult, sizeof(DWORD));
-		return TRUE;
+		switch (eTargetOpType)
+		{
+		case EOT_NUMBER:
+		{
+			INT dwSrc = 0;
+			FLOAT nResult = 0;
+			memcpy(&dwSrc, &dwResultNumber, sizeof(INT));
+
+			nResult = (FLOAT)dwSrc;
+			memcpy(pTargetMemory, &nResult, sizeof(FLOAT));
+
+			return TRUE;
+		}
+		case EOT_FLOAT:
+		{
+			memcpy(pTargetMemory, &dwResultNumber, sizeof(FLOAT));
+
+			return TRUE;
+		}
+		}
 	case ERT_P:
 		return TRUE; // PmcIncrement(pTargetMemory)
 	default:
@@ -685,33 +933,155 @@ PasmMul3(
 	DWORD dwFirstNumber = 0;
 	DWORD dwSecondNumber = 0;
 
-	BOOL bResult = GetNativeNumber(
+	EOperandTypes eLeft = GetNativeNumber(
 		psVirtualProcessor,
 		eOperandType[0],
 		dwOperand[1],
 		&dwFirstNumber);
-	if (!bResult)
+	if (!eLeft)
 	{
 		return FALSE;
 	}
 
-	bResult = GetNativeNumber(
+	EOperandTypes eRight = GetNativeNumber(
 		psVirtualProcessor,
 		eOperandType[1],
 		dwOperand[2],
 		&dwSecondNumber);
-	if (!bResult)
+	if (!eRight)
 	{
 		return FALSE;
 	}
 
-	DWORD dwResult = dwFirstNumber * dwSecondNumber;
+	DWORD dwResultNumber = 0;
+	EOperandTypes eTargetOpType = 0;
+	switch (eLeft)
+	{
+	case EOT_FLOAT:
+	{
+		switch (eRight)
+		{
+		case EOT_FLOAT:
+		{
+			FLOAT fLeft;
+			FLOAT fRight;
+
+			memcpy(&fLeft, &dwFirstNumber, sizeof(FLOAT));
+			memcpy(&fRight, &dwSecondNumber, sizeof(FLOAT));
+
+			fLeft *= fRight;
+			memcpy(&dwResultNumber, &fLeft, sizeof(DWORD));
+			eTargetOpType = EOT_FLOAT;
+
+			break;
+		}
+		case EOT_NUMBER:
+		{
+			FLOAT fLeft;
+			INT fRight;
+
+			memcpy(&fLeft, &dwFirstNumber, sizeof(FLOAT));
+			memcpy(&fRight, &dwSecondNumber, sizeof(DWORD));
+
+			fLeft *= fRight;
+			memcpy(&dwResultNumber, &fLeft, sizeof(DWORD));
+			eTargetOpType = EOT_FLOAT;
+
+			break;
+		}
+		default:
+			return FALSE;
+		}
+		break;
+	}
+	case EOT_NUMBER:
+	{
+		switch (eRight)
+		{
+		case EOT_FLOAT:
+		{
+			INT fLeft;
+			FLOAT fRight;
+
+			memcpy(&fLeft, &dwFirstNumber, sizeof(DWORD));
+			memcpy(&fRight, &dwSecondNumber, sizeof(FLOAT));
+
+			fRight *= fLeft;
+			memcpy(&dwResultNumber, &fRight, sizeof(DWORD));
+			eTargetOpType = EOT_FLOAT;
+
+			break;
+		}
+		case EOT_NUMBER:
+		{
+			INT fLeft;
+			INT fRight;
+
+			memcpy(&fLeft, &dwFirstNumber, sizeof(DWORD));
+			memcpy(&fRight, &dwSecondNumber, sizeof(DWORD));
+
+			fLeft *= fRight;
+			memcpy(&dwResultNumber, &fLeft, sizeof(DWORD));
+			eTargetOpType = EOT_NUMBER;
+
+			break;
+		}
+		default:
+			return FALSE;
+		}
+		break;
+	}
+	default:
+		return FALSE;
+	}
+
 	switch (eRegisterType)
 	{
 	case ERT_I:
+	{
+		switch (eTargetOpType)
+		{
+		case EOT_FLOAT:
+		{
+			INT dwSrc = 0;
+			FLOAT nResult = 0;
+			memcpy(&nResult, &dwResultNumber, sizeof(FLOAT));
+
+			dwSrc = (INT)nResult;
+			memcpy(pTargetMemory, &dwSrc, sizeof(INT));
+
+			return TRUE;
+		}
+		case EOT_NUMBER:
+		{
+			memcpy(pTargetMemory, &dwResultNumber, sizeof(INT));
+
+			return TRUE;
+		}
+		}
+		break;
+	}
 	case ERT_N:
-		memcpy(pTargetMemory, &dwResult, sizeof(DWORD));
-		return TRUE;
+		switch (eTargetOpType)
+		{
+		case EOT_NUMBER:
+		{
+			INT dwSrc = 0;
+			FLOAT nResult = 0;
+			memcpy(&dwSrc, &dwResultNumber, sizeof(INT));
+
+			nResult = (FLOAT)dwSrc;
+			memcpy(pTargetMemory, &nResult, sizeof(FLOAT));
+
+			return TRUE;
+		}
+		case EOT_FLOAT:
+		{
+			memcpy(pTargetMemory, &dwResultNumber, sizeof(FLOAT));
+
+			return TRUE;
+		}
+		}
 	case ERT_P:
 		return TRUE; // PmcIncrement(pTargetMemory)
 	default:
@@ -744,33 +1114,155 @@ PasmDiv3(
 	DWORD dwFirstNumber = 0;
 	DWORD dwSecondNumber = 0;
 
-	BOOL bResult = GetNativeNumber(
+	EOperandTypes eLeft = GetNativeNumber(
 		psVirtualProcessor,
 		eOperandType[0],
 		dwOperand[1],
 		&dwFirstNumber);
-	if (!bResult)
+	if (!eLeft)
 	{
 		return FALSE;
 	}
 
-	bResult = GetNativeNumber(
+	EOperandTypes eRight = GetNativeNumber(
 		psVirtualProcessor,
 		eOperandType[1],
 		dwOperand[2],
 		&dwSecondNumber);
-	if (!bResult)
+	if (!eRight)
 	{
 		return FALSE;
 	}
 
-	DWORD dwResult = dwFirstNumber / dwSecondNumber;
+	DWORD dwResultNumber = 0;
+	EOperandTypes eTargetOpType = 0;
+	switch (eLeft)
+	{
+	case EOT_FLOAT:
+	{
+		switch (eRight)
+		{
+		case EOT_FLOAT:
+		{
+			FLOAT fLeft;
+			FLOAT fRight;
+
+			memcpy(&fLeft, &dwFirstNumber, sizeof(FLOAT));
+			memcpy(&fRight, &dwSecondNumber, sizeof(FLOAT));
+
+			fLeft /= fRight;
+			memcpy(&dwResultNumber, &fLeft, sizeof(DWORD));
+			eTargetOpType = EOT_FLOAT;
+
+			break;
+		}
+		case EOT_NUMBER:
+		{
+			FLOAT fLeft;
+			INT fRight;
+
+			memcpy(&fLeft, &dwFirstNumber, sizeof(FLOAT));
+			memcpy(&fRight, &dwSecondNumber, sizeof(DWORD));
+
+			fLeft /= fRight;
+			memcpy(&dwResultNumber, &fLeft, sizeof(DWORD));
+			eTargetOpType = EOT_FLOAT;
+
+			break;
+		}
+		default:
+			return FALSE;
+		}
+		break;
+	}
+	case EOT_NUMBER:
+	{
+		switch (eRight)
+		{
+		case EOT_FLOAT:
+		{
+			INT fLeft;
+			FLOAT fRight;
+
+			memcpy(&fLeft, &dwFirstNumber, sizeof(DWORD));
+			memcpy(&fRight, &dwSecondNumber, sizeof(FLOAT));
+
+			fRight /= fLeft;
+			memcpy(&dwResultNumber, &fRight, sizeof(DWORD));
+			eTargetOpType = EOT_FLOAT;
+
+			break;
+		}
+		case EOT_NUMBER:
+		{
+			INT fLeft;
+			INT fRight;
+
+			memcpy(&fLeft, &dwFirstNumber, sizeof(DWORD));
+			memcpy(&fRight, &dwSecondNumber, sizeof(DWORD));
+
+			fLeft /= fRight;
+			memcpy(&dwResultNumber, &fLeft, sizeof(DWORD));
+			eTargetOpType = EOT_NUMBER;
+
+			break;
+		}
+		default:
+			return FALSE;
+		}
+		break;
+	}
+	default:
+		return FALSE;
+	}
+
 	switch (eRegisterType)
 	{
 	case ERT_I:
+	{
+		switch (eTargetOpType)
+		{
+		case EOT_FLOAT:
+		{
+			INT dwSrc = 0;
+			FLOAT nResult = 0;
+			memcpy(&nResult, &dwResultNumber, sizeof(FLOAT));
+
+			dwSrc = (INT)nResult;
+			memcpy(pTargetMemory, &dwSrc, sizeof(INT));
+
+			return TRUE;
+		}
+		case EOT_NUMBER:
+		{
+			memcpy(pTargetMemory, &dwResultNumber, sizeof(INT));
+
+			return TRUE;
+		}
+		}
+		break;
+	}
 	case ERT_N:
-		memcpy(pTargetMemory, &dwResult, sizeof(DWORD));
-		return TRUE;
+		switch (eTargetOpType)
+		{
+		case EOT_NUMBER:
+		{
+			INT dwSrc = 0;
+			FLOAT nResult = 0;
+			memcpy(&dwSrc, &dwResultNumber, sizeof(INT));
+
+			nResult = (FLOAT)dwSrc;
+			memcpy(pTargetMemory, &nResult, sizeof(FLOAT));
+
+			return TRUE;
+		}
+		case EOT_FLOAT:
+		{
+			memcpy(pTargetMemory, &dwResultNumber, sizeof(FLOAT));
+
+			return TRUE;
+		}
+		}
 	case ERT_P:
 		return TRUE; // PmcIncrement(pTargetMemory)
 	default:
@@ -793,40 +1285,77 @@ PasmAdd2(
 		dwOperand[0], psVirtualProcessor,
 		&pTargetMemory, &dwSize);
 
-	INT dwNumber = 0;
-	EOperandTypes eOperandType = RecognizeOperand(dwOperand[1]);
-	switch (eOperandType)
+	DWORD dwNumber = 0;
+	EOperandTypes opType = RecognizeOperand(dwOperand[1]);
+	EOperandTypes opResult = GetNativeNumber(
+		psVirtualProcessor,
+		opType, dwOperand[1],
+		&dwNumber);
+	if (!opResult)
 	{
-	case EOT_NUMBER:
-		dwNumber = GetNumberLiteral(dwOperand[1]);
-		break;
-	case EOT_REGISTER:
-	{
-		PBYTE pDestMemory = NULL;
-		ERegisterTypes eRegisterType = RecognizeRegister(
-			dwOperand[1], psVirtualProcessor,
-			&pDestMemory, &dwSize);
-		switch (eRegisterType)
-		{
-		case ERT_I:
-		case ERT_N:
-			memcpy(&dwNumber, pDestMemory, dwSize);
-			break;
-		default:
-			return FALSE;
-		}
-		break;
-	}
-	default:
 		return FALSE;
-	}	
+	}
 
 	switch (eRegisterType)
 	{
 	case ERT_I:
+	{
+		switch (opResult)
+		{
+		case EOT_FLOAT:
+		{
+			INT nDest = *(INT*)pTargetMemory;
+
+			FLOAT fNumber = 0;
+			memcpy(&fNumber, &dwNumber, sizeof(FLOAT));
+
+			nDest += fNumber;
+			memcpy(pTargetMemory, &nDest, sizeof(INT));
+			return TRUE;
+		}
+		case EOT_NUMBER:
+		{
+			INT nDest = *(INT*)pTargetMemory;
+
+			INT nNumber = 0;
+			memcpy(&nNumber, &dwNumber, sizeof(INT));
+
+			nDest += nNumber;
+			memcpy(pTargetMemory, &nDest, sizeof(INT));
+			return TRUE;
+		}
+		default:
+			return FALSE;
+		}
+	}
 	case ERT_N:
-		return RegisterAdd(
-			pTargetMemory, dwNumber);
+		switch (opResult)
+		{
+		case EOT_FLOAT:
+		{
+			FLOAT fNumber = *(FLOAT*)pTargetMemory;
+
+			FLOAT nSrc = 0;
+			memcpy(&nSrc, &dwNumber, sizeof(FLOAT));
+
+			fNumber += nSrc;
+			memcpy(pTargetMemory, &fNumber, sizeof(FLOAT));
+			return TRUE;
+		}
+		case EOT_NUMBER:
+		{
+			FLOAT fNumber = *(FLOAT*)pTargetMemory;
+			
+			INT nSrc = 0;
+			memcpy(&nSrc, &dwNumber, sizeof(INT));
+
+			fNumber += nSrc;
+			memcpy(pTargetMemory, &fNumber, sizeof(FLOAT));
+			return TRUE;
+		}
+		default:
+			return FALSE;
+		}
 	case ERT_P:
 		return TRUE; // PmcIncrement(pTargetMemory)
 	default:
@@ -849,40 +1378,77 @@ PasmSub2(
 		dwOperand[0], psVirtualProcessor,
 		&pTargetMemory, &dwSize);
 
-	INT dwNumber = 0;
-	EOperandTypes eOperandType = RecognizeOperand(dwOperand[1]);
-	switch (eOperandType)
+	DWORD dwNumber = 0;
+	EOperandTypes opType = RecognizeOperand(dwOperand[1]);
+	EOperandTypes opResult = GetNativeNumber(
+		psVirtualProcessor,
+		opType, dwOperand[1],
+		&dwNumber);
+	if (!opResult)
 	{
-	case EOT_NUMBER:
-		dwNumber = GetNumberLiteral(dwOperand[1]);
-		break;
-	case EOT_REGISTER:
-	{
-		PBYTE pDestMemory = NULL;
-		ERegisterTypes eRegisterType = RecognizeRegister(
-			dwOperand[1], psVirtualProcessor,
-			&pDestMemory, &dwSize);
-		switch (eRegisterType)
-		{
-		case ERT_I:
-		case ERT_N:
-			memcpy(&dwNumber, pDestMemory, dwSize);
-			break;
-		default:
-			return FALSE;
-		}
-		break;
-	}
-	default:
 		return FALSE;
 	}
 
 	switch (eRegisterType)
 	{
 	case ERT_I:
+	{
+		switch (opResult)
+		{
+		case EOT_FLOAT:
+		{
+			INT nDest = *(INT*)pTargetMemory;
+
+			FLOAT fNumber = 0;
+			memcpy(&fNumber, &dwNumber, sizeof(FLOAT));
+
+			nDest -= fNumber;
+			memcpy(pTargetMemory, &nDest, sizeof(INT));
+			return TRUE;
+		}
+		case EOT_NUMBER:
+		{
+			INT nDest = *(INT*)pTargetMemory;
+
+			INT nNumber = 0;
+			memcpy(&nNumber, &dwNumber, sizeof(INT));
+
+			nDest -= nNumber;
+			memcpy(pTargetMemory, &nDest, sizeof(INT));
+			return TRUE;
+		}
+		default:
+			return FALSE;
+		}
+	}
 	case ERT_N:
-		return RegisterAdd(
-			pTargetMemory, -dwNumber);
+		switch (opResult)
+		{
+		case EOT_FLOAT:
+		{
+			FLOAT fNumber = *(FLOAT*)pTargetMemory;
+
+			FLOAT nSrc = 0;
+			memcpy(&nSrc, &dwNumber, sizeof(FLOAT));
+
+			fNumber -= nSrc;
+			memcpy(pTargetMemory, &fNumber, sizeof(FLOAT));
+			return TRUE;
+		}
+		case EOT_NUMBER:
+		{
+			FLOAT fNumber = *(FLOAT*)pTargetMemory;
+
+			INT nSrc = 0;
+			memcpy(&nSrc, &dwNumber, sizeof(INT));
+
+			fNumber -= nSrc;
+			memcpy(pTargetMemory, &fNumber, sizeof(FLOAT));
+			return TRUE;
+		}
+		default:
+			return FALSE;
+		}
 	case ERT_P:
 		return TRUE; // PmcIncrement(pTargetMemory)
 	default:
@@ -905,40 +1471,77 @@ PasmMul2(
 		dwOperand[0], psVirtualProcessor,
 		&pTargetMemory, &dwSize);
 
-	INT dwNumber = 0;
-	EOperandTypes eOperandType = RecognizeOperand(dwOperand[1]);
-	switch (eOperandType)
+	DWORD dwNumber = 0;
+	EOperandTypes opType = RecognizeOperand(dwOperand[1]);
+	EOperandTypes opResult = GetNativeNumber(
+		psVirtualProcessor,
+		opType, dwOperand[1],
+		&dwNumber);
+	if (!opResult)
 	{
-	case EOT_NUMBER:
-		dwNumber = GetNumberLiteral(dwOperand[1]);
-		break;
-	case EOT_REGISTER:
-	{
-		PBYTE pDestMemory = NULL;
-		ERegisterTypes eRegisterType = RecognizeRegister(
-			dwOperand[1], psVirtualProcessor,
-			&pDestMemory, &dwSize);
-		switch (eRegisterType)
-		{
-		case ERT_I:
-		case ERT_N:
-			memcpy(&dwNumber, pDestMemory, dwSize);
-			break;
-		default:
-			return FALSE;
-		}
-		break;
-	}
-	default:
 		return FALSE;
 	}
 
 	switch (eRegisterType)
 	{
 	case ERT_I:
+	{
+		switch (opResult)
+		{
+		case EOT_FLOAT:
+		{
+			INT nDest = *(INT*)pTargetMemory;
+
+			FLOAT fNumber = 0;
+			memcpy(&fNumber, &dwNumber, sizeof(FLOAT));
+
+			nDest *= fNumber;
+			memcpy(pTargetMemory, &nDest, sizeof(INT));
+			return TRUE;
+		}
+		case EOT_NUMBER:
+		{
+			INT nDest = *(INT*)pTargetMemory;
+
+			INT nNumber = 0;
+			memcpy(&nNumber, &dwNumber, sizeof(INT));
+
+			nDest *= nNumber;
+			memcpy(pTargetMemory, &nDest, sizeof(INT));
+			return TRUE;
+		}
+		default:
+			return FALSE;
+		}
+	}
 	case ERT_N:
-		return RegisterMul(
-			pTargetMemory, dwNumber);
+		switch (opResult)
+		{
+		case EOT_FLOAT:
+		{
+			FLOAT fNumber = *(FLOAT*)pTargetMemory;
+
+			FLOAT nSrc = 0;
+			memcpy(&nSrc, &dwNumber, sizeof(FLOAT));
+
+			fNumber *= nSrc;
+			memcpy(pTargetMemory, &fNumber, sizeof(FLOAT));
+			return TRUE;
+		}
+		case EOT_NUMBER:
+		{
+			FLOAT fNumber = *(FLOAT*)pTargetMemory;
+
+			INT nSrc = 0;
+			memcpy(&nSrc, &dwNumber, sizeof(INT));
+
+			fNumber *= nSrc;
+			memcpy(pTargetMemory, &fNumber, sizeof(FLOAT));
+			return TRUE;
+		}
+		default:
+			return FALSE;
+		}
 	case ERT_P:
 		return TRUE; // PmcIncrement(pTargetMemory)
 	default:
@@ -961,40 +1564,77 @@ PasmDiv2(
 		dwOperand[0], psVirtualProcessor,
 		&pTargetMemory, &dwSize);
 
-	INT dwNumber = 0;
-	EOperandTypes eOperandType = RecognizeOperand(dwOperand[1]);
-	switch (eOperandType)
+	DWORD dwNumber = 0;
+	EOperandTypes opType = RecognizeOperand(dwOperand[1]);
+	EOperandTypes opResult = GetNativeNumber(
+		psVirtualProcessor,
+		opType, dwOperand[1],
+		&dwNumber);
+	if (!opResult)
 	{
-	case EOT_NUMBER:
-		dwNumber = GetNumberLiteral(dwOperand[1]);
-		break;
-	case EOT_REGISTER:
-	{
-		PBYTE pDestMemory = NULL;
-		ERegisterTypes eRegisterType = RecognizeRegister(
-			dwOperand[1], psVirtualProcessor,
-			&pDestMemory, &dwSize);
-		switch (eRegisterType)
-		{
-		case ERT_I:
-		case ERT_N:
-			memcpy(&dwNumber, pDestMemory, dwSize);
-			break;
-		default:
-			return FALSE;
-		}
-		break;
-	}
-	default:
 		return FALSE;
 	}
 
 	switch (eRegisterType)
 	{
 	case ERT_I:
+	{
+		switch (opResult)
+		{
+		case EOT_FLOAT:
+		{
+			INT nDest = *(INT*)pTargetMemory;
+
+			FLOAT fNumber = 0;
+			memcpy(&fNumber, &dwNumber, sizeof(FLOAT));
+
+			nDest /= fNumber;
+			memcpy(pTargetMemory, &nDest, sizeof(INT));
+			return TRUE;
+		}
+		case EOT_NUMBER:
+		{
+			INT nDest = *(INT*)pTargetMemory;
+
+			INT nNumber = 0;
+			memcpy(&nNumber, &dwNumber, sizeof(INT));
+
+			nDest /= nNumber;
+			memcpy(pTargetMemory, &nDest, sizeof(INT));
+			return TRUE;
+		}
+		default:
+			return FALSE;
+		}
+	}
 	case ERT_N:
-		return RegisterDiv(
-			pTargetMemory, dwNumber);
+		switch (opResult)
+		{
+		case EOT_FLOAT:
+		{
+			FLOAT fNumber = *(FLOAT*)pTargetMemory;
+
+			FLOAT nSrc = 0;
+			memcpy(&nSrc, &dwNumber, sizeof(FLOAT));
+
+			fNumber /= nSrc;
+			memcpy(pTargetMemory, &fNumber, sizeof(FLOAT));
+			return TRUE;
+		}
+		case EOT_NUMBER:
+		{
+			FLOAT fNumber = *(FLOAT*)pTargetMemory;
+
+			INT nSrc = 0;
+			memcpy(&nSrc, &dwNumber, sizeof(INT));
+
+			fNumber /= nSrc;
+			memcpy(pTargetMemory, &fNumber, sizeof(FLOAT));
+			return TRUE;
+		}
+		default:
+			return FALSE;
+		}
 	case ERT_P:
 		return TRUE; // PmcIncrement(pTargetMemory)
 	default:
@@ -1017,7 +1657,7 @@ PasmPrint(
 	{
 	case EOT_FLOAT:
 	{
-		DWORD dwNumber = GetNumberLiteral(dwOperand);
+		DWORD dwNumber = GetFloatNumberLiteral(dwOperand);
 		FLOAT fDecoded = DecodeFloat((WORD)dwNumber);
 		printf("%f", fDecoded);
 
@@ -1025,7 +1665,7 @@ PasmPrint(
 	}
 	case EOT_NUMBER:
 	{
-		DWORD dwNumber = GetNumberLiteral(dwOperand);
+		DWORD dwNumber = GetIntegerNumberLiteral(dwOperand);
 		printf("%d", dwNumber);
 
 		return TRUE;
@@ -1106,16 +1746,33 @@ PasmLength(
 		return FALSE;
 	}
 
-	PCHAR pString = GetStringLitral(
-		dwOperand[1],
-		psIndexTable);
-	if (!bResult)
+	DWORD dwDestSize = 0;
+	PCHAR pString = NULL;
+	EOperandTypes eOperandType = RecognizeOperand(dwOperand[1]);
+	switch (eOperandType)
 	{
+	case EOT_REGISTER:
+		bResult = RecognizeRegister(
+			dwOperand[1],
+			psVirtualProcessor,
+			&pString,
+			&dwDestSize);
+		if (!bResult)
+		{
+			return FALSE;
+		}
+		break;
+	case EOT_STRING:
+		pString = GetStringLitral(
+			dwOperand[1],
+			psIndexTable);
+		break;
+	default:
 		return FALSE;
 	}
 
 	SIZE_T nLength = strlen(pString);
-	memcpy(pTargetMemory, nLength, dwSize);
+	memcpy(pTargetMemory, &nLength, dwSize);
 
 	return TRUE;
 }

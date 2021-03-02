@@ -127,12 +127,14 @@
   <ItemGroup>
     <ClInclude Include="Fnv1a.h" />
     <ClInclude Include="global.h" />
+    <ClInclude Include="HashTable.h" />
     <ClInclude Include="List.h" />
     <ClInclude Include="PMC.h" />
     <ClInclude Include="VirtualContext.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Fnv1a.c" />
+    <ClCompile Include="HashTable.c" />
     <ClCompile Include="PMC.c" />
     <ClCompile Include="VirtualContext.c" />
   </ItemGroup>

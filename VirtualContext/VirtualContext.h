@@ -93,7 +93,7 @@ typedef enum _EProcessorOperation
 typedef struct _SVirtualProcessor
 {
 	/** Регистры общего назначения */
-	SHORT					I[REGISTERS_COUNT];
+	INT						I[REGISTERS_COUNT];
 	CHAR					S[REGISTERS_COUNT][STRING_MAX_LENGTH];
 	FLOAT					N[REGISTERS_COUNT];
 	/** Parrot Magic Cookie регистр */

@@ -287,7 +287,10 @@ CompileAssembler(
 			}
 			else if ((psContainingEntry->sLexeme.eToken[i] & EMT_INTEGER_LITERAL) == psContainingEntry->sLexeme.eToken[i])
 			{
-				psCurrentBytecode->sBytecode.dwOperands[i - 1] = strtol(psContainingEntry->sLexeme.szLexemes[i], NULL, 10);
+				psCurrentBytecode->sBytecode.dwOperands[i - 1] = 0;
+				SHORT wLiteral = (SHORT)strtol(psContainingEntry->sLexeme.szLexemes[i], NULL, 10);
+				memcpy(&psCurrentBytecode->sBytecode.dwOperands[i - 1], &wLiteral, sizeof(SHORT));
+				
 				psCurrentBytecode->sBytecode.dwOperands[i - 1] |= BYTECODE_NUMBER_LITERAL_FLAG;
 			}
 			else

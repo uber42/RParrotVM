@@ -14,10 +14,10 @@
 
 #define STRING_MAX_LENGTH	256
 
+#include "../VirtualContext/HashTable.h"
 #include "../VirtualContext/PMC.h"
 #include "../VirtualContext/VirtualContext.h"
 
-#include "HashTable.h"
 #include "Operations.h"
 #include "Runtime.h"
 

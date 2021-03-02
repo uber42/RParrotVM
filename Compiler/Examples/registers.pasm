@@ -8,3 +8,7 @@ print S0
 set I0, 12351
 print I0
 print "\n"
+
+set I0, -654
+print I0
+print "\n"
