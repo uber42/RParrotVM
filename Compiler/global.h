@@ -15,9 +15,11 @@
 
 #define STRING_MAX_LENGTH	256
 
+#include "../VirtualContext/Defenitions.h"
 #include "../VirtualContext/HashTable.h"
 #include "../VirtualContext/PMC.h"
 #include "../VirtualContext/VirtualContext.h"
+
 #include "Token.h"
 #include "Lexer.h"
 #include "StateMachine.h"

@@ -31,6 +31,9 @@
     <ClInclude Include="HashTable.h">
       <Filter>Core\HashTable</Filter>
     </ClInclude>
+    <ClInclude Include="Defenitions.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Fnv1a.c">

@@ -4,7 +4,7 @@
 /**
  * Типы данных возможные для хранения в регистрах PMC
  */
-typedef enum _EParrotMagicCookieType
+typedef enum _EPmcType
 {
 	EPMCT_INTEGER,
 	EPMCT_FLOAT,
@@ -12,20 +12,20 @@ typedef enum _EParrotMagicCookieType
 	EPMCT_HASHTABLE,
 
 	EPMCT_UNINITIALIZED
-} EParrotMagicCookieType, *PEParrotMagicCookieType;
+} EPmcType, *PEPmcType;
 
 
 
 typedef struct _SParrotMagicCookie
 {
-	EParrotMagicCookieType	eType;
+	EPmcType		eType;
 	
-	union 
+	union _UPmcData
 	{
 		PSSkipList	HashTable;
 		INT			Integer;
 		FLOAT		Float;
-		PCHAR		String;
+		CHAR		String[STRING_MAX_LENGTH];
 	} uData;
 } SParrotMagicCookie, *PSParrotMagicCookie;
 
@@ -38,7 +38,111 @@ PmcInitialize(
 BOOL
 PmcNew(
 	PSParrotMagicCookie		psPmc,
-	EParrotMagicCookieType	ePmcType
+	EPmcType				ePmcType
+);
+
+BOOL
+PmcGetFloat(
+	PBYTE	pDestMemory,
+	PBYTE	pPmcRegister
+);
+
+BOOL
+PmcSetFloat(
+	PBYTE	pPmcRegister,
+	FLOAT	fValue
+);
+
+BOOL
+PmcSetInteger(
+	PBYTE	pPmcRegister,
+	INT		dwValue
+);
+
+BOOL
+PmcSetString(
+	PBYTE	pPmcRegister,
+	PCHAR	szString
+);
+
+BOOL
+PmcIncrement(
+	PBYTE	pPmcRegister
+);
+
+BOOL
+PmcDecrement(
+	PBYTE	pPmcRegister
+);
+
+BOOL
+PmcAddInteger(
+	PBYTE	pPmcRegister,
+	INT		nValue
+);
+
+BOOL
+PmcAddFloat(
+	PBYTE	pPmcRegister,
+	FLOAT	fValue
+);
+
+BOOL
+PmcSubInteger(
+	PBYTE	pPmcRegister,
+	INT		nValue
+);
+
+BOOL
+PmcSubFloat(
+	PBYTE	pPmcRegister,
+	FLOAT	fValue
+);
+
+BOOL
+PmcMulInteger(
+	PBYTE	pPmcRegister,
+	INT		nValue
+);
+
+BOOL
+PmcMulFloat(
+	PBYTE	pPmcRegister,
+	FLOAT	fValue
+);
+
+BOOL
+PmcDivInteger(
+	PBYTE	pPmcRegister,
+	INT		nValue
+);
+
+BOOL
+PmcDivFloat(
+	PBYTE	pPmcRegister,
+	FLOAT	fValue
+);
+
+BOOL
+PmcGetNativeNumber(
+	PBYTE			pPmcRegister,
+	PEOperandTypes	peOperand,
+	DWORD			dwNumber
+);
+
+BOOL
+PmcPrint(
+	PBYTE	pPmcRegister
+);
+
+PCHAR
+PmcGetString(
+	PBYTE	pPmcRegister
+);
+
+EPmcType
+PmcGetType(
+	PBYTE	pPmcRegister
 );
 
 #endif

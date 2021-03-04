@@ -5,24 +5,6 @@
 
 #define NO_SUCCESS_EXECUTION	((DWORD)-1)
 
-typedef enum _EOperandTypes
-{
-	EOT_STRING,
-	EOT_NUMBER,
-	EOT_FLOAT,
-	EOT_REGISTER,
-	EOT_VIRTUAL_MEMORY,
-	EOT_SPECIAL
-} EOperandTypes, *PEOperandTypes;
-
-typedef enum _ERegisterTypes
-{
-	ERT_I = 1 << 0,
-	ERT_N = 1 << 1,
-	ERT_S = 1 << 2,
-	ERT_P = 1 << 3
-} ERegisterTypes, *PERegisterTypes;
-
 static
 DOUBLE
 DecodeFloat(
@@ -264,18 +246,33 @@ GetNativeNumber(
 			&pTargetMemory,
 			&dwSize);
 
-		memcpy(pdwNumber, pTargetMemory, dwSize);
-
-		if (eSrcRegister == ERT_I)
+		switch (eSrcRegister)
 		{
+		case ERT_I:
+			memcpy(pdwNumber, pTargetMemory, dwSize);
 			return EOT_NUMBER;
-		}
-		else if (eSrcRegister == ERT_N)
-		{
+		case ERT_N:
+			memcpy(pdwNumber, pTargetMemory, dwSize);
 			return EOT_FLOAT;
-		}
+		case ERT_P:
+		{
+			DWORD dwNumber = 0;
+			EOperandTypes eOperandType;
+			BOOL bResult = PmcGetNativeNumber(
+				pTargetMemory,
+				&eOperandType,
+				&dwNumber);
+			if (!bResult)
+			{
+				return FALSE;
+			}
 
-		return FALSE;
+			memcpy(pdwNumber, &dwNumber, sizeof(DWORD));
+			return eOperandType;
+		}
+		default:
+			return FALSE;
+		}
 	}
 	default:
 		return FALSE;
@@ -342,8 +339,10 @@ PasmSet(
 
 			if (eDestRegister == ERT_P)
 			{
-				// PmcCopyMem();
-				return TRUE;
+				DWORD dwNumber = GetFloatNumberLiteral(pdwOperands[1]);
+				FLOAT fDecoded = DecodeFloat((WORD)dwNumber);
+
+				return PmcSetFloat(pTargetMemory, fDecoded);
 			}
 			else
 			{
@@ -362,8 +361,11 @@ PasmSet(
 
 			if (eDestRegister == ERT_P)
 			{
-				// PmcCopyMem();
-				return TRUE; 
+				DWORD dwLiteral = GetIntegerNumberLiteral(pdwOperands[1]);
+				INT nNumber = 0;
+				memcpy(&nNumber, &dwLiteral, sizeof(INT));
+
+				return PmcSetInteger(pTargetMemory, nNumber);
 			}
 			else
 			{
@@ -398,8 +400,11 @@ PasmSet(
 			}
 			else if (eDestRegister == ERT_P)
 			{
-				// PmcCopyMem();
-				return TRUE;
+				PCHAR pString = GetStringLitral(
+					pdwOperands[1],
+					psIndexTable);
+
+				return PmcSetString(pTargetMemory, pString);
 			}
 			else
 			{
@@ -501,7 +506,7 @@ PasmInc(
 		return TRUE;
 	}
 	case ERT_P:
-		return TRUE; // PmcIncrement(pTargetMemory)
+		return PmcIncrement(pTargetMemory);
 	default:
 		return FALSE;
 	}
@@ -540,7 +545,7 @@ PasmDec(
 		return TRUE;
 	}
 	case ERT_P:
-		return TRUE; // PmcIncrement(pTargetMemory)
+		return PmcDecrement(pTargetMemory);
 	default:
 		return FALSE;
 	}
@@ -696,8 +701,9 @@ PasmAdd3(
 
 			return TRUE;
 		}
+		default:
+			return FALSE;
 		}
-		break;
 	}
 	case ERT_N:
 		switch (eTargetOpType)
@@ -719,9 +725,32 @@ PasmAdd3(
 
 			return TRUE;
 		}
+		default:
+			return FALSE;
 		}
 	case ERT_P:
-		return TRUE; // PmcIncrement(pTargetMemory)
+		switch (eTargetOpType)
+		{
+		case EOT_NUMBER:
+		{
+			INT dwSrc = 0;
+			FLOAT nResult = 0;
+			memcpy(&dwSrc, &dwResultNumber, sizeof(INT));
+
+			nResult = (FLOAT)dwSrc;
+
+			return PmcSetInteger(pTargetMemory, nResult);
+		}
+		case EOT_FLOAT:
+		{
+			FLOAT nResult = 0;
+			memcpy(&nResult, &dwResultNumber, sizeof(FLOAT));
+
+			return PmcSetFloat(pTargetMemory, nResult);;
+		}
+		default:
+			return FALSE;
+		}
 	default:
 		return FALSE;
 	}
@@ -877,6 +906,8 @@ PasmSub3(
 
 			return TRUE;
 		}
+		default:
+			return FALSE;
 		}
 		break;
 	}
@@ -900,9 +931,32 @@ PasmSub3(
 
 			return TRUE;
 		}
+		default:
+			return FALSE;
 		}
 	case ERT_P:
-		return TRUE; // PmcIncrement(pTargetMemory)
+		switch (eTargetOpType)
+		{
+		case EOT_NUMBER:
+		{
+			INT dwSrc = 0;
+			FLOAT nResult = 0;
+			memcpy(&dwSrc, &dwResultNumber, sizeof(INT));
+
+			nResult = (FLOAT)dwSrc;
+
+			return PmcSetInteger(pTargetMemory, nResult);
+		}
+		case EOT_FLOAT:
+		{
+			FLOAT nResult = 0;
+			memcpy(&nResult, &dwResultNumber, sizeof(FLOAT));
+
+			return PmcSetFloat(pTargetMemory, nResult);;
+		}
+		default:
+			return FALSE;
+		}
 	default:
 		return FALSE;
 	}
@@ -1058,6 +1112,8 @@ PasmMul3(
 
 			return TRUE;
 		}
+		default:
+			return FALSE;
 		}
 		break;
 	}
@@ -1081,9 +1137,32 @@ PasmMul3(
 
 			return TRUE;
 		}
+		default:
+			return FALSE;
 		}
 	case ERT_P:
-		return TRUE; // PmcIncrement(pTargetMemory)
+		switch (eTargetOpType)
+		{
+		case EOT_NUMBER:
+		{
+			INT dwSrc = 0;
+			FLOAT nResult = 0;
+			memcpy(&dwSrc, &dwResultNumber, sizeof(INT));
+
+			nResult = (FLOAT)dwSrc;
+
+			return PmcSetInteger(pTargetMemory, nResult);
+		}
+		case EOT_FLOAT:
+		{
+			FLOAT nResult = 0;
+			memcpy(&nResult, &dwResultNumber, sizeof(FLOAT));
+
+			return PmcSetFloat(pTargetMemory, nResult);;
+		}
+		default:
+			return FALSE;
+		}
 	default:
 		return FALSE;
 	}
@@ -1239,6 +1318,8 @@ PasmDiv3(
 
 			return TRUE;
 		}
+		default:
+			return FALSE;
 		}
 		break;
 	}
@@ -1262,9 +1343,32 @@ PasmDiv3(
 
 			return TRUE;
 		}
+		default:
+			return FALSE;
 		}
 	case ERT_P:
-		return TRUE; // PmcIncrement(pTargetMemory)
+		switch (eTargetOpType)
+		{
+		case EOT_NUMBER:
+		{
+			INT dwSrc = 0;
+			FLOAT nResult = 0;
+			memcpy(&dwSrc, &dwResultNumber, sizeof(INT));
+
+			nResult = (FLOAT)dwSrc;
+
+			return PmcSetInteger(pTargetMemory, nResult);
+		}
+		case EOT_FLOAT:
+		{
+			FLOAT nResult = 0;
+			memcpy(&nResult, &dwResultNumber, sizeof(FLOAT));
+
+			return PmcSetFloat(pTargetMemory, nResult);;
+		}
+		default:
+			return FALSE;
+		}
 	default:
 		return FALSE;
 	}
@@ -1357,7 +1461,25 @@ PasmAdd2(
 			return FALSE;
 		}
 	case ERT_P:
-		return TRUE; // PmcIncrement(pTargetMemory)
+		switch (opResult)
+		{
+		case EOT_FLOAT:
+		{
+			FLOAT nSrc = 0;
+			memcpy(&nSrc, &dwNumber, sizeof(FLOAT));
+
+			return PmcAddFloat(pTargetMemory, nSrc);
+		}
+		case EOT_NUMBER:
+		{
+			INT nSrc = 0;
+			memcpy(&nSrc, &dwNumber, sizeof(INT));
+
+			return PmcAddInteger(pTargetMemory, nSrc);
+		}
+		default:
+			return FALSE;
+		}
 	default:
 		return FALSE;
 	}
@@ -1450,7 +1572,25 @@ PasmSub2(
 			return FALSE;
 		}
 	case ERT_P:
-		return TRUE; // PmcIncrement(pTargetMemory)
+		switch (opResult)
+		{
+		case EOT_FLOAT:
+		{
+			FLOAT nSrc = 0;
+			memcpy(&nSrc, &dwNumber, sizeof(FLOAT));
+
+			return PmcSubFloat(pTargetMemory, nSrc);
+		}
+		case EOT_NUMBER:
+		{
+			INT nSrc = 0;
+			memcpy(&nSrc, &dwNumber, sizeof(INT));
+
+			return PmcSubInteger(pTargetMemory, nSrc);
+		}
+		default:
+			return FALSE;
+		}
 	default:
 		return FALSE;
 	}
@@ -1543,7 +1683,25 @@ PasmMul2(
 			return FALSE;
 		}
 	case ERT_P:
-		return TRUE; // PmcIncrement(pTargetMemory)
+		switch (opResult)
+		{
+		case EOT_FLOAT:
+		{
+			FLOAT nSrc = 0;
+			memcpy(&nSrc, &dwNumber, sizeof(FLOAT));
+
+			return PmcMulFloat(pTargetMemory, nSrc);
+		}
+		case EOT_NUMBER:
+		{
+			INT nSrc = 0;
+			memcpy(&nSrc, &dwNumber, sizeof(INT));
+
+			return PmcMulInteger(pTargetMemory, nSrc);
+		}
+		default:
+			return FALSE;
+		}
 	default:
 		return FALSE;
 	}
@@ -1636,7 +1794,25 @@ PasmDiv2(
 			return FALSE;
 		}
 	case ERT_P:
-		return TRUE; // PmcIncrement(pTargetMemory)
+		switch (opResult)
+		{
+		case EOT_FLOAT:
+		{
+			FLOAT nSrc = 0;
+			memcpy(&nSrc, &dwNumber, sizeof(FLOAT));
+
+			return PmcDivFloat(pTargetMemory, nSrc);
+		}
+		case EOT_NUMBER:
+		{
+			INT nSrc = 0;
+			memcpy(&nSrc, &dwNumber, sizeof(INT));
+
+			return PmcDivInteger(pTargetMemory, nSrc);
+		}
+		default:
+			return FALSE;
+		}
 	default:
 		return FALSE;
 	}
@@ -1713,7 +1889,7 @@ PasmPrint(
 		}
 		case ERT_P:
 		{
-			return TRUE; // PmcPrint();
+			return PmcPrint(pSrcMemory);
 		}
 		default:
 			return FALSE;
@@ -1760,6 +1936,15 @@ PasmLength(
 		if (!bResult)
 		{
 			return FALSE;
+		}
+		
+		if (bResult == ERT_P)
+		{
+			pString = PmcGetString(pString);
+			if (!pString)
+			{
+				return FALSE;
+			}
 		}
 		break;
 	case EOT_STRING:
