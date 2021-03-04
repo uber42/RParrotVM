@@ -108,6 +108,9 @@ StartProgram()
 		switch (eOperation)
 		{
 		case EPO_NEW:
+			bResult = PasmNew(
+				&g_sVirtualProcessor,
+				pCurrentInstruction + sizeof(BYTE));
 			break;
 		case EPO_SET:
 			bResult = PasmSet(

@@ -2,6 +2,12 @@
 #define OPERATIONS_H
 
 BOOL
+PasmNew(
+	PSVirtualProcessor	psVirtualProcessor,
+	PBYTE				pCurrentInstruction
+);
+
+BOOL
 PasmSet(
 	PSVirtualProcessor	psVirtualProcessor,
 	PBYTE				psHeap,

@@ -46,7 +46,7 @@ PmcInitialize(
 BOOL
 PmcNew(
 	PSParrotMagicCookie		psPmc,
-	EPmcType	ePmcType
+	EPmcType				ePmcType
 )
 {
 	switch (ePmcType)

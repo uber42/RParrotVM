@@ -2671,3 +2671,27 @@ PasmPopStack(
 	
 	return TRUE;
 }
+
+BOOL
+PasmNew(
+	PSVirtualProcessor	psVirtualProcessor,
+	PBYTE				pCurrentInstruction
+)
+{
+	DWORD dwOperand[2];
+	memcpy(dwOperand, pCurrentInstruction, sizeof(dwOperand));
+
+	DWORD dwSize = 0;
+	PBYTE pTargetMemory = NULL;
+	ERegisterTypes eRegisterType = RecognizeRegister(
+		dwOperand[0],
+		psVirtualProcessor,
+		&pTargetMemory,
+		&dwSize);
+	if (eRegisterType != ERT_P)
+	{
+		return FALSE;
+	}
+
+	return PmcNew(pTargetMemory, dwOperand[1]);
+}
