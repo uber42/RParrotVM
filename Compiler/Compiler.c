@@ -165,6 +165,7 @@ ReadAssemblerLines(
 	FILE* pFile = fopen(psCompilerContext->szFileName, "r");
 	if (pFile == NULL)
 	{
+		DWORD dwError = GetLastError();
 		return FALSE;
 	}
 

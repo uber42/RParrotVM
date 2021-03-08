@@ -95,7 +95,7 @@ static const SMiddleStateLayer div_table_2[] =
 static const SStateMachineTransition transition_1[] =
 {
 	{ EMT_P,								{ .nNextState = 0			},		0,		0,		ENST_NUMBER,	0				},		// new [REG], [PMC_TYPE]
-	{ ALL_MEMORY_MASK,						{ .sTable	  = tables		},		-1,		0,		ENST_TABLE,		0				},		// set [REG, MEM], [REG, MEM]
+	{ ALL_MEMORY_MASK | EMT_P,				{ .sTable	  = tables		},		-1,		0,		ENST_TABLE,		0				},		// set [REG, MEM], [REG, MEM]
 
 	{ EMT_I | EMT_N | EMT_P,				{ .nNextState = -1			},		1,		1,		ENST_NUMBER,	EPO_INC			},		// inc [REG]
 	{ EMT_I | EMT_N | EMT_P,				{ .nNextState = -1			},		1,		1,		ENST_NUMBER,	EPO_DEC			},		// dec [REG]
@@ -117,7 +117,7 @@ static const SStateMachineTransition transition_1[] =
 
 	{ EMT_MARKER,							{ .nNextState = -1			},		9,		1,		ENST_NUMBER,	EPO_BSR			},		// bsr [MARKER]
 
-	{ NATIVE_MASK,							{ .nNextState = -1			},		12,		1,		ENST_NUMBER,	EPO_PRINT		},		// print [REG, STRING_LITERAL]
+	{ NATIVE_MASK | EMT_P,					{ .nNextState = -1			},		12,		1,		ENST_NUMBER,	EPO_PRINT		},		// print [REG, STRING_LITERAL]
 
 	{ EMT_NUMBER_LITERAL | EMT_I | EMT_P,	{ .nNextState = 9			},		13,		1,		ENST_NUMBER,	EPO_PUSH_STACK	},		// push
 	{ REGISTERS_MASK,						{ .nNextState = 10			},		13,		1,		ENST_NUMBER,	EPO_POP_STACK	},		// pop

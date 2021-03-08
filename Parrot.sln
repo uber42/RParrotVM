@@ -15,6 +15,18 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VirtualMachine", "VirtualMa
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VirtualContext", "VirtualContext\VirtualContext.vcxproj", "{548964DC-7747-4EED-81C0-F61751CBC7CD}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{94E64B6A-CC13-4C06-A6F3-40897252A496}"
+	ProjectSection(SolutionItems) = preProject
+		Compiler\Examples\factoral.pasm = Compiler\Examples\factoral.pasm
+		Compiler\Examples\hashtable.pasm = Compiler\Examples\hashtable.pasm
+		Compiler\Examples\helloworld.pasm = Compiler\Examples\helloworld.pasm
+		Compiler\Examples\loop.pasm = Compiler\Examples\loop.pasm
+		Compiler\Examples\math.pasm = Compiler\Examples\math.pasm
+		Compiler\Examples\pmc_native.pasm = Compiler\Examples\pmc_native.pasm
+		Compiler\Examples\registers.pasm = Compiler\Examples\registers.pasm
+		Compiler\Examples\string.pasm = Compiler\Examples\string.pasm
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64

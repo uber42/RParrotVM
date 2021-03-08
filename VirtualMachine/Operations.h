@@ -198,4 +198,10 @@ PasmPopStack(
 	PBYTE				pStack
 );
 
+BOOL
+PasmPushHashTable(
+	PSVirtualProcessor	psVirtualProcessor,
+	PBYTE				pCurrentInstruction
+);
+
 #endif

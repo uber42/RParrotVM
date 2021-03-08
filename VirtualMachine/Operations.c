@@ -2695,3 +2695,121 @@ PasmNew(
 
 	return PmcNew(pTargetMemory, dwOperand[1]);
 }
+
+BOOL
+PasmPushHashTable(
+	PSVirtualProcessor	psVirtualProcessor,
+	PBYTE				pCurrentInstruction,
+	PBYTE				pIndexTable,
+	PBYTE				pVirtualMemory
+)
+{
+	DWORD dwOperand[3];
+	memcpy(dwOperand, pCurrentInstruction, sizeof(dwOperand));
+
+	DWORD dwSize = 0;
+	PBYTE pTargetMemory = NULL;
+	ERegisterTypes eRegType = RecognizeRegister(
+		dwOperand[0],
+		psVirtualProcessor,
+		&pTargetMemory,
+		&dwSize);
+	if (eRegType != ERT_P)
+	{
+		return FALSE;
+	}
+
+	EPmcType ePmcType = PmcGetType(pTargetMemory);
+	if (ePmcType != EPMCT_HASHTABLE)
+	{
+		return FALSE;
+	}
+
+	PCHAR pszKey = ExtractString(
+		dwOperand[1],
+		psVirtualProcessor,
+		pIndexTable);
+	if (!pszKey)
+	{
+		return FALSE;
+	}
+
+	BYTE pInsertMemory[STRING_MAX_LENGTH] = { 0 };
+	EOperandTypes eInsertType = RecognizeOperand(dwOperand[2]);
+	EOperandTypes eTargetType = eInsertType;
+	switch (eInsertType)
+	{
+	case EOT_SPECIAL:
+	case EOT_VIRTUAL_MEMORY:
+		return FALSE;
+	case EOT_FLOAT:
+	{
+		DWORD dwCompressed = GetFloatNumberLiteral(dwOperand[2]);
+		FLOAT fDecoded = (FLOAT)DecodeFloat((WORD)dwCompressed);
+		memcpy(pInsertMemory, &fDecoded, sizeof(FLOAT));
+		break;
+	}
+	case EOT_NUMBER:
+	{
+		INT nNumber = GetIntegerNumberLiteral(dwOperand[2]);
+		memcpy(pInsertMemory, &nNumber, sizeof(INT));
+		break;
+	}
+	case EOT_STRING:
+	{
+		PCHAR pString = GetStringLitral(
+			dwOperand[2],
+			pIndexTable);
+		size_t nLength = strlen(pString);
+		memcpy(pInsertMemory, pString, nLength);
+		break;
+	}
+	case EOT_REGISTER:
+	{
+		DWORD dwInsertSize = 0;
+		PBYTE pInsertRegMemory = NULL;
+		ERegisterTypes eRegType = RecognizeRegister(
+			dwOperand[2],
+			psVirtualProcessor,
+			&pInsertRegMemory,
+			&dwInsertSize);
+		if (!eRegType)
+		{
+			return FALSE;
+		}
+
+		memcpy(pInsertMemory, pInsertRegMemory, dwInsertSize);
+
+		switch (eRegType)
+		{
+		case ERT_I:
+			eTargetType = EOT_NUMBER;
+			break;
+		case ERT_N:
+			eTargetType = EOT_FLOAT;
+			break;
+		case ERT_S:
+			eTargetType = EOT_STRING;
+			break;
+		case ERT_P:
+		{
+			/// pmc get operand
+			eTargetType = EOT_SPECIAL;
+			break;
+		}
+			
+		default:
+			return FALSE;
+		}
+		break;
+	}
+	default:
+		return FALSE;
+	}
+
+	return PmcHashTableInsert(
+		pTargetMemory,
+		pszKey,
+		eTargetType,
+		pInsertMemory);
+}

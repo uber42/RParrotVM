@@ -145,4 +145,13 @@ PmcGetType(
 	PBYTE	pPmcRegister
 );
 
+BOOL
+PmcHashTableInsert(
+	PBYTE			pPmcRegister,
+	PCHAR			psKey,
+	EOperandTypes	eInsertType,
+	PBYTE			pElemMemory
+);
+
+
 #endif
