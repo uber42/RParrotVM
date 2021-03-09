@@ -389,3 +389,21 @@ SkipListClose(
 	SkipListClear(psSkipList);
 	free(psSkipList);
 }
+
+VOID
+SkipListClone(
+	PSSkipList			psDest,
+	PSSkipList			psSrc
+)
+{
+	psDest->dwCount = psSrc->dwCount;
+
+	PSList psCurrentEntry = psSrc->pHead[0].pFlink;
+	for(;psCurrentEntry != &psSrc->pHead[0];
+		psCurrentEntry = psCurrentEntry->pFlink)
+	{
+		PSSkipListNode psCurretNode = CONTAINING_RECORD(
+			psCurrentEntry, SSkipListNode, pLink[0]);
+		SkipListSet(psDest, psCurretNode->pKey, psCurretNode->pValue);
+	}
+}

@@ -7,7 +7,7 @@ int main()
 {
 	COMPILER hCompiler = NULL;
 	BOOL bResult = CreateCompiler(
-		&hCompiler, "C:\\Users\\admin\\ReducedParrotVirtualMachine\\Compiler\\Examples\\pmc_native.pasm");
+		&hCompiler, ".\\Examples\\hashtable.pasm");
 	if (!bResult)
 	{
 		ExitProcess(-1);

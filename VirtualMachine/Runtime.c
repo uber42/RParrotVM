@@ -272,8 +272,18 @@ StartProgram()
 				g_sRuntimeContext.pStack);
 			break;
 		case EPO_PMC_PUSH:
+			bResult = PasmPushHashTable(
+				&g_sVirtualProcessor,
+				pCurrentInstruction + sizeof(BYTE),
+				g_sRuntimeContext.pIndexTable,
+				g_sRuntimeContext.pHeap);
 			break;
 		case EPO_PMC_POP:
+			bResult = PasmPopHashTable(
+				&g_sVirtualProcessor,
+				pCurrentInstruction + sizeof(BYTE),
+				g_sRuntimeContext.pIndexTable,
+				g_sRuntimeContext.pHeap);
 			break;
 		case EPO_PMC_ERASE:
 			break;

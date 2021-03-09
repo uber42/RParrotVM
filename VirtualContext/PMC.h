@@ -14,19 +14,20 @@ typedef enum _EPmcType
 	EPMCT_UNINITIALIZED = 0xFFFF
 } EPmcType, *PEPmcType;
 
+typedef union _UPmcData
+{
+	PSSkipList	HashTable;
+	INT			Integer;
+	FLOAT		Float;
+	CHAR		String[STRING_MAX_LENGTH];
+} UPmcData;
 
 
 typedef struct _SParrotMagicCookie
 {
 	EPmcType		eType;
 	
-	union _UPmcData
-	{
-		PSSkipList	HashTable;
-		INT			Integer;
-		FLOAT		Float;
-		CHAR		String[STRING_MAX_LENGTH];
-	} uData;
+	UPmcData		uData;
 } SParrotMagicCookie, *PSParrotMagicCookie;
 
 
@@ -145,11 +146,25 @@ PmcGetType(
 	PBYTE	pPmcRegister
 );
 
+EOperandTypes
+PmcRecognizeOperand(
+	PBYTE			pPmcRegister,
+	PBYTE			pTargetMemory
+);
+
 BOOL
 PmcHashTableInsert(
 	PBYTE			pPmcRegister,
 	PCHAR			psKey,
 	EOperandTypes	eInsertType,
+	PBYTE			pElemMemory
+);
+
+BOOL
+PmcHashTableFind(
+	PBYTE			pPmcRegister,
+	PCHAR			psKey,
+	ERegisterTypes	eInsertType,
 	PBYTE			pElemMemory
 );
 

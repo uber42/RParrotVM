@@ -1,19 +1,18 @@
 ﻿#include "global.h"
 
-
 typedef int FSkipListComp(
 	PVOID pFirst,
 	PVOID pSecond
 );
 
 static
-BOOL
+INT
 HashTableComparator(
 	PVOID pFirst,
 	PVOID pSecond
 )
 {
-	return strcmp((PCHAR)pFirst, (PCHAR)pSecond) >= 0;
+	return strcmp((PCHAR)pFirst, (PCHAR)pSecond);
 }
 
 static
@@ -22,7 +21,7 @@ HashTableNodeEraser(
 	PVOID pNode
 )
 {
-	UNREFERENCED_PARAMETER(pNode);
+	free(pNode);
 }
 
 static
@@ -69,6 +68,7 @@ PmcNew(
 		{
 			return FALSE;
 		}
+		break;
 	default:
 		return FALSE;
 	}
@@ -433,4 +433,145 @@ PmcGetType(
 {
 	PSParrotMagicCookie psPmc = pPmcRegister;
 	return psPmc->eType;
+}
+
+EOperandTypes
+PmcRecognizeOperand(
+	PBYTE			pPmcRegister,
+	PBYTE			pTargetMemory
+)
+{
+	PSParrotMagicCookie psPmc = pPmcRegister;
+	memcpy(pTargetMemory, &psPmc->uData, sizeof(UPmcData));
+	switch (psPmc->eType)
+	{
+	case EPMCT_INTEGER:
+		return EOT_NUMBER;
+	case EPMCT_STRING:
+		return EOT_STRING;
+	case EPMCT_FLOAT:
+		return EOT_FLOAT;
+	case EPMCT_HASHTABLE:
+		return EOT_SPECIAL;
+	default:
+		return FALSE;
+	}
+}
+
+BOOL
+PmcHashTableInsert(
+	PBYTE			pPmcRegister,
+	PCHAR			psKey,
+	EOperandTypes	eInsertType,
+	PBYTE			pElemMemory
+)
+{
+	PSParrotMagicCookie psPmc = pPmcRegister;
+	if (psPmc->eType != EPMCT_HASHTABLE)
+	{
+		return FALSE;
+	}
+
+	/** Нужен внутренний аллокатор на куче виртуальной машины (Пока что так) */
+	PSParrotMagicCookie psNode = malloc(sizeof(SParrotMagicCookie));
+	if (!psNode)
+	{
+		return FALSE;
+	}
+
+	UPmcData uData = { 0 };
+	memcpy(&uData, pElemMemory, sizeof(UPmcData));
+
+	switch (eInsertType)
+	{
+	case EOT_FLOAT:
+		psNode->eType = EPMCT_FLOAT;
+		memcpy(&psNode->uData.Float, &uData.Float, sizeof(FLOAT));
+		break;
+	case EOT_NUMBER:
+		psNode->eType = EPMCT_INTEGER;
+		memcpy(&psNode->uData.Integer, &uData.Integer, sizeof(INT));
+		break;
+	case EOT_STRING:
+		psNode->eType = EPMCT_STRING;
+		strcpy(psNode->uData.String, uData.String);
+		break;
+	case EOT_SPECIAL:
+		psNode->eType = EPMCT_HASHTABLE;
+		psNode->uData.HashTable = CreateSkipList(
+			HashTableComparator,
+			HashTableNodeEraser,
+			HashTableSwapper);
+		if (!psNode->uData.HashTable)
+		{
+			return FALSE;
+		}
+		SkipListClone(psNode->uData.HashTable, uData.HashTable);
+		break;
+	default:
+		break;
+	}
+
+	PSSkipListNode psAdded = SkipListSet(psPmc->uData.HashTable, psKey, psNode);
+	if (!psAdded)
+	{
+		free(psNode);
+		return FALSE;
+	}
+
+	return TRUE;
+}
+
+BOOL
+PmcHashTableFind(
+	PBYTE			pPmcRegister,
+	PCHAR			psKey,
+	ERegisterTypes	eInsertType,
+	PBYTE			pElemMemory
+)
+{
+	PSParrotMagicCookie psPmc = pPmcRegister;
+	if (psPmc->eType != EPMCT_HASHTABLE)
+	{
+		return FALSE;
+	}
+
+	PSSkipListNode psFound = SkipListFind(psPmc->uData.HashTable, psKey);
+	if (!psFound)
+	{
+		return FALSE;
+	}
+
+	PSParrotMagicCookie psPmcFound = psFound->pValue;
+	switch (psPmcFound->eType)
+	{
+	case EPMCT_INTEGER:
+		memcpy(pElemMemory, &psPmcFound->uData.Integer, sizeof(INT));
+		break;
+	case EPMCT_FLOAT:
+		memcpy(pElemMemory, &psPmcFound->uData.Float, sizeof(FLOAT));
+		break;
+	case EPMCT_STRING:
+		strcpy(pElemMemory, psPmcFound->uData.String);
+		break;
+	case EPMCT_HASHTABLE:
+	{
+		PSParrotMagicCookie psPmc = pElemMemory;
+		psPmc->uData.HashTable = CreateSkipList(
+			HashTableComparator,
+			HashTableNodeEraser,
+			HashTableSwapper);
+		if (!psPmc->uData.HashTable)
+		{
+			return FALSE;
+		}
+		memcpy(psPmc->uData.HashTable, psPmcFound->uData.HashTable, sizeof(SSkipList));
+		psPmc->eType = EPMCT_HASHTABLE;
+		break;
+	}
+	default:
+		return FALSE;
+	}
+
+	return TRUE;
 }

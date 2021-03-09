@@ -201,7 +201,17 @@ PasmPopStack(
 BOOL
 PasmPushHashTable(
 	PSVirtualProcessor	psVirtualProcessor,
-	PBYTE				pCurrentInstruction
+	PBYTE				pCurrentInstruction,
+	PBYTE				pIndexTable,
+	PBYTE				pVirtualMemory
+);
+
+BOOL
+PasmPopHashTable(
+	PSVirtualProcessor	psVirtualProcessor,
+	PBYTE				pCurrentInstruction,
+	PBYTE				pIndexTable,
+	PBYTE				pVirtualMemory
 );
 
 #endif

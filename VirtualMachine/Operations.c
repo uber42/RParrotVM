@@ -2734,7 +2734,7 @@ PasmPushHashTable(
 		return FALSE;
 	}
 
-	BYTE pInsertMemory[STRING_MAX_LENGTH] = { 0 };
+	UPmcData pInsertMemory;
 	EOperandTypes eInsertType = RecognizeOperand(dwOperand[2]);
 	EOperandTypes eTargetType = eInsertType;
 	switch (eInsertType)
@@ -2746,13 +2746,13 @@ PasmPushHashTable(
 	{
 		DWORD dwCompressed = GetFloatNumberLiteral(dwOperand[2]);
 		FLOAT fDecoded = (FLOAT)DecodeFloat((WORD)dwCompressed);
-		memcpy(pInsertMemory, &fDecoded, sizeof(FLOAT));
+		memcpy(&pInsertMemory.Float, &fDecoded, sizeof(FLOAT));
 		break;
 	}
 	case EOT_NUMBER:
 	{
 		INT nNumber = GetIntegerNumberLiteral(dwOperand[2]);
-		memcpy(pInsertMemory, &nNumber, sizeof(INT));
+		memcpy(&pInsertMemory.Integer, &nNumber, sizeof(INT));
 		break;
 	}
 	case EOT_STRING:
@@ -2761,7 +2761,7 @@ PasmPushHashTable(
 			dwOperand[2],
 			pIndexTable);
 		size_t nLength = strlen(pString);
-		memcpy(pInsertMemory, pString, nLength);
+		memcpy(&pInsertMemory.String, pString, nLength + 1);
 		break;
 	}
 	case EOT_REGISTER:
@@ -2778,26 +2778,32 @@ PasmPushHashTable(
 			return FALSE;
 		}
 
-		memcpy(pInsertMemory, pInsertRegMemory, dwInsertSize);
 
 		switch (eRegType)
 		{
 		case ERT_I:
 			eTargetType = EOT_NUMBER;
+			memcpy(&pInsertMemory.Integer, pInsertRegMemory, dwInsertSize);
 			break;
 		case ERT_N:
 			eTargetType = EOT_FLOAT;
+			memcpy(&pInsertMemory.Float, pInsertRegMemory, dwInsertSize);
 			break;
 		case ERT_S:
 			eTargetType = EOT_STRING;
+			memcpy(&pInsertMemory.String, pInsertRegMemory, dwInsertSize);
 			break;
 		case ERT_P:
 		{
-			/// pmc get operand
-			eTargetType = EOT_SPECIAL;
+			eTargetType = PmcRecognizeOperand(
+				pInsertRegMemory,
+				&pInsertMemory);
+			if (!eTargetType)
+			{
+				return FALSE;
+			}
 			break;
 		}
-			
 		default:
 			return FALSE;
 		}
@@ -2811,5 +2817,56 @@ PasmPushHashTable(
 		pTargetMemory,
 		pszKey,
 		eTargetType,
-		pInsertMemory);
+		&pInsertMemory);
+}
+
+BOOL
+PasmPopHashTable(
+	PSVirtualProcessor	psVirtualProcessor,
+	PBYTE				pCurrentInstruction,
+	PBYTE				pIndexTable,
+	PBYTE				pVirtualMemory
+)
+{
+	DWORD dwOperand[3];
+	memcpy(dwOperand, pCurrentInstruction, sizeof(dwOperand));
+
+	DWORD dwSize = 0;
+	PBYTE pTargetMemory = NULL;
+	ERegisterTypes eType = RecognizeRegister(
+		dwOperand[0],
+		psVirtualProcessor,
+		&pTargetMemory,
+		&dwSize);
+	if (!eType)
+	{
+		return FALSE;
+	}
+
+	DWORD dwPmcSize = 0;
+	PBYTE pPmcRegister = NULL;
+	ERegisterTypes eRegType = RecognizeRegister(
+		dwOperand[1],
+		psVirtualProcessor,
+		&pPmcRegister,
+		&dwPmcSize);
+	if (!eRegType || eRegType != ERT_P)
+	{
+		return FALSE;
+	}
+
+	PCHAR pszKey = ExtractString(
+		dwOperand[2],
+		psVirtualProcessor,
+		pIndexTable);
+	if (!pszKey)
+	{
+		return FALSE;
+	}
+
+	return PmcHashTableFind(
+		pPmcRegister,
+		pszKey,
+		eType,
+		pTargetMemory);
 }

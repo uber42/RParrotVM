@@ -116,6 +116,11 @@ SkipListClose(
 	PSSkipList			psSkipList
 );
 
+VOID
+SkipListClone(
+	PSSkipList			psDest,
+	PSSkipList			psSrc
+);
 
 
 #endif
