@@ -13,6 +13,10 @@
 
 #define PROCESSOR_STACK_SIZE			0x20000
 
+#ifdef __cplusplus
+extern "C"
+#endif
+
 typedef enum _EProcessorOperation
 {
 	/** Инициализировать PMC */
