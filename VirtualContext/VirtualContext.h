@@ -19,6 +19,9 @@ typedef struct _SVirtualProcessor
 	DWORD					IP;
 	/** Регистр указатель стека */
 	DWORD					SP;
+
+	/** Флаг успешного выполнения */
+	BOOL					FLAG;
 } SVirtualProcessor, *PSVirtualProcessor;
 
 /**

@@ -21,7 +21,8 @@ HashTableNodeEraser(
 	PVOID pNode
 )
 {
-	free(pNode);
+	PSSkipListNode psSkipListNode = pNode;
+	free(psSkipListNode->pValue);
 }
 
 static
@@ -506,7 +507,8 @@ PmcHashTableInsert(
 		{
 			return FALSE;
 		}
-		SkipListClone(psNode->uData.HashTable, uData.HashTable);
+		SkipListClone(
+			psNode->uData.HashTable, uData.HashTable, sizeof(SParrotMagicCookie));
 		break;
 	default:
 		break;
@@ -527,7 +529,8 @@ PmcHashTableFind(
 	PBYTE			pPmcRegister,
 	PCHAR			psKey,
 	ERegisterTypes	eInsertType,
-	PBYTE			pElemMemory
+	PBYTE			pElemMemory,
+	PBOOL			pFound
 )
 {
 	PSParrotMagicCookie psPmc = pPmcRegister;
@@ -536,10 +539,12 @@ PmcHashTableFind(
 		return FALSE;
 	}
 
+	*pFound = TRUE;
 	PSSkipListNode psFound = SkipListFind(psPmc->uData.HashTable, psKey);
 	if (!psFound)
 	{
-		return FALSE;
+		*pFound = FALSE;
+		return TRUE;
 	}
 
 	PSParrotMagicCookie psPmcFound = psFound->pValue;
@@ -572,6 +577,24 @@ PmcHashTableFind(
 	default:
 		return FALSE;
 	}
+
+	return TRUE;
+}
+
+BOOL
+PmcHashTableRemove(
+	PBYTE			pPmcRegister,
+	PCHAR			psKey,
+	PBOOL			pRemoved
+)
+{
+	PSParrotMagicCookie psPmc = pPmcRegister;
+	if (psPmc->eType != EPMCT_HASHTABLE)
+	{
+		return FALSE;
+	}
+
+	*pRemoved = SkipListRemove(psPmc->uData.HashTable, psKey);
 
 	return TRUE;
 }

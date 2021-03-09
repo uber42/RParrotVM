@@ -214,4 +214,24 @@ PasmPopHashTable(
 	PBYTE				pVirtualMemory
 );
 
+BOOL
+PasmEraseHashTable(
+	PSVirtualProcessor	psVirtualProcessor,
+	PBYTE				pCurrentInstruction,
+	PBYTE				pIndexTable
+);
+
+BOOL
+PasmChk(
+	PSVirtualProcessor	psVirtualProcessor,
+	PBYTE				pCurrentInstruction
+);
+
+BOOL
+PasmTypeof(
+	PSVirtualProcessor	psVirtualProcessor,
+	PBYTE				pCurrentInstruction
+);
+
+
 #endif

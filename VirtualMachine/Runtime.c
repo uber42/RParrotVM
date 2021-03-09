@@ -7,7 +7,7 @@ static const DWORD dwOperationStepMap[] =
 	13, 9, 13, 9, 13, 9, 9,
 	17, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0,
-	5, 5, 5, 13, 13, 9, 1, 9
+	5, 5, 5, 13, 13, 9, 1, 9, 0
 };
 
 /**
@@ -51,6 +51,8 @@ InititalizeRuntime(
 	{
 		PmcInitialize(&g_sVirtualProcessor.P[i]);
 	}
+
+	g_sVirtualProcessor.FLAG = TRUE;
 		
 	return TRUE;
 }
@@ -286,10 +288,22 @@ StartProgram()
 				g_sRuntimeContext.pHeap);
 			break;
 		case EPO_PMC_ERASE:
+			bResult = PasmEraseHashTable(
+				&g_sVirtualProcessor,
+				pCurrentInstruction + sizeof(BYTE),
+				g_sRuntimeContext.pIndexTable);
 			break;
 		case EPO_END:
 			return TRUE;
 		case EPO_TYPEOF:
+			bResult = PasmTypeof(
+				&g_sVirtualProcessor,
+				pCurrentInstruction + sizeof(BYTE));
+			break;
+		case EPO_CHK:
+			bResult = PasmChk(
+				&g_sVirtualProcessor,
+				pCurrentInstruction + sizeof(BYTE));
 			break;
 		}
 

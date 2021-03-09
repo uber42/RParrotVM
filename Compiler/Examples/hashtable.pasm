@@ -29,3 +29,18 @@ print	"\n"
 pop		N1, P1, "foo"
 print	N1
 print	"\n"
+
+erase	P0, "foo"
+pop		S2, P2, "foo"
+chk		not_found
+print	"found\n"
+
+pop		S3, P0, "foo"
+chk		not_found
+
+next:
+end
+
+not_found:
+print	"not found\n"
+branch	next

@@ -393,17 +393,26 @@ SkipListClose(
 VOID
 SkipListClone(
 	PSSkipList			psDest,
-	PSSkipList			psSrc
+	PSSkipList			psSrc,
+	DWORD				dwSize
 )
 {
 	psDest->dwCount = psSrc->dwCount;
 
 	PSList psCurrentEntry = psSrc->pHead[0].pFlink;
-	for(;psCurrentEntry != &psSrc->pHead[0];
+	for (; psCurrentEntry != &psSrc->pHead[0];
 		psCurrentEntry = psCurrentEntry->pFlink)
 	{
 		PSSkipListNode psCurretNode = CONTAINING_RECORD(
 			psCurrentEntry, SSkipListNode, pLink[0]);
-		SkipListSet(psDest, psCurretNode->pKey, psCurretNode->pValue);
+
+		PBYTE pNewEntry = malloc(dwSize);
+		if (!pNewEntry)
+		{
+			return;
+		}
+		memcpy(pNewEntry, psCurretNode->pValue, dwSize);
+
+		SkipListSet(psDest, psCurretNode->pKey, pNewEntry);
 	}
 }

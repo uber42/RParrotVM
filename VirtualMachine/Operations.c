@@ -2831,6 +2831,8 @@ PasmPopHashTable(
 	DWORD dwOperand[3];
 	memcpy(dwOperand, pCurrentInstruction, sizeof(dwOperand));
 
+	psVirtualProcessor->FLAG = TRUE;
+
 	DWORD dwSize = 0;
 	PBYTE pTargetMemory = NULL;
 	ERegisterTypes eType = RecognizeRegister(
@@ -2864,9 +2866,145 @@ PasmPopHashTable(
 		return FALSE;
 	}
 
-	return PmcHashTableFind(
+	BOOL bFound = TRUE;
+	BOOL bResult = PmcHashTableFind(
 		pPmcRegister,
 		pszKey,
 		eType,
-		pTargetMemory);
+		pTargetMemory,
+		&bFound);
+	if (!bFound)
+	{
+		psVirtualProcessor->FLAG = FALSE;
+	}
+
+	return bResult;
+}
+
+BOOL
+PasmEraseHashTable(
+	PSVirtualProcessor	psVirtualProcessor,
+	PBYTE				pCurrentInstruction,
+	PBYTE				pIndexTable
+)
+{
+	DWORD dwOperand[2];
+	memcpy(dwOperand, pCurrentInstruction, sizeof(dwOperand));
+
+	psVirtualProcessor->FLAG = TRUE;
+
+	DWORD dwPmcSize = 0;
+	PBYTE pPmcRegister = NULL;
+	ERegisterTypes eRegType = RecognizeRegister(
+		dwOperand[0],
+		psVirtualProcessor,
+		&pPmcRegister,
+		&dwPmcSize);
+	if (!eRegType || eRegType != ERT_P)
+	{
+		return FALSE;
+	}
+
+	PCHAR pszKey = ExtractString(
+		dwOperand[1],
+		psVirtualProcessor,
+		pIndexTable);
+	if (!pszKey)
+	{
+		return FALSE;
+	}
+
+	BOOL bRemoved = TRUE;
+	PmcHashTableRemove(
+		pPmcRegister,
+		pszKey,
+		&bRemoved);
+
+	if (!bRemoved)
+	{
+		psVirtualProcessor->FLAG = FALSE;
+	}
+
+	return TRUE;
+}
+
+BOOL
+PasmChk(
+	PSVirtualProcessor	psVirtualProcessor,
+	PBYTE				pCurrentInstruction
+)
+{
+	if (!psVirtualProcessor->FLAG)
+	{
+		DWORD dwMarker;
+		memcpy(&dwMarker, pCurrentInstruction, sizeof(DWORD));
+
+		psVirtualProcessor->IP = dwMarker;
+
+		psVirtualProcessor->FLAG = TRUE;
+	}
+	else
+	{
+		psVirtualProcessor->IP += 5;
+	}
+
+	return TRUE;
+}
+
+BOOL
+PasmTypeof(
+	PSVirtualProcessor	psVirtualProcessor,
+	PBYTE				pCurrentInstruction
+)
+{
+	DWORD dwOperand[2];
+	memcpy(dwOperand, pCurrentInstruction, sizeof(dwOperand));
+
+	DWORD dwSize = 0;
+	PBYTE pRegister = NULL;
+	ERegisterTypes eRegType = RecognizeRegister(
+		dwOperand[1],
+		psVirtualProcessor,
+		&pRegister,
+		&dwSize);
+	if (!eRegType || eRegType != ERT_S)
+	{
+		return FALSE;
+	}
+
+	DWORD dwPmcSize = 0;
+	PBYTE pPmcRegister = NULL;
+	eRegType = RecognizeRegister(
+		dwOperand[1],
+		psVirtualProcessor,
+		&pPmcRegister,
+		&dwPmcSize);
+	if (!eRegType || eRegType != ERT_P)
+	{
+		return FALSE;
+	}
+
+	EPmcType ePmcType = PmcGetType(pPmcRegister);
+	switch (ePmcType)
+	{
+	case EPMCT_FLOAT:
+		strcpy(pRegister, "Float");
+		break;
+	case EPMCT_INTEGER:
+		strcpy(pRegister, "Integer");
+		break;
+	case EPMCT_STRING:
+		strcpy(pRegister, "String");
+		break;
+	case EPMCT_HASHTABLE:
+		strcpy(pRegister, "Hashtable");
+		break;
+	case EPMCT_UNINITIALIZED:
+		strcpy(pRegister, "Uninitialized");
+		break;
+	default:
+		return FALSE;
+	}
+
+	return TRUE;
 }

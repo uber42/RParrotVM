@@ -119,7 +119,8 @@ SkipListClose(
 VOID
 SkipListClone(
 	PSSkipList			psDest,
-	PSSkipList			psSrc
+	PSSkipList			psSrc,
+	DWORD				dwSize
 );
 
 

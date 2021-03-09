@@ -90,7 +90,10 @@ typedef enum _EProcessorOperation
 	EPO_END,
 
 	/** Тип PMC регистра */
-	EPO_TYPEOF
+	EPO_TYPEOF,
+
+	/** Проверка выполнения последней операции */
+	EPO_CHK
 } EProcessorOperation, * PEProcessorOperation;
 
 typedef enum _EOperandTypes

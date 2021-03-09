@@ -34,7 +34,9 @@ static const SStateMahcineCommand machine_operators[] =
 
 	{ -1 ,	"end",		0x6A8E75AA },
 
-	{ 21,	"typeof",	0x9A90A8A0 }
+	{ 21,	"typeof",	0x9A90A8A0 },
+	{ 22,	"erase",	0x3C41DDD5 },
+	{ 23,	"chk",		0xF385873F }
 };
 
 static SMiddleLayerContainer tables[9] = { 0 };
@@ -122,25 +124,30 @@ static const SStateMachineTransition transition_1[] =
 	{ EMT_NUMBER_LITERAL | EMT_I | EMT_P,	{ .nNextState = 9			},		13,		1,		ENST_NUMBER,	EPO_PUSH_STACK	},		// push
 	{ REGISTERS_MASK,						{ .nNextState = 10			},		13,		1,		ENST_NUMBER,	EPO_POP_STACK	},		// pop
 
-	{ EMT_P,								{ .nNextState = -1			},		77,		1,		ENST_NUMBER,	EPO_TYPEOF		}		// typeof [PMC_REGISTER]
+	{ EMT_S,								{ .nNextState = 11			},		77,		0,		ENST_NUMBER,	0				},		// typeof	[STR_REG], [PMC_REGISTER]
+	{ EMT_P,								{ .nNextState = 12			},		77,		0,		ENST_NUMBER,	0				},		// erase	[PMC_REG], [STRING]
+	{ EMT_MARKER,							{ .nNextState = -1			},		77,		1,		ENST_NUMBER,	EPO_CHK			}		// chk		[MARKER]
 };
 
 static const SStateMachineTransition transition_2[] =
 {
-	{ PMC_TYPE_MASK,						{ .nNextState = -1 },		16,		1,		ENST_NUMBER, EPO_NEW	},				// new
+	{ PMC_TYPE_MASK,						{ .nNextState = -1 },		16,		1,		ENST_NUMBER, EPO_NEW		},		// new
 
-	{ EMT_S | EMT_STRING_LITERAL,			{ .nNextState = 8  },		17,		1,		ENST_NUMBER, EPO_LENGTH	},				// length
-	{ EMT_S | EMT_STRING_LITERAL,			{ .nNextState = -1 },		18,		1,		ENST_NUMBER, EPO_CONCAT },				// concat
-	{ EMT_S | EMT_STRING_LITERAL,			{ .nNextState = 0  },		19,		0,		ENST_NUMBER, 0			},				// substr
+	{ EMT_S | EMT_STRING_LITERAL,			{ .nNextState = 8  },		17,		1,		ENST_NUMBER, EPO_LENGTH		},		// length
+	{ EMT_S | EMT_STRING_LITERAL,			{ .nNextState = -1 },		18,		1,		ENST_NUMBER, EPO_CONCAT		},		// concat
+	{ EMT_S | EMT_STRING_LITERAL,			{ .nNextState = 0  },		19,		0,		ENST_NUMBER, 0				},		// substr
 
-	{ EMT_MARKER,							{ .nNextState = 1  },		20,		1,		ENST_NUMBER, EPO_IF_2	},				// if
-	{ REGISTERS_AND_LITERAL,				{ .nNextState = 2  },		20,		0,		ENST_NUMBER, 0			},				// ne
-	{ REGISTERS_AND_LITERAL,				{ .nNextState = 3  },		20,		0,		ENST_NUMBER, 0			},				// eq
-	{ ALL_NUMBER_MASK,						{ .nNextState = 4  },		20,		0,		ENST_NUMBER, 0			},				// gt
-	{ ALL_NUMBER_MASK,						{ .nNextState = 5  },		20,		0,		ENST_NUMBER, 0			},				// lt
-		
-	{ EMT_S | EMT_STRING_LITERAL,			{ .nNextState = 6  },		77,		0,		ENST_NUMBER, 0			},				// push
-	{ EMT_P,								{ .nNextState = 7  },		77,		0,		ENST_NUMBER, 0			}				// pop
+	{ EMT_MARKER,							{ .nNextState = 1  },		20,		1,		ENST_NUMBER, EPO_IF_2		},		// if
+	{ REGISTERS_AND_LITERAL,				{ .nNextState = 2  },		20,		0,		ENST_NUMBER, 0				},		// ne
+	{ REGISTERS_AND_LITERAL,				{ .nNextState = 3  },		20,		0,		ENST_NUMBER, 0				},		// eq
+	{ ALL_NUMBER_MASK,						{ .nNextState = 4  },		20,		0,		ENST_NUMBER, 0				},		// gt
+	{ ALL_NUMBER_MASK,						{ .nNextState = 5  },		20,		0,		ENST_NUMBER, 0				},		// lt
+			
+	{ EMT_S | EMT_STRING_LITERAL,			{ .nNextState = 6  },		77,		0,		ENST_NUMBER, 0				},		// push
+	{ EMT_P,								{ .nNextState = 7  },		77,		0,		ENST_NUMBER, 0				},		// pop
+
+	{ EMT_P,								{ .nNextState = -1 },		77,		1,		ENST_NUMBER, EPO_TYPEOF		},		// typeof
+	{ EMT_S | EMT_STRING_LITERAL,			{ .nNextState = -1 },		77,		1,		ENST_NUMBER, EPO_PMC_ERASE	}		// erase
 };
 
 static const SStateMachineTransition transition_3[] =

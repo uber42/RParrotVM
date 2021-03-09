@@ -165,7 +165,15 @@ PmcHashTableFind(
 	PBYTE			pPmcRegister,
 	PCHAR			psKey,
 	ERegisterTypes	eInsertType,
-	PBYTE			pElemMemory
+	PBYTE			pElemMemory,
+	PBOOL			pFound
+);
+
+BOOL
+PmcHashTableRemove(
+	PBYTE			pPmcRegister,
+	PCHAR			psKey,
+	PBOOL			pRemoved
 );
 
 
