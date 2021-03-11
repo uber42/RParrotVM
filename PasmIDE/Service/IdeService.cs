@@ -4,6 +4,8 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.ComponentModel;
 using System.Windows.Forms;
+using PasmIDE.Helpers;
+using System.Security.AccessControl;
 
 namespace PasmIDE.Service
 {
@@ -32,7 +34,7 @@ namespace PasmIDE.Service
             set;
         }
 
-        public Mutex hSendEvent
+        public EventWaitHandle hSendEvent
         {
             get;
             set;
@@ -84,12 +86,12 @@ namespace PasmIDE.Service
         }
 
         static readonly string SHARED_MEMORY_NAME = "PasmIdeSharedMemory";
-        static readonly string RECV_EVENT_NAME = "PasmIdeRecvEvent";
-        static readonly string SEND_EVENT_NAME = "PasmIdeSendEvent";
+        static readonly string RECV_EVENT_NAME = "Global\\PasmIdeRecvEvent";
+        static readonly string SEND_EVENT_NAME = "Global\\PasmIdeSendEvent";
 
         private MemoryMappedFile hSharedMemory;
         private EventWaitHandle hRecvEvent;
-        private Mutex hSendEvent;
+        private EventWaitHandle hSendEvent;
         private BackgroundWorker hThread;
 
         public IdeService()
@@ -102,7 +104,7 @@ namespace PasmIDE.Service
             int size = Marshal.SizeOf(typeof(IdeMessage));
             hSharedMemory = MemoryMappedFile.CreateNew(SHARED_MEMORY_NAME, size);
             hRecvEvent = new EventWaitHandle(false, EventResetMode.AutoReset, RECV_EVENT_NAME);
-            hSendEvent = new Mutex(false, SEND_EVENT_NAME);
+            hSendEvent = new EventWaitHandle(false, EventResetMode.AutoReset, SEND_EVENT_NAME);
 
             ThreadArg arg = new ThreadArg();
             arg.hSendEvent = hSendEvent;
@@ -129,11 +131,10 @@ namespace PasmIDE.Service
                 {
                     WaitHandle.WaitAny(new WaitHandle[] { context.hRecvEvent });
 
+                    IdeMessage ideMessage;
                     int size = Marshal.SizeOf(typeof(IdeMessage));
                     using (var accessor = context.hSharedMemory.CreateViewAccessor())
                     {
-                        IdeMessage ideMessage;
-
                         byte[] data = new byte[size];
                         accessor.ReadArray(0, data, 0, size);
 
@@ -143,25 +144,24 @@ namespace PasmIDE.Service
                         ideMessage = (IdeMessage)Marshal.PtrToStructure(p, typeof(IdeMessage));
 
                         Marshal.FreeHGlobal(p);
-
-                        string message = HandleIdeMessage(ideMessage);
-                        if (message == null)
-                        {
-                            continue;
-                        }
-
-                        context.listBox.Invoke((MethodInvoker)delegate
-                        {
-                            context.listBox.Items.Add(message);
-                        });
-
-                        context.hSendEvent.ReleaseMutex();
                     }
+
+                    string message = HandleIdeMessage(ideMessage);
+                    if (message == null)
+                    {
+                        continue;
+                    }
+
+                    context.hSendEvent.Set();
+
+                    context.listBox.Invoke((MethodInvoker)delegate
+                    {
+                        context.listBox.Items.Add(message);
+                    });
                 }
-                catch
+                catch (Exception ex)
                 {
-                    context.hSendEvent.ReleaseMutex();
-                    return;
+                    continue;
                 }
             }
         }

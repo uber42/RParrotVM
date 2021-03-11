@@ -100,10 +100,6 @@ namespace PasmIDE
                 EnableRaisingEvents = true
             };
             process.Start();
-
-            process.WaitForExit();
-
-            int code = process.ExitCode;
         }
     }
 }

@@ -1,8 +1,8 @@
 #include "global.h"
 
 #define SHARED_MEMORY_NAME  TEXT("PasmIdeSharedMemory")
-#define RECV_EVENT_NAME		TEXT("PasmIdeRecvEvent")
-#define SEND_EVENT_NAME		TEXT("PasmIdeSendEvent")
+#define RECV_EVENT_NAME		TEXT("Global\\PasmIdeRecvEvent")
+#define SEND_EVENT_NAME		TEXT("Global\\PasmIdeSendEvent")
 
 typedef struct _SIdeMessage
 {
@@ -71,7 +71,7 @@ InitializeIdeApi()
 		return FALSE;
 	}
 
-	g_hSendEvent = OpenMutex(MUTEX_ALL_ACCESS, TRUE, SEND_EVENT_NAME);
+	g_hSendEvent = OpenEvent(EVENT_ALL_ACCESS, TRUE, SEND_EVENT_NAME);
 	if (!g_hSendEvent)
 	{
 		CloseHandle(g_hRecvEvent);
@@ -107,20 +107,28 @@ ThreadRoutine(
 	{
 		DWORD dwSize = 0;
 		SIdeMessage sIdeMessage = { 0 };
-		ReceiveMessageChannel(
+		DWORD dwResult = ReceiveMessageChannel(
 			g_hMessageQueue,
 			&sIdeMessage,
 			&dwSize);
+		if (dwResult == MESSAGE_CHANNEL_BAD_RESULT)
+		{
+			return 0;
+		}
 
 		memcpy(g_psMsgBuffer, &sIdeMessage, sizeof(SIdeMessage));
 
 		BOOL bResult = SetEvent(g_hRecvEvent);
 		if (!bResult)
 		{
-			return FALSE;
+			return 0;
 		}
 
-		WaitForSingleObject(g_hSendEvent, INFINITE);
+		DWORD dwWaitRes = WaitForSingleObject(g_hSendEvent, INFINITE);
+		if (dwWaitRes != WAIT_OBJECT_0)
+		{
+			return 0;
+		}
 	}
 }
 

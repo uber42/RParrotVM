@@ -49,6 +49,7 @@
   <ItemGroup>
     <Compile Include="Helpers\FormDragLogic.cs" />
     <Compile Include="Helpers\IniFile.cs" />
+    <Compile Include="Helpers\UnmanagedMutex.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
