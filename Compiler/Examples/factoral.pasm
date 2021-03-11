@@ -22,10 +22,13 @@ main:
     push I1
     set I1, 1
 
-    push 8
+    set I3, 15
+
+    push I3
     bsr factorial
 
-    print "8! = "
+    print I3
+    print "! = "
     print I1
     print "\n"
 

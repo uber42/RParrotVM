@@ -100,6 +100,7 @@ LoadProgram(
 BOOL
 StartProgram()
 {
+	DWORD dwInstNumber = 1;
 	for (; g_sRuntimeContext.pInstruction + g_sVirtualProcessor.IP < g_sRuntimeContext.pHeap;)
 	{
 		PBYTE pCurrentInstruction = g_sRuntimeContext.pInstruction + g_sVirtualProcessor.IP;
@@ -309,11 +310,16 @@ StartProgram()
 
 		if (!bResult)
 		{
+			CHAR szMessage[STRING_MAX_LENGTH];
+			sprintf(szMessage, "Строка №%d", dwInstNumber);
+
+			IdeApiSendMessage(EIAMT_RUNTIME_ERROR, szMessage);
 			return FALSE;
 		}
 
 		DWORD dwNumber = (DWORD)eOperation;
 		g_sVirtualProcessor.IP += dwOperationStepMap[dwNumber];
+		dwInstNumber++;
 	}
 
 	return TRUE;

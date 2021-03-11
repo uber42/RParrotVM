@@ -1,39 +1,39 @@
 new		P0, .Hashtable
-push	P0, "foo", 1
-push	P0, "bar", "foo"
+push  	P0, "foo", 1
+push  	P0, "bar", "foo"
 
 pop		I0, P0, "foo"
 print	I0
 print	"\n"
 
 pop		S0, P0, "bar"
-print	S0
-print	"\n"
+print 	S0
+print 	"\n"
 
 # =====================================
 
 new		P1, .Hashtable
-push	P1, "hashtable", P0
-push	P1, "foo", 2.5
+push  	P1, "hashtable", P0
+push  	P1, "foo", 2.5
 
 pop		P2, P1, "hashtable"
 
 pop		I0, P2, "foo"
-print	I0
-print	"\n"
+print 	I0
+print 	"\n"
 
 pop		S0, P2, "bar"
-print	S0
-print	"\n"
+print 	S0
+print 	"\n"
 
 pop		N1, P1, "foo"
-print	N1
-print	"\n"
+print 	N1
+print 	"\n"
 
-erase	P0, "foo"
+erase 	P0, "foo"
 pop		S2, P2, "foo"
 chk		not_found
-print	"found\n"
+print 	"found\n"
 
 pop		S3, P0, "foo"
 chk		not_found
@@ -42,5 +42,5 @@ next:
 end
 
 not_found:
-print	"not found\n"
+print 	"not found\n"
 branch	next

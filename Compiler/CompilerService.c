@@ -74,6 +74,7 @@ CompilerServiceStart()
 	bResult = SaveBytecodeToFile(hCompiler, "./bytecode.bin");
 	if (!bResult)
 	{
+		IdeApiSendMessage(EIAMT_ERROR, "Ошибка сохранения файла");
 		CloseCompiler(hCompiler);
 		return FALSE;
 	}

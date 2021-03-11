@@ -1,34 +1,24 @@
 #include "global.h"
+#include <conio.h>
 
 
-
-int main()
+int main(int argc, char* argv[])
 {
-	BOOL bResult = InititalizeRuntime(
-		0x140000,
-		0x020000,
-		0x040000
-	);
+	BOOL bResult = InitializeVmService(argc, argv);
 	if (!bResult)
 	{
 		ExitProcess(-1);
 	}
 
-	bResult = LoadProgram("../Compiler/Bytecode.bin");
+	bResult = VmServiceStart();
 	if (!bResult)
 	{
-		DeinitializeRuntime();
+		DeinitializeVmService();
 		ExitProcess(-1);
 	}
 
-	bResult = StartProgram();
-	if (!bResult)
-	{
-		DeinitializeRuntime();
-		ExitProcess(-1);
-	}
+	DeinitializeVmService();
 
-	DeinitializeRuntime();
-
-	system("PAUSE");
+	_getch();
+	ExitProcess(0);
 }

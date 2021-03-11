@@ -12,6 +12,7 @@ namespace PasmIDE.Service
     enum EIdeApiMessageType
     {
         EIAMT_INFO,
+        EIAMT_ERROR,
         EIAMT_LEXICAL_ERROR,
         EIAMT_SYNTACTIC_ERROR,
         EIAMT_RUNTIME_ERROR
@@ -66,6 +67,9 @@ namespace PasmIDE.Service
             {
                 case EIdeApiMessageType.EIAMT_INFO:
                     result += "Информация: ";
+                    break;
+                case EIdeApiMessageType.EIAMT_ERROR:
+                    result += "Ошибка: ";
                     break;
                 case EIdeApiMessageType.EIAMT_LEXICAL_ERROR:
                     result += "Лексическая ошибка: ";

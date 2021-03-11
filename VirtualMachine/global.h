@@ -14,6 +14,7 @@
 
 #define STRING_MAX_LENGTH	256
 
+#include "../VirtualContext//IdeAPI.h"
 #include "../VirtualContext/Defenitions.h"
 #include "../VirtualContext/HashTable.h"
 #include "../VirtualContext/PMC.h"
@@ -21,5 +22,6 @@
 
 #include "Operations.h"
 #include "Runtime.h"
+#include "VmService.h"
 
 #endif

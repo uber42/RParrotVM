@@ -80,7 +80,7 @@ namespace PasmIDE
 
         private void VmPath_Click(object sender, EventArgs e)
         {
-            if (codeOpenDialog.ShowDialog() == DialogResult.OK)
+            if (exeFileDialog.ShowDialog() == DialogResult.OK)
             {
                 sVirtualMachinePath = exeFileDialog.FileName;
             }
@@ -88,12 +88,39 @@ namespace PasmIDE
 
         private void CompileButton_Click(object sender, EventArgs e)
         {
+            if (sCompilerPath == null || sCurrentFilePath == null)
+            {
+                return;
+            }
+
             Process process = new Process
             {
                 StartInfo = new System.Diagnostics.ProcessStartInfo
                 {
                     FileName = sCompilerPath,
                     Arguments = $"\"{sCurrentFilePath}\" -IDE",
+                    UseShellExecute = false,
+                    WindowStyle = System.Diagnostics.ProcessWindowStyle.Normal
+                },
+                EnableRaisingEvents = true
+            };
+            process.Start();
+        }
+
+        private void ExecuteButton_Click(object sender, EventArgs e)
+        {
+            if(sVirtualMachinePath == null)
+            {
+                return;
+            }
+
+            string currentDir = Directory.GetCurrentDirectory();
+            Process process = new Process
+            {
+                StartInfo = new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = sVirtualMachinePath,
+                    Arguments = $"\"{currentDir}\\bytecode.bin\" -IDE",
                     UseShellExecute = false,
                     WindowStyle = System.Diagnostics.ProcessWindowStyle.Normal
                 },

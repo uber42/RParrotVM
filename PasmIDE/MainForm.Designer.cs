@@ -135,6 +135,7 @@
             this.executeButton.Size = new System.Drawing.Size(20, 20);
             this.executeButton.TabIndex = 16;
             this.executeButton.UseVisualStyleBackColor = true;
+            this.executeButton.Click += new System.EventHandler(this.ExecuteButton_Click);
             // 
             // compileButton
             // 
