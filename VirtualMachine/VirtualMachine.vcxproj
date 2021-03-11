@@ -133,11 +133,13 @@
     <ClCompile Include="main.c" />
     <ClCompile Include="Operations.c" />
     <ClCompile Include="Runtime.c" />
+    <ClCompile Include="VmService.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="global.h" />
     <ClInclude Include="Operations.h" />
     <ClInclude Include="Runtime.h" />
+    <ClInclude Include="VmService.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

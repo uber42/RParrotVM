@@ -133,6 +133,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Compiler.h" />
+    <ClInclude Include="CompilerService.h" />
     <ClInclude Include="global.h" />
     <ClInclude Include="Lexer.h" />
     <ClInclude Include="LexerTest.h" />
@@ -142,6 +143,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Compiler.c" />
+    <ClCompile Include="CompilerService.c" />
     <ClCompile Include="Lexer.c" />
     <ClCompile Include="LexerTest.c" />
     <ClCompile Include="main.c" />

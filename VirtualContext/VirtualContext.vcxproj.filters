@@ -13,6 +13,12 @@
     <Filter Include="Core\HashTable">
       <UniqueIdentifier>{185675bc-113b-4ded-a54d-cb317e05160e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="API">
+      <UniqueIdentifier>{d77ac5ca-47bd-4b5d-90ec-055187421b1f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tools">
+      <UniqueIdentifier>{1da85db1-54db-4fb0-be54-0b1a5e1b64cc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Fnv1a.h">
@@ -34,6 +40,12 @@
     <ClInclude Include="Defenitions.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="IdeAPI.h">
+      <Filter>API</Filter>
+    </ClInclude>
+    <ClInclude Include="MessageQueue.h">
+      <Filter>Tools</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Fnv1a.c">
@@ -47,6 +59,12 @@
     </ClCompile>
     <ClCompile Include="HashTable.c">
       <Filter>Core\HashTable</Filter>
+    </ClCompile>
+    <ClCompile Include="IdeAPI.c">
+      <Filter>API</Filter>
+    </ClCompile>
+    <ClCompile Include="MessageQueue.c">
+      <Filter>Tools</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

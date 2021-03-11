@@ -16,6 +16,9 @@
     </ClInclude>
     <ClInclude Include="Token.h" />
     <ClInclude Include="Compiler.h" />
+    <ClInclude Include="CompilerService.h">
+      <Filter>Service</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.c" />
@@ -32,6 +35,9 @@
       <Filter>StateMachine</Filter>
     </ClCompile>
     <ClCompile Include="Compiler.c" />
+    <ClCompile Include="CompilerService.c">
+      <Filter>Service</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Lexer">
@@ -39,6 +45,9 @@
     </Filter>
     <Filter Include="StateMachine">
       <UniqueIdentifier>{0ef28495-2a23-48d0-9b7c-44407e53ecdc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Service">
+      <UniqueIdentifier>{4a3464dd-5878-466e-9a07-0e32b14eb5a5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

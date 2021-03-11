@@ -8,6 +8,9 @@
     <ClCompile Include="Operations.c">
       <Filter>Runtime</Filter>
     </ClCompile>
+    <ClCompile Include="VmService.c">
+      <Filter>Service</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="global.h" />
@@ -17,10 +20,16 @@
     <ClInclude Include="Operations.h">
       <Filter>Runtime</Filter>
     </ClInclude>
+    <ClInclude Include="VmService.h">
+      <Filter>Service</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Runtime">
       <UniqueIdentifier>{87a0b7ac-5c86-43de-8756-27c228a8552f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Service">
+      <UniqueIdentifier>{d85f186b-ee88-4550-b920-0e24c33250d3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

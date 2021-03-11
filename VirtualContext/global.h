@@ -11,9 +11,14 @@
 #include "List.h"
 #include "Fnv1a.h"
 
+#include "MessageQueue.h"
+
 #include "Defenitions.h"
 #include "HashTable.h"
 #include "PMC.h"
 #include "VirtualContext.h"
+
+
+#include "IdeAPI.h"
 
 #endif

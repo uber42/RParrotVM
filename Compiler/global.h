@@ -19,11 +19,14 @@
 #include "../VirtualContext/HashTable.h"
 #include "../VirtualContext/PMC.h"
 #include "../VirtualContext/VirtualContext.h"
+#include "../VirtualContext/IdeAPI.h"
 
 #include "Token.h"
 #include "Lexer.h"
 #include "StateMachine.h"
 #include "Compiler.h"
+
+#include "CompilerService.h"
 
 #include "LexerTest.h"
 #include "StateMachineTest.h"

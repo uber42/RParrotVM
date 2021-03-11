@@ -178,6 +178,7 @@ ReadAssemblerLines(
 		BOOL bResult = PrepareCommand(szBuffer, &sLexemeContainer);
 		if (!bResult)
 		{
+			IdeApiSendMessage(EIAMT_LEXICAL_ERROR, szBuffer);
 			bSuccess = FALSE;
 			break;
 		}
@@ -189,6 +190,7 @@ ReadAssemblerLines(
 		bResult = HandleLexemes(psCompilerContext, &sLexemeContainer, &dwOffset);
 		if (!bResult)
 		{
+			IdeApiSendMessage(EIAMT_SYNTACTIC_ERROR, szBuffer);
 			bSuccess = FALSE;
 			break;
 		}

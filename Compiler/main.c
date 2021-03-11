@@ -1,32 +1,23 @@
 #include "global.h"
 
+static char* test_argv[] = { "", "C:\\Users\\uber42\\source\\repos\\Parrot\\Compiler\\Examples\\hashtable.pasm", "-IDE" };
 
 
-
-int main()
+int main(int argc, char *argv[])
 {
-	COMPILER hCompiler = NULL;
-	BOOL bResult = CreateCompiler(
-		&hCompiler, ".\\Examples\\hashtable.pasm");
+	BOOL bResult = InitializeCompilerService(3, test_argv);
 	if (!bResult)
 	{
 		ExitProcess(-1);
 	}
 
-	bResult = CompileProgram(hCompiler);
+	bResult = CompilerServiceStart();
 	if (!bResult)
 	{
-		CloseCompiler(hCompiler);
+		DeinitializeCompilerService();
 		ExitProcess(-1);
 	}
 
-	bResult = SaveBytecodeToFile(hCompiler, "./Bytecode.bin");
-	if (!bResult)
-	{
-		CloseCompiler(hCompiler);
-		ExitProcess(-1);
-	}
-
-	CloseCompiler(hCompiler);
-	return 0;
+	DeinitializeCompilerService();
+	ExitProcess(0);
 }

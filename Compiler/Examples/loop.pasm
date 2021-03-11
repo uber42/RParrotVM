@@ -1,4 +1,4 @@
-    print "begin\n"
+    print "begin :)\n"
     set I0, 0
 loop:
     print I0
