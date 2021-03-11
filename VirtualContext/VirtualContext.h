@@ -1,7 +1,9 @@
 ﻿#ifndef VIRTUAL_CONTEXT_H
 #define VIRTUAL_CONTEXT_H
 
-
+#ifdef __cplusplus
+extern "C"
+#endif
 
 /**
  * Структура виртуального процессора Parrot

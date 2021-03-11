@@ -54,9 +54,6 @@
     <ClCompile Include="PMC.c">
       <Filter>Core\ParrotMagicCookie</Filter>
     </ClCompile>
-    <ClCompile Include="VirtualContext.c">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="HashTable.c">
       <Filter>Core\HashTable</Filter>
     </ClCompile>
