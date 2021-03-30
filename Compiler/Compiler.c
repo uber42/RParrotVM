@@ -265,7 +265,7 @@ CompileAssembler(
 						dwOffset = psMarker->dwOffset;
 						break;
 					}
-				}
+				}    
 
 				if (dwOffset == (DWORD)-1)
 				{

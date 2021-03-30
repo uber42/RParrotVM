@@ -1,4 +1,4 @@
-#ifndef IDE_API_H
+﻿#ifndef IDE_API_H
 #define IDE_API_H
 
 typedef enum _EIdeApiMessageType

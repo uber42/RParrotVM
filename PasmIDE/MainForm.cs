@@ -128,5 +128,10 @@ namespace PasmIDE
             };
             process.Start();
         }
+
+        private void SaveSetting_Click(object sender, EventArgs e)
+        {
+            messageList.Items.Clear();
+        }
     }
 }

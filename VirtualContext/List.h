@@ -1,6 +1,10 @@
 #ifndef LIST_H
 #define LIST_H
 
+#ifdef __cplusplus
+extern "C"
+#endif
+
 typedef struct _SList
 {
 	struct _SList* pFlink;

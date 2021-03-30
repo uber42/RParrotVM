@@ -1,4 +1,4 @@
-#include "global.h"
+﻿#include "global.h"
 
 #define SHARED_MEMORY_NAME  TEXT("PasmIdeSharedMemory")
 #define RECV_EVENT_NAME		TEXT("Global\\PasmIdeRecvEvent")

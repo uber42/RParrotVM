@@ -22,7 +22,7 @@ main:
     push I1
     set I1, 1
 
-    set I3, 15
+    set I3, 8
 
     push I3
     bsr factorial

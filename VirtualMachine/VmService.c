@@ -1,4 +1,4 @@
-#include "global.h"
+п»ї#include "global.h"
 
 static BOOL		g_bIde = FALSE;
 static CHAR		g_szFilePath[MAX_PATH] = { 0 };
@@ -63,16 +63,16 @@ VmServiceStart()
 		return FALSE;
 	}
 	
-	IdeApiSendMessage(EIAMT_INFO, "Загрузка программы в адресное пространство ВМ");
+	IdeApiSendMessage(EIAMT_INFO, "Р—Р°РіСЂСѓР·РєР° РїСЂРѕРіСЂР°РјРјС‹ РІ Р°РґСЂРµСЃРЅРѕРµ РїСЂРѕСЃС‚СЂР°РЅСЃС‚РІРѕ Р’Рњ");
 	bResult = LoadProgram(g_szFilePath);
 	if (!bResult)
 	{
-		IdeApiSendMessage(EIAMT_ERROR, "Ошибка открытия файла программы");
+		IdeApiSendMessage(EIAMT_ERROR, "РћС€РёР±РєР° РѕС‚РєСЂС‹С‚РёСЏ С„Р°Р№Р»Р° РїСЂРѕРіСЂР°РјРјС‹");
 		DeinitializeRuntime();
 		return FALSE;
 	}
 
-	IdeApiSendMessage(EIAMT_INFO, "Запуск программы");
+	IdeApiSendMessage(EIAMT_INFO, "Р—Р°РїСѓСЃРє РїСЂРѕРіСЂР°РјРјС‹");
 	bResult = StartProgram();
 	if (!bResult)
 	{
@@ -80,7 +80,7 @@ VmServiceStart()
 		return FALSE;
 	}
 
-	IdeApiSendMessage(EIAMT_INFO, "Выполнение программы закончено");
+	IdeApiSendMessage(EIAMT_INFO, "Р’С‹РїРѕР»РЅРµРЅРёРµ РїСЂРѕРіСЂР°РјРјС‹ Р·Р°РєРѕРЅС‡РµРЅРѕ");
 	DeinitializeRuntime();
 
 	return TRUE;

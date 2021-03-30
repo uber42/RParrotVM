@@ -111,6 +111,7 @@
             this.saveSetting.Size = new System.Drawing.Size(20, 20);
             this.saveSetting.TabIndex = 18;
             this.saveSetting.UseVisualStyleBackColor = true;
+            this.saveSetting.Click += new System.EventHandler(this.SaveSetting_Click);
             // 
             // compileAndRun
             // 

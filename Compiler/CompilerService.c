@@ -1,4 +1,4 @@
-#include "global.h"
+п»ї#include "global.h"
 
 
 static BOOL		g_bIde = FALSE;
@@ -62,23 +62,23 @@ CompilerServiceStart()
 		return FALSE;
 	}
 
-	IdeApiSendMessage(EIAMT_INFO, "Начало сборки");
+	IdeApiSendMessage(EIAMT_INFO, "РќР°С‡Р°Р»Рѕ СЃР±РѕСЂРєРё");
 	bResult = CompileProgram(hCompiler);
 	if (!bResult)
 	{
 		CloseCompiler(hCompiler);
 		return FALSE;
 	}
-	IdeApiSendMessage(EIAMT_INFO, "Сборка окончена");
+	IdeApiSendMessage(EIAMT_INFO, "РЎР±РѕСЂРєР° РѕРєРѕРЅС‡РµРЅР°");
 
 	bResult = SaveBytecodeToFile(hCompiler, "./bytecode.bin");
 	if (!bResult)
 	{
-		IdeApiSendMessage(EIAMT_ERROR, "Ошибка сохранения файла");
+		IdeApiSendMessage(EIAMT_ERROR, "РћС€РёР±РєР° СЃРѕС…СЂР°РЅРµРЅРёСЏ С„Р°Р№Р»Р°");
 		CloseCompiler(hCompiler);
 		return FALSE;
 	}
-	IdeApiSendMessage(EIAMT_INFO, "Файл сохранен");
+	IdeApiSendMessage(EIAMT_INFO, "Р¤Р°Р№Р» СЃРѕС…СЂР°РЅРµРЅ");
 
 	CloseCompiler(hCompiler);
 	return TRUE;

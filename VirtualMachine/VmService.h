@@ -1,4 +1,4 @@
-#ifndef VM_SERVICE_H
+﻿#ifndef VM_SERVICE_H
 #define VM_SERVICE_H
 
 

@@ -4,7 +4,7 @@ loop:
     print I0
     print "\n"
 
-    inc I0
+    inc S0
     gt I0, 10, out, loop
 out:
     print "end of program\n"

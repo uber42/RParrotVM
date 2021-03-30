@@ -1,4 +1,4 @@
-#include "global.h"
+﻿#include "global.h"
 
 #define OPERAND_CUT_MASK		0x7C000000
 #define NUMBER_CUT_MASK			0x03FFFFFF
